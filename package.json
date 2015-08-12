@@ -1,8 +1,9 @@
 {
-  "name": "hack.chat-desktop",
-  "version": "0.1.0",
-  "main": "main.js",
-  "devDependencies": {
-    "fs": "0.0.2"
-  }
+    "name": "hack.chat-desktop",
+    "version": "0.1.0",
+    "main": "main.js",
+    "devDependencies": {
+        "fs": "0.0.2",
+        "electron-prebuilt": "0.30.4"
+    }
 }
