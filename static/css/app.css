@@ -1,0 +1,21 @@
+ header,
+ main,
+ footer {
+     padding-left: 290px;
+ }
+ @media only screen and (max-width: 992px) {
+     header,
+     main,
+     footer {
+         padding-left: 0;
+     }
+ }
+ #sidemenu li > p {
+     cursor: default;
+     padding: 10px 0px;
+ }
+ .channel form {
+     bottom: 0;
+     position: fixed;
+     width: 100%;
+ }

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>hack.chat</title>
+    <link href="static/css/materialize.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="static/css/app.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <div class="row fixed">
+            <ul id="channels-tabs" class="tabs">
+                <li class="tab disabled col s1" style="visibility:hidden;">
+                    <a href="#"></a>
+                </li>
+            </ul>
+        </div>
+    </header>
+    <ul id="sidemenu" class="side-nav fixed">
+        <li style="font-size: 10px;line-height: 12px; font-weight:bold;">
+            <pre style="overflow:hidden;"> _           _         _       _   
+| |_ ___ ___| |_   ___| |_ ___| |_
+|   |_ ||  _| '_| |  _|   |_ ||  _| 
+|_|_|__/|___|_,_|.|___|_|_|__/|_|</pre>
+        </li>
+        <li class="addChannel">
+            <form class="inputprompt">
+                <button class="btn waves-effect waves-light" type="button">
+                    <img width="16" height="16" src="static/img/plug.png">Join Channel
+                </button>
+                <div class="input-field">
+                    <input type="text" style="display:none;" class="validate" placeholder="Channel Name">
+                </div>
+            </form>
+        </li>
+        <li>
+            <p>Favourite Channels</p>
+        </li>
+        <ul id="favourites">
+        </ul>
+    </ul>
+    <main id="container">
+        <div id="channels">
+        </div>
+    </main>
+    <div id="nickPrompt" class="modal" style="display:none;">
+        <div class="modal-content">
+            <h4>Enter a nickname</h4>
+            <form>
+                <div class="input-field">
+                    <input type="text" class="validate" placeholder="nick[#password] (ex: bob#isadick)">
+                </div>
+                <input type="checkbox" id="forAll">
+                <label for="forAll">Use this nick for all channels</label>
+                <button type="submit">Join channel</button>
+            </form>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script src="static/js/materialize.min.js"></script>
+</body>
+
+</html>
