@@ -1,6 +1,7 @@
 exports.Channel = function (name, nickName) {
     this.name = name;
     this.nick = nickName;
+    this.users = {};
     var that = this;
     var ws = new WebSocket("wss://hack.chat/chat-ws");
     this.send = function (arg) {
@@ -21,8 +22,18 @@ exports.Channel = function (name, nickName) {
         });
     };
     ws.onmessage = function (message) {
-        console.log(message);
+        console.log(message.data);
         var args = JSON.parse(message.data);
+        if(!that.users[args.nick]){
+          users[args.nick] = args.trip||"";
+        }
+        if(args.nicks){
+          args.nicks.forEach(function (nick) {
+            if(!that.users[nick]){
+              users[nick] = "";
+            }
+          });
+        }
         exports.Channel.messageReceived.call(that, args);
     };
     this.sendMessage = function (message) {
@@ -33,4 +44,6 @@ exports.Channel = function (name, nickName) {
     }
 };
 
-exports.Channel.messageReceived = null;
+exports.Channel.messageReceived = function (args) {
+  //the object this is the channel that received the message
+};

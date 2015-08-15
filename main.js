@@ -18,54 +18,74 @@ require('crash-reporter').start();
 var mainWindow = null;
 
 // Quit when all windows are closed.
-app.on('window-all-closed', function () {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform != 'darwin') {
-        app.quit();
-    }
+app.on('window-all-closed', function() {
+  // On OS X it is common for applications and their menu bar
+  // to stay active until the user quits explicitly with Cmd + Q
+  if (process.platform != 'darwin') {
+    app.quit();
+  }
 });
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 
-ipc.on("join", function (event, channel) {
-    event.sender.send("openChannel", channel);
+ipc.on("join", function(event, channel) {
+  event.sender.send("openChannel", channel);
 });
 
-ipc.on("setNick", function (event, nick) {
-    config.setNickName(nick);
-    myNick = nick;
+ipc.on("setNick", function(event, nick) {
+  config.setNickName(nick);
+  myNick = nick;
 });
 
-ipc.on("askForNick", function (event) {
-    if (myNick !== null) {
-        event.returnValue = null;
-    } else {
-        event.returnValue = myNick;
-    }
+ipc.on("askForNick", function(event) {
+  if (myNick !== null) {
+    event.returnValue = null;
+  } else {
+    event.returnValue = myNick;
+  }
 });
 
-app.on('ready', function () {
-    // Create the browser window.
-    mainWindow = new BrowserWindow({
-        width: 1900,
-        height: 1080
-    });
+ipc.on("close", function(event) {
+  mainWindow.close();
+});
 
-    Menu.setApplicationMenu(null);
+ipc.on("minimize", function(event) {
+  mainWindow.minimize();
+});
 
-    // and load the index.html of the app.
-    mainWindow.loadUrl('file://' + __dirname + '/index.html');
+ipc.on("fullscreen", function(event) {
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize()
+  } else {
+    mainWindow.maximize();
+  }
+});
 
-    // Open the devtools.
-    mainWindow.openDevTools();
+app.on('ready', function() {
+  // Create the browser window.
+  mainWindow = new BrowserWindow({
+    width: 1280,
+    height: 720,
+    frame: false,
+    icon:"./static/img/icon128.png",
+    "min-width":800,
+    "min-height":600
+  });
 
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function () {
-        // Dereference the window object, usually you would store windows
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
-        mainWindow = null;
-    });
+  Menu.setApplicationMenu(null);
+
+  // and load the index.html of the app.
+  mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  mainWindow.flashFrame(true);
+  // Open the devtools.
+  mainWindow.openDevTools();
+
+  // Emitted when the window is closed.
+  mainWindow.on('closed', function() {
+    // Dereference the window object, usually you would store windows
+    // in an array if your app supports multi windows, this is the time
+    // when you should delete the corresponding element.
+    mainWindow = null;
+  });
 });

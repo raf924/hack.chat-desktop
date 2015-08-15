@@ -1,21 +1,102 @@
- header,
- main,
- footer {
-     padding-left: 290px;
- }
- @media only screen and (max-width: 992px) {
-     header,
-     main,
-     footer {
-         padding-left: 0;
-     }
- }
- #sidemenu li > p {
-     cursor: default;
-     padding: 10px 0px;
- }
- .channel form {
-     bottom: 0;
-     position: fixed;
-     width: 100%;
- }
+body {
+  position: absolute;
+  width: 100%;
+}
+main#container {
+  margin-top: 5em;
+  top: 0;
+  position: fixed;
+  height: 100%;
+  overflow-y: visible;
+}
+header, main, footer {
+  padding-left: 290px;
+}
+@media only screen and (max-width: 992px) {
+  header, main {
+    padding-left: 0;
+  }
+  main {
+    padding-left: 10%;
+    padding-right: 10%;
+  }
+  #input_container.row {
+    padding-left: 1%;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    max-height: 20%;
+  }
+}
+.button-collapse {
+  font-size: 3em;
+}
+header {
+  max-height: 20%;
+  padding-top: 24px;
+}
+#sidemenu li > (p, h4) {
+  cursor: default;
+  padding: 10px 0px;
+}
+#sidemenu, #users {
+  padding-top: 1em;
+}
+#sidemenu, #settings {
+  opacity: 1;
+  z-index: 1000;
+  -webkit-perspective: 1000px;
+}
+#sidemenu {
+  -webkit-transform: rotateY(0deg);
+}
+#settings {
+  -webkit-transform: rotateY(-180deg);
+}
+#sidemenu.flipped, #settings.flipped {
+  -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
+}
+#sidemenu.flipped {
+  -webkit-transform: rotateY(180deg);
+  opacity: 0;
+}
+#settings.flipped {
+  z-index: 1001;
+  -webkit-transform: rotateY(0deg);
+}
+#users {
+  left: -250px;
+}
+.channel form {
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+}
+.messages {
+  overflow-y: visible;
+  width: 100%;
+  max-height: 71%;
+  position: absolute;
+}
+#input_container.row {
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  min-height: 11%;
+}
+.titlebar {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+.brand {
+  font-size: 10px;
+  line-height: 12px;
+  font-weight: bold;
+  -webkit-user-select: none;
+  cursor: default;
+}
+form#send #textfield {
+  overflow-y: visible;
+}

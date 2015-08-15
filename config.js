@@ -11,6 +11,7 @@ if (!fs.existsSync("./data.json")) {
     config = {
         vars: {}
     };
+    save();
 } else {
     var buffer = fs.readFileSync("./data.json", "utf-8");
     config = JSON.parse(buffer.toString());
