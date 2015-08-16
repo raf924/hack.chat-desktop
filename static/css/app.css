@@ -9,8 +9,8 @@ main#container {
   height: 100%;
   overflow-y: visible;
 }
-header, main, footer {
-  padding-left: 290px;
+header, main {
+  padding-left: 310px;
 }
 @media only screen and (max-width: 992px) {
   header, main {
@@ -28,6 +28,11 @@ header, main, footer {
     max-height: 20%;
   }
 }
+
+.material-icon{
+  -webkit-user-select:none;
+}
+
 .button-collapse {
   font-size: 3em;
 }
@@ -65,7 +70,7 @@ header {
   -webkit-transform: rotateY(0deg);
 }
 #users {
-  left: -250px;
+  left: -310px;
 }
 .channel form {
   bottom: 0;

@@ -1,4 +1,6 @@
 //TODO: Clean the code (but no rush)
+"use strict";
+
 window.$ = window.jQuery = require('./static/js/jquery.min.js');
 window.Hammer = require("./static/js/hammer.min.js");
 var Channel = require("./static/js/channel.js").Channel;
@@ -51,7 +53,7 @@ var message_icons = {
     color: "red",
     title: ""
   }
-}
+};
 
 var channels = {};
 var myNick = ipc.sendSync("askForNick");
@@ -61,7 +63,7 @@ function scrollToBottom() {
   $(".messages").scrollTop($(".messages")[0].scrollHeight);
 }
 
-var setMaterialIcon = function($message,iconName, colour) {
+var setMaterialIcon = function($message, iconName, colour) {
   $message.addClass("avatar");
   var $icon = $("<i></i>");
   $icon.addClass("material-icons circle").addClass(colour).text(iconName);
@@ -96,7 +98,7 @@ Channel.messageReceived = function(args) {
         break;
     }
     args.nick = message_icon.title;
-    setMaterialIcon($message,message_icon.icon, message_icon.color);
+    setMaterialIcon($message, message_icon.icon, message_icon.color);
     appendMessage($messages, $message, args);
   });
 };
@@ -107,6 +109,22 @@ function insertAtCursor(text) {
   var new_val = [value.slice(0, pos), text, value.slice(pos)].join('');
   $("form#send #textfield").val(new_val)[0].selectionStart = pos + text.length;
 }
+
+Channel.addUser = function(channel, user) {
+  $.get("./static/views/user.html", function(data) {
+    var $user = $(data);
+    $user.attr("user", user).find(".nick").text(user);
+    $("#users .users[for='" + channel + "']").append($user);
+  });
+};
+
+Channel.setTripCode = function(channel, user, tripCode) {
+  $("#users .users[for='" + channel + "']").find(".user[user='" + user + "']").find(".trip").text(tripCode);
+};
+
+Channel.removeUser = function(channel, user) {
+  $("#users .users[for='" + channel + "']").find(".user[user='" + user + "']").remove();
+};
 
 $(function() {
   $(".addChannel form").submit(function(e) {
@@ -134,16 +152,7 @@ $(function() {
 
   $(".tabs a").click(function(e) {
     var channel = $(this).data("tab");
-    $("#users .user").remove();
-    $.get("./static/views/user.html", function(data) {
-      var users = channels[channel];
-      for (var user in users) {
-        if (users.hasOwnProperty(user)) {
-          $(data).find(".nick").text(user);
-          $(data).find("trip").text(users[user]);
-        }
-      }
-    });
+    loadUsers(channel);
   });
 
   $("form#send").submit(function(e) {
@@ -156,8 +165,8 @@ $(function() {
       $(this).val("");
     }
   });
-  $(".channel .title a").click(function(e) {
-    insertAtCursor(" @" + $(this).val() + " ");
+  $("body").on("click", ".channel .title a, .user a.nick", function(e) {
+    insertAtCursor(" @" + $(this).text() + " ");
   });
 
   var sidemenu_button = $("<a></a>");
@@ -166,7 +175,10 @@ $(function() {
   $("header .row").prepend(sidemenu_button);
   sidemenu_button.attr("data-activates", "sidemenu").attr("href", "#");
   $(t.element).append($("<div></div>").text("Chatron"));
-  $(".button-collapse").sideNav();
+  $(".button-collapse").sideNav({
+    menuWidth: 300,
+    closeOnClick: true
+  });
   $(".button-collapse[data-activates='sidemenu']").click(function(e) {
     $(".button-collapse[data-activates='settings']").click();
     $("body").on("click", "#sidenav-overlay:last-of-type", function(e) {
@@ -198,7 +210,9 @@ function login(channel) {
         openChannel(channel, nick);
       }
       $("#nickPrompt").closeModal();
-      $(".side-nav").css("left", "-250px");
+      if (document.body.width < 992) {
+        $(".side-nav").css("left", "-310px");
+      }
       $("#sidenav-overlay").remove();
     });
   }
@@ -207,8 +221,7 @@ function login(channel) {
 function openChannel(channel, nick) {
   var ch = new Channel(channel, nick);
   channels[channel] = ch;
-  console.log(channels);
-  var page = $.get("./static/views/channel.html", function(data) {
+  $.get("./static/views/channel.html", function(data) {
     var $channel = $(data);
     $("#channels-tabs .disabled").remove();
     $channel.attr("id", channel);
@@ -222,5 +235,11 @@ function openChannel(channel, nick) {
     $("#channels-tabs").find("*").css("width", "");
     $("#channels-tabs").tabs("select_tab", channel);
     $("form#send #textfield").removeAttr("disabled");
+    $.get("./static/views/users.html", function(data) {
+      var $users = $(data);
+      $users.attr("for", channel);
+      $(".users").css("display:none");
+      $("#users").append($users);
+    });
   });
 }
