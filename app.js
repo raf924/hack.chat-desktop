@@ -203,7 +203,7 @@ function login(channel) {
       var forAll = $(this).find("#forAll:checked");
       var nick = $(this).find("input.validate").val();
       if (forAll.length > 0) {
-        myNick = nick;
+        window.myNick = nick;
         ipc.send("setNick", nick);
       }
       if (channel !== "") {
