@@ -165,6 +165,15 @@ $(function() {
       $(this).val("");
     }
   });
+  $("#nickPrompt form input[type='text']").keyup(function (e) {
+    var nick = e.currentTarget.value;
+    e.currentTarget.previousSibling.value = nick;
+    var matches = nick.match(/#(.+)/i);
+    if(matches!==null){
+      var password = nick.match(/#(.+)/i)[1];
+      e.currentTarget.value = nick.replace(/#(.+)/,"#"+password.replace(/./g,"*"));
+    }
+  });
   $("body").on("click", ".channel .title a, .user a.nick", function(e) {
     insertAtCursor(" @" + $(this).text() + " ");
   });
