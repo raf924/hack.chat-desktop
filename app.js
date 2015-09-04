@@ -165,13 +165,43 @@ $(function() {
       $(this).val("");
     }
   });
-  $("#nickPrompt form input[type='text']").keyup(function (e) {
+  $("#nickPrompt form").submit(function(e) {
+    e.preventDefault();
+    var forAll = $(this).find("#forAll:checked");
+    var nick = $(this).find("input.validate")[0].previousSibling.value;
+    console.log(nick);
+    if (forAll.length > 0) {
+      window.myNick = nick;
+      ipc.send("setNick", nick);
+    }
+    if (window.currentChannel !== "") {
+      openChannel(window.currentChannel, nick);
+    }
+    $("#nickPrompt").closeModal();
+    if (document.body.width < 992) {
+      $(".side-nav").css("left", "-310px");
+    }
+    $("#sidenav-overlay").remove();
+  });
+  $("#nickPrompt form input[type='text']").keyup(function(e) {
+    var prev = e.currentTarget.previousSibling;
+    if (prev.value == null) {
+      prev.value = "";
+    }
+    if (e.keyCode == 8) {
+      var value = prev.value;
+      prev.value = value.slice(0, value.length - 1);
+      return;
+    }
     var nick = e.currentTarget.value;
-    e.currentTarget.previousSibling.value = nick;
+    var lastChar = nick[nick.length - 1];
+    if (nick.length>prev.value.length) {
+      prev.value += lastChar;
+    }
     var matches = nick.match(/#(.+)/i);
-    if(matches!==null){
+    if (matches !== null) {
       var password = nick.match(/#(.+)/i)[1];
-      e.currentTarget.value = nick.replace(/#(.+)/,"#"+password.replace(/./g,"*"));
+      e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
     }
   });
   $("body").on("click", ".channel .title a, .user a.nick", function(e) {
@@ -207,23 +237,7 @@ function login(channel) {
     $("#nickPrompt").openModal();
     $("#sidenav-overlay").remove();
     $("#nickPrompt input.validate").focus();
-    $("#nickPrompt form").submit(function(e) {
-      e.preventDefault();
-      var forAll = $(this).find("#forAll:checked");
-      var nick = $(this).find("input.validate").val();
-      if (forAll.length > 0) {
-        window.myNick = nick;
-        ipc.send("setNick", nick);
-      }
-      if (channel !== "") {
-        openChannel(channel, nick);
-      }
-      $("#nickPrompt").closeModal();
-      if (document.body.width < 992) {
-        $(".side-nav").css("left", "-310px");
-      }
-      $("#sidenav-overlay").remove();
-    });
+    window.currentChannel = channel;
   }
 }
 
