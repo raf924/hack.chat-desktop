@@ -182,9 +182,12 @@ $(function() {
       $(".side-nav").css("left", "-310px");
     }
     $("#sidenav-overlay").remove();
+    $(this).find("input.validate")[0].previousSibling.value = "";
+    $(this).find("input.validate").val("");
   });
   $("#nickPrompt form input[type='text']").keyup(function(e) {
     var prev = e.currentTarget.previousSibling;
+    console.log(prev.value);
     if (prev.value == null) {
       prev.value = "";
     }
@@ -195,7 +198,10 @@ $(function() {
     }
     var nick = e.currentTarget.value;
     var lastChar = nick[nick.length - 1];
-    if (nick.length>prev.value.length) {
+    if(lastChar=="*"&&e.which!=106){
+      lastChar = "";
+    }
+    if (nick.length > prev.value.length) {
       prev.value += lastChar;
     }
     var matches = nick.match(/#(.+)/i);
