@@ -28,11 +28,9 @@ header, main {
     max-height: 20%;
   }
 }
-
-.material-icon{
-  -webkit-user-select:none;
+.material-icon {
+  -webkit-user-select: none;
 }
-
 .button-collapse {
   font-size: 3em;
 }
@@ -47,26 +45,33 @@ header {
 #sidemenu, #users {
   padding-top: 1em;
 }
-#sidemenu, #settings {
-  opacity: 1;
-  z-index: 1000;
+#menu, #settings {
   -webkit-perspective: 1000px;
+  top: 24px;
+  will-change: transform, opacity, z-index;
+  position: absolute;
+  width: 100%;
+  -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
 }
-#sidemenu {
+#menu {
+  z-index: 800;
   -webkit-transform: rotateY(0deg);
 }
 #settings {
+  opacity: 0;
+  z-index: 0;
   -webkit-transform: rotateY(-180deg);
 }
-#sidemenu.flipped, #settings.flipped {
+#menu.flipped, #settings.flipped {
   -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
 }
-#sidemenu.flipped {
+#menu.flipped {
   -webkit-transform: rotateY(180deg);
   opacity: 0;
 }
 #settings.flipped {
-  z-index: 1001;
+  opacity: 1;
+  z-index: 800;
   -webkit-transform: rotateY(0deg);
 }
 #users {

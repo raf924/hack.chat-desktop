@@ -169,7 +169,6 @@ $(function() {
     e.preventDefault();
     var forAll = $(this).find("#forAll:checked");
     var nick = $(this).find("input.validate")[0].previousSibling.value;
-    console.log(nick);
     if (forAll.length > 0) {
       window.myNick = nick;
       ipc.send("setNick", nick);
@@ -181,13 +180,11 @@ $(function() {
     if (document.body.width < 992) {
       $(".side-nav").css("left", "-310px");
     }
-    $("#sidenav-overlay").remove();
     $(this).find("input.validate")[0].previousSibling.value = "";
     $(this).find("input.validate").val("");
   });
   $("#nickPrompt form input[type='text']").keyup(function(e) {
     var prev = e.currentTarget.previousSibling;
-    console.log(prev.value);
     if (prev.value == null) {
       prev.value = "";
     }
@@ -198,7 +195,7 @@ $(function() {
     }
     var nick = e.currentTarget.value;
     var lastChar = nick[nick.length - 1];
-    if(lastChar=="*"&&e.which!=106){
+    if (lastChar == "*" && e.which != 106) {
       lastChar = "";
     }
     if (nick.length > prev.value.length) {
@@ -214,26 +211,22 @@ $(function() {
     insertAtCursor(" @" + $(this).text() + " ");
   });
 
-  var sidemenu_button = $("<a></a>");
-  sidemenu_button.addClass("button-collapse hide-on-large-only col s1");
-  sidemenu_button.append($("<i></i>").addClass("mdi-navigation-menu"));
-  $("header .row").prepend(sidemenu_button);
-  sidemenu_button.attr("data-activates", "sidemenu").attr("href", "#");
   $(t.element).append($("<div></div>").text("Chatron"));
   $(".button-collapse").sideNav({
     menuWidth: 300,
-    closeOnClick: true
+    closeOnClick: false
   });
   $(".button-collapse[data-activates='sidemenu']").click(function(e) {
-    $(".button-collapse[data-activates='settings']").click();
     $("body").on("click", "#sidenav-overlay:last-of-type", function(e) {
-      $("#sidemenu,#settings").removeClass("flipped");
-      $(".button-collapse[data-activates='sidemenu']").sideNav("hide");
-      $("body").off();
+      $("#menu,#settings").removeClass("flipped");
     });
   });
   $("a[data-flips='settings']").click(function(e) {
-    $("#sidemenu,#settings").addClass("flipped");
+    if ($("#menu, #settings").hasClass("flipped")) {
+      $("#menu,#settings").removeClass("flipped");
+    } else {
+      $("#menu,#settings").addClass("flipped");
+    }
   });
   $("div.drag-target").remove();
 });
@@ -241,7 +234,6 @@ $(function() {
 function login(channel) {
   if (myNick !== "") {
     $("#nickPrompt").openModal();
-    $("#sidenav-overlay").remove();
     $("#nickPrompt input.validate").focus();
     window.currentChannel = channel;
   }

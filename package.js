@@ -14,8 +14,6 @@ packager({
     ignore: "node_modules/(electron-builder|.bin)|dist|.bin",
     asar: true,
     icon:"icon.ico"
-
-
 }, function done(err, appPath) {
     console.log(err);
     console.log(appPath);
