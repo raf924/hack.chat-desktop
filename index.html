@@ -12,16 +12,16 @@
   <header>
     <div class="row">
       <a class="button-collapse hide-on-large-only col s1" data-activates="sidemenu" href="#"><i class="mdi-navigation-menu"></i></a>
-      <div class="col s11">
+      <!--<div class="col s11">
         <ul id="channels-tabs" class="tabs">
           <li class="tab disabled col s1" style="visibility:hidden;">
             <a href="#"></a>
           </li>
         </ul>
-      </div>
+      </div>-->
     </div>
   </header>
-  <ul id="sidemenu" class="side-nav">
+  <ul id="sidemenu" class="side-nav fixed">
     <div id="menu">
       <li class="brand row">
         <pre class="col s11" style="overflow:hidden;white-space: pre-line">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
@@ -39,6 +39,12 @@
           </div>
         </form>
       </li>
+      <li>
+        <p>Open channels</p>
+      </li>
+      <ul id="channels-tabs">
+
+      </ul>
       <li>
         <p>Favourite Channels</p>
       </li>
@@ -71,7 +77,7 @@
     <div id="channels">
     </div>
     <div id="input_container" class="row">
-      <a href="#!" data-activates="users" class="button-collapse col s1 btn"><i class="material-icons medium">recent_actors</i>Users</a>
+      <a href="#!" data-activates="users" class="button-collapse col s1 btn"><i class="material-icons medium">recent_actors</i></a>
       <form id="send" class="col s11">
         <div class="input-field">
           <textarea type="text" id="textfield" class="materialize-textarea" disabled></textarea>
@@ -96,6 +102,7 @@
   </div>
   <script src="app.js"></script>
   <script src="static/js/materialize.js"></script>
+  <script src="static/js/tabs.js" charset="utf-8"></script>
 </body>
 
 </html>

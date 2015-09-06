@@ -54,8 +54,8 @@ header {
   -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
 }
 #menu {
-  z-index: 800;
   -webkit-transform: rotateY(0deg);
+  z-index: 800;
 }
 #settings {
   opacity: 0;
@@ -76,6 +76,10 @@ header {
 }
 #users {
   left: -310px;
+}
+
+#channels-tabs .tab a.active{
+  border-bottom: 1px red solid;
 }
 .channel form {
   bottom: 0;
