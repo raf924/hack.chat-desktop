@@ -1,6 +1,7 @@
 body {
   position: absolute;
   width: 100%;
+  font-family: Roboto;
 }
 main#container {
   margin-top: 5em;
@@ -77,8 +78,7 @@ header {
 #users {
   left: -310px;
 }
-
-#channels-tabs .tab a.active{
+#channels-tabs .tab a.active {
   border-bottom: 1px red solid;
 }
 .channel form {
@@ -91,6 +91,18 @@ header {
   width: 100%;
   max-height: 71%;
   position: absolute;
+}
+.messages li .message {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  word-break: break-word;
+  white-space: pre-line;
+  font-family: Roboto;
+}
+.messages li.collection-item.avatar {
+  padding-top: 1px;
+  min-height: 45px;
+  padding-bottom: 0px;
 }
 #input_container.row {
   position: fixed;
@@ -113,4 +125,6 @@ header {
 }
 form#send #textfield {
   overflow-y: visible;
+  width: 91%;
+  max-height: 4em;
 }

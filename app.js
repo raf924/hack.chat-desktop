@@ -82,9 +82,6 @@ Channel.messageReceived = function(args) {
     var $message = $(data);
     var $messages = $("#channels").find(".channel#" + that.name).find(".messages");
     var message_icon = message_icons[args.cmd];
-    if (!message_icon.title) {
-      message_icon.title = args.nick;
-    }
     switch (args.cmd) {
       case "onlineSet":
         args.text = "Users online : " + args.nicks.join(", ");
@@ -96,7 +93,9 @@ Channel.messageReceived = function(args) {
         args.text = args.nick += " has joined";
         break;
     }
-    args.nick = message_icon.title;
+    if (message_icon.title) {
+      args.nick = message_icon.title;
+    }
     setMaterialIcon($message, message_icon.icon, message_icon.color);
     appendMessage($messages, $message, args);
   });

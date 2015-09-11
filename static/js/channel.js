@@ -1,14 +1,10 @@
-exports.Channel = function(name, nickName) {
+var Channel = function(name, nickName) {
   this.name = name;
   this.nick = nickName;
   this.users = {};
   var that = this;
   var ws = new WebSocket("wss://hack.chat/chat-ws");
-  this.send = function(arg) {
-    if (ws && ws.readyState == ws.OPEN) {
-      ws.send(JSON.stringify(arg))
-    }
-  };
+  this.ws = ws;
   window.setInterval(function() {
     that.send({
       cmd: 'ping'
@@ -41,13 +37,22 @@ exports.Channel = function(name, nickName) {
     }
     exports.Channel.messageReceived.call(that, args);
   };
-  this.sendMessage = function(message) {
-    that.send({
-      cmd: "chat",
-      text: message
-    });
+};
+
+Channel.prototype.send = function(args) {
+  if (this.ws && this.ws.readyState == this.ws.OPEN) {
+    this.ws.send(JSON.stringify(args));
   }
 };
+
+Channel.prototype.sendMessage = function(message) {
+  this.send({
+    cmd: "chat",
+    text: message
+  });
+};
+
+exports.Channel = Channel;
 
 exports.Channel.addUser = function(channelName, user) {
   // body...
