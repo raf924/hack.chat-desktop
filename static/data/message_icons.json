@@ -1,0 +1,30 @@
+{
+  chat: {
+    icon: "chat_bubble_outline",
+    color: "blue"
+  },
+  info: {
+    icon: "info_outline",
+    color: "green",
+    title: ""
+  },
+  onlineSet: {
+    icon: "recent_actors",
+    color: "green",
+    title: ""
+  },
+  onlineAdd: {
+    icon: "perm_identity",
+    color: "green"
+  },
+  onlineRemove: {
+    icon: "perm_identity",
+    color: "yellow",
+    title: ""
+  },
+  warn: {
+    icon: "warning",
+    color: "red",
+    title: ""
+  }
+}
