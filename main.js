@@ -6,6 +6,7 @@ var Menu = require("menu");
 var nativeImage = require("native-image");
 var ipc = require('ipc');
 var config = require("./config.js");
+var fs = require('fs');
 
 var myNick = config.getNickName();
 

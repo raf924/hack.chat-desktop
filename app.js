@@ -4,8 +4,15 @@
 window.$ = window.jQuery = require('./static/js/jquery.min.js');
 window.Hammer = require("./static/js/hammer.min.js");
 var Channel = require("./static/js/channel.js").Channel;
+var View = require("./static/js/views.js").View
 var ipc = require('ipc');
 var titlebar = require('titlebar');
+
+var views = ["message": null, "user": null, "users": null, "channel": null];
+for (view in views) {
+  views[view] = new View(view);
+}
+
 var t = titlebar();
 t.appendTo(document.body);
 
@@ -23,36 +30,7 @@ t.on("minimize", function() {
   titleBarEventHandler("minimize");
 });
 
-var message_icons = {
-  chat: {
-    icon: "chat_bubble_outline",
-    color: "blue"
-  },
-  info: {
-    icon: "info_outline",
-    color: "green",
-    title: ""
-  },
-  onlineSet: {
-    icon: "recent_actors",
-    color: "green",
-    title: ""
-  },
-  onlineAdd: {
-    icon: "perm_identity",
-    color: "green"
-  },
-  onlineRemove: {
-    icon: "perm_identity",
-    color: "yellow",
-    title: ""
-  },
-  warn: {
-    icon: "warning",
-    color: "red",
-    title: ""
-  }
-};
+var message_icons = require("../data/message_icons.json");
 
 var channels = {};
 var myNick = ipc.sendSync("askForNick");
@@ -78,27 +56,25 @@ var appendMessage = function($messages, $message, args) {
 
 Channel.messageReceived = function(args) {
   var that = this;
-  $.get("./static/views/message.html", function(data) {
-    var $message = $(data);
-    var $messages = $("#channels").find(".channel#" + that.name).find(".messages");
-    var message_icon = message_icons[args.cmd];
-    switch (args.cmd) {
-      case "onlineSet":
-        args.text = "Users online : " + args.nicks.join(", ");
-        break;
-      case "onlineRemove":
-        args.text = args.nick += " has left";
-        break;
-      case "onlineAdd":
-        args.text = args.nick += " has joined";
-        break;
-    }
-    if (message_icon.title) {
-      args.nick = message_icon.title;
-    }
-    setMaterialIcon($message, message_icon.icon, message_icon.color);
-    appendMessage($messages, $message, args);
-  });
+  var $message = views["message"].clone();
+  var $messages = $("#channels").find(".channel#" + that.name).find(".messages");
+  var message_icon = message_icons[args.cmd];
+  switch (args.cmd) {
+    case "onlineSet":
+      args.text = "Users online : " + args.nicks.join(", ");
+      break;
+    case "onlineRemove":
+      args.text = args.nick += " has left";
+      break;
+    case "onlineAdd":
+      args.text = args.nick += " has joined";
+      break;
+  }
+  if (message_icon.title) {
+    args.nick = message_icon.title;
+  }
+  setMaterialIcon($message, message_icon.icon, message_icon.color);
+  appendMessage($messages, $message, args);
 };
 
 function insertAtCursor(text) {
@@ -109,11 +85,9 @@ function insertAtCursor(text) {
 }
 
 Channel.addUser = function(channel, user) {
-  $.get("./static/views/user.html", function(data) {
-    var $user = $(data);
-    $user.attr("user", user).find(".nick").text(user);
-    $("#users .users[for='" + channel + "']").append($user);
-  });
+  var $user = views["user"].clone();
+  $user.attr("user", user).find(".nick").text(user);
+  $("#users .users[for='" + channel + "']").append($user);
 };
 
 Channel.setTripCode = function(channel, user, tripCode) {
@@ -241,22 +215,18 @@ function login(channel) {
 function openChannel(channel, nick) {
   var ch = new Channel(channel, nick);
   channels[channel] = ch;
-  $.get("./static/views/channel.html", function(data) {
-    var $channel = $(data);
-    $channel.attr("id", channel);
-    $channel.appendTo("#channels");
-    var $tab = $("<li></li>").addClass("tab");
-    var $link = $("<a href='#!'></a>").addClass("active").text(channel).attr("data-tab", channel);
-    var $badge = $("<span>0</span>").addClass("badge").css("right", 0);
-    $link.append($badge);
-    $tab.append($link);
-    $("#channels-tabs").append($tab);
-    $("form#send #textfield").removeAttr("disabled");
-    $.get("./static/views/users.html", function(data) {
-      var $users = $(data);
-      $users.attr("for", channel);
-      $(".users").css("display:none");
-      $("#users").append($users);
-    });
-  });
+  var $channel = views["channel"].clone();
+  $channel.attr("id", channel);
+  $channel.appendTo("#channels");
+  var $tab = $("<li></li>").addClass("tab");
+  var $link = $("<a href='#!'></a>").addClass("active").text(channel).attr("data-tab", channel);
+  var $badge = $("<span>0</span>").addClass("badge").css("right", 0);
+  $link.append($badge);
+  $tab.append($link);
+  $("#channels-tabs").append($tab);
+  $("form#send #textfield").removeAttr("disabled");
+  var $users = views["users"].clone();
+  $users.attr("for", channel);
+  $(".users").css("display:none");
+  $("#users").append($users);
 }
