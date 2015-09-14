@@ -117,6 +117,7 @@ $(function() {
       ipc.send("join", $(this).val());
       $(".addChannel form button").css("display", "");
       $(".addChannel form input").css("display", "none");
+      $(this).val("");
     }
   }).blur(function(e) {
     $(".addChannel form button").css("display", "");
