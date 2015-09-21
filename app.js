@@ -52,14 +52,18 @@ var setMaterialIcon = function($message, iconName, colour) {
 
 var appendMessage = function($messages, $message, args) {
   $message.find(".nick").text(args.nick);
-  $message.find(".message").text(args.text);
+  $message.find(".message").html(args.text);
   $messages.append($message);
   scrollToBottom();
 };
 
 var parseText = function (text) {
-  // TODO: parse text for links and latex and other stuff
-  var matches = text.match(/http(|s):[/][/].+[ ]/gi);
+  var matches = text.match(/http(|s):[/][/].+(|[ ])/gi);
+  if(matches!=null){
+    matches.forEach(function (link) {
+      text = text.replace(link.trim(),$("<a></a>").attr("href",text.trim()).text(link.trim()).html());
+    });
+  }
   return text;
 }
 
