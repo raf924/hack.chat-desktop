@@ -8,8 +8,8 @@ var View = require("./static/js/views.js").View
 var ipc = require('ipc');
 var titlebar = require('titlebar');
 
-var views = ["message": null, "user": null, "users": null, "channel": null];
-for (view in views) {
+var views = {"message": null, "user": null, "users": null, "channel": null};
+for (var view in views) {
   views[view] = new View(view);
 }
 
@@ -20,15 +20,16 @@ var titleBarEventHandler = function(e) {
   ipc.send(e, function() {});
 };
 
-t.on('close', function() {
-  titleBarEventHandler("close");
-});
-t.on("fullscreen", function() {
-  titleBarEventHandler("fullscreen");
-});
-t.on("minimize", function() {
-  titleBarEventHandler("minimize");
-});
+function bind(event) {
+  t.on(event, function() {
+    titleBarEventHandler(event);
+  });
+};
+
+bind('close');
+bind('fullscreen');
+bind('minimize');
+
 
 var message_icons = require("../data/message_icons.json");
 
