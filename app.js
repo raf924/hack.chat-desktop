@@ -31,7 +31,7 @@ bind('fullscreen');
 bind('minimize');
 
 
-var message_icons = require("../data/message_icons.json");
+var message_icons = require("./static/data/message_icons.json");
 
 var channels = {};
 var myNick = ipc.sendSync("askForNick");
