@@ -38,7 +38,9 @@ var myNick = ipc.sendSync("askForNick");
 var currentChannel;
 
 function scrollToBottom() {
-  $(".messages").scrollTop($(".messages")[0].scrollHeight);
+  $(".messages").each(function (index, element) {
+    $(element).scrollTop(element.scrollHeight);
+  });
 }
 
 var setMaterialIcon = function($message, iconName, colour) {
@@ -165,22 +167,6 @@ $(function() {
     $(this).find("input.validate").val("");
   });
   $("#nickPrompt form input[type='text']").keyup(function(e) {
-    /*var prev = e.currentTarget.previousSibling;
-    if (prev.value == null) {
-      prev.value = "";
-    }
-    if (e.keyCode == 8) {
-      var value = prev.value;
-      prev.value = value.slice(0, value.length - 1);
-      return;
-    }
-    var lastChar = nick[nick.length - 1];
-    if (lastChar == "*" && e.which != 106) {
-      lastChar = "";
-    }
-    if (nick.length > prev.value.length) {
-      prev.value += lastChar;
-    }*/
     var nick = e.currentTarget.value;
   }).keydown(function (e) {
     e.currentTarget.previousSibling.keyCode = e.keyCode;
@@ -194,7 +180,8 @@ $(function() {
     }
     if (prev.keyCode == 8) {
       var value = prev.value;
-      prev.value = value.slice(0,prev.selectionStart) + value.slice(prev.selectionEnd, prev.value.length-1);
+      prev.value = value.slice(0,prev.selectionStart - 1) + value.slice(prev.selectionEnd + 1, value.length-1);
+      console.log(prev.value);
       return;
     }
     var nick = e.currentTarget.value;
