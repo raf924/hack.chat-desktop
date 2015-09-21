@@ -10,7 +10,7 @@ var titlebar = require('titlebar');
 
 var views = {"message": null, "user": null, "users": null, "channel": null};
 for (var view in views) {
-  views[view] = new View(view);
+  views[view] = new View(view).$element;
 }
 
 var t = titlebar();
@@ -100,6 +100,8 @@ Channel.removeUser = function(channel, user) {
 };
 
 $(function() {
+  $(t.element).append($("<div></div>").text("Chatron"));
+
   $("#channels-tabs").tabs("init");
   $(".button-collapse").sideNav({
     menuWidth: 300,
@@ -163,7 +165,7 @@ $(function() {
     $(this).find("input.validate").val("");
   });
   $("#nickPrompt form input[type='text']").keyup(function(e) {
-    var prev = e.currentTarget.previousSibling;
+    /*var prev = e.currentTarget.previousSibling;
     if (prev.value == null) {
       prev.value = "";
     }
@@ -172,11 +174,31 @@ $(function() {
       prev.value = value.slice(0, value.length - 1);
       return;
     }
-    var nick = e.currentTarget.value;
     var lastChar = nick[nick.length - 1];
     if (lastChar == "*" && e.which != 106) {
       lastChar = "";
     }
+    if (nick.length > prev.value.length) {
+      prev.value += lastChar;
+    }*/
+    var nick = e.currentTarget.value;
+  }).keydown(function (e) {
+    e.currentTarget.previousSibling.keyCode = e.keyCode;
+  }).on("select", function (e) {
+    e.currentTarget.previousSibling.selectionEnd =  e.currentTarget.selectionEnd;
+    e.currentTarget.previousSibling.selectionStart = e.currentTarget.selectionStart;
+  }).on("input", function (e) {
+    var prev = e.currentTarget.previousSibling;
+    if (prev.value == null) {
+      prev.value = "";
+    }
+    if (prev.keyCode == 8) {
+      var value = prev.value;
+      prev.value = value.slice(0,prev.selectionStart) + value.slice(prev.selectionEnd, prev.value.length-1);
+      return;
+    }
+    var nick = e.currentTarget.value;
+    var lastChar = nick[nick.length - 1];
     if (nick.length > prev.value.length) {
       prev.value += lastChar;
     }
@@ -190,7 +212,6 @@ $(function() {
     insertAtCursor(" @" + $(this).text() + " ");
   });
 
-  $(t.element).append($("<div></div>").text("Chatron"));
   $(".button-collapse[data-activates='sidemenu']").click(function(e) {
     $("body").on("click", "#sidenav-overlay:last-of-type", function(e) {
       $("#menu,#settings").removeClass("flipped");

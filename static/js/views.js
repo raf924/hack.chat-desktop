@@ -1,5 +1,5 @@
 var View = function(name) {
-  this.$element = $($.ajax("../views/" + name + ".html", {
+  this.$element = $($.ajax("static/views/" + name + ".html", {
     async: false
   }).responseText);
 };

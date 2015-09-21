@@ -86,10 +86,10 @@ header {
   position: fixed;
   width: 100%;
 }
-.messages {
+ul.collection.messages {
   overflow-y: visible;
   width: 100%;
-  max-height: 71%;
+  max-height: 69%;
   position: absolute;
 }
 .messages li .message {
