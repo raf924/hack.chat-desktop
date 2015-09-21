@@ -57,6 +57,12 @@ var appendMessage = function($messages, $message, args) {
   scrollToBottom();
 };
 
+var parseText = function (text) {
+  // TODO: parse text for links and latex and other stuff
+  var matches = text.match(/http(|s):[/][/].+[ ]/gi);
+  return text;
+}
+
 Channel.messageReceived = function(args) {
   var that = this;
   var $message = views["message"].clone();
@@ -67,10 +73,13 @@ Channel.messageReceived = function(args) {
       args.text = "Users online : " + args.nicks.join(", ");
       break;
     case "onlineRemove":
-      args.text = args.nick += " has left";
+      args.text = args.nick + " has left";
       break;
     case "onlineAdd":
-      args.text = args.nick += " has joined";
+      args.text = args.nick + " has joined";
+      break;
+    case "chat":
+      args.text = parseText(args.text);
       break;
   }
   if (message_icon.title) {
@@ -196,7 +205,7 @@ $(function() {
     }
   });
   $("body").on("click", ".channel .title a, .user a.nick", function(e) {
-    insertAtCursor(" @" + $(this).text() + " ");
+    insertAtCursor("@" + $(this).text() + " ");
   });
 
   $(".button-collapse[data-activates='sidemenu']").click(function(e) {
