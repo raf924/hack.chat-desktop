@@ -2,39 +2,28 @@
 
 var fs = require("fs");
 
-var config = null;
-
+var config = {
+  "width": 1280,
+  "height": 720,
+  "nickName": "",
+  "favourites": ["programming"],
+  "openInside": false
+};
 
 if (!fs.existsSync("./data.json")) {
-    var file = fs.openSync("./data.json", "w");
-    fs.closeSync(file);
-    config = {
-        vars: {}
-    };
-    save();
+  save();
 } else {
-    var buffer = fs.readFileSync("./data.json", "utf-8");
-    config = JSON.parse(buffer.toString());
+  var buffer = fs.readFileSync("./data.json", "utf-8");
+  config = JSON.parse(buffer.toString());
 }
 
 function save() {
-    fs.writeFileSync("./data.json", JSON.stringify(config));
+  fs.writeFileSync("./data.json", JSON.stringify(config));
 }
 
-exports.getNickName = function () {
-    return config.vars.nickName;
-};
+var getConfig = function() {
+  return config;
+}
 
-exports.setNickName = function (nick) {
-    config.vars.nickName = nick;
-    save();
-};
-
-exports.getFavourites = function () {
-    return config.vars.favourites;
-};
-
-exports.addFavourites = function (channel) {
-    config.vars.favourites.push(channel);
-    save();
-};
+exports.get = getConfig;
+exports.save = save;

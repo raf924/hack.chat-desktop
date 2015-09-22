@@ -3,12 +3,15 @@
 var app = require('app'); // Module to control application life.
 var BrowserWindow = require('browser-window'); // Module to create native browser window.
 var Menu = require("menu");
+var shell = require('shell');
 var nativeImage = require("native-image");
 var ipc = require('ipc');
 var config = require("./config.js");
 var fs = require('fs');
 
-var myNick = config.getNickName();
+var myNick = config.get().nickName;
+console.log(config.get().nickName);
+console.log(myNick);
 
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
@@ -17,6 +20,7 @@ require('crash-reporter').start();
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
 var mainWindow = null;
+var webContents = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function() {
@@ -34,17 +38,14 @@ ipc.on("join", function(event, channel) {
   event.sender.send("openChannel", channel);
 });
 
-ipc.on("setNick", function(event, nick) {
-  config.setNickName(nick);
-  myNick = nick;
+ipc.on("set", function(event, args) {
+  var obj = JSON.parse(args);
+  config.get()[obj.prop] = obj.value;
+  config.save();
 });
 
-ipc.on("askForNick", function(event) {
-  if (myNick !== null) {
-    event.returnValue = null;
-  } else {
-    event.returnValue = myNick;
-  }
+ipc.on("get", function(event, prop) {
+  event.returnValue = config.get()[prop];
 });
 
 ipc.on("close", function(event) {
@@ -66,18 +67,19 @@ ipc.on("fullscreen", function(event) {
 app.on('ready', function() {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1280,
-    height: 720,
+    width: config.get().width,
+    height: config.get().height,
     frame: false,
-    icon:"./static/img/icon128.png",
-    "min-width":800,
-    "min-height":600
+    icon: "./static/img/icon128.png",
+    "min-width": 800,
+    "min-height": 600
   });
 
   Menu.setApplicationMenu(null);
 
   // and load the index.html of the app.
   mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  webContents = mainWindow.webContents;
   mainWindow.flashFrame(true);
   // Open the devtools.
   mainWindow.openDevTools();
@@ -88,6 +90,17 @@ app.on('ready', function() {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null;
-    app.quit();
+  });
+
+  webContents.on("new-window", function(e, url, frameName, disposition) {
+    if (url.match(/https:[/][/]hack[.]chat/i) != null) {
+      ipc.send("openChannel", url.split("?")[1]);
+      return false;
+    } else {
+      if (!config.get().openInside) {
+        shell.openExternal("url");
+        return false;
+      }
+    }
   });
 });

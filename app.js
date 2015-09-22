@@ -34,7 +34,7 @@ bind('minimize');
 var message_icons = require("./static/data/message_icons.json");
 
 var channels = {};
-var myNick = ipc.sendSync("askForNick");
+var myNick = ipc.sendSync("get","nick");
 var currentChannel;
 
 function scrollToBottom() {
@@ -167,7 +167,7 @@ $(function() {
     var nick = $(this).find("input.validate")[0].previousSibling.value;
     if (forAll.length > 0) {
       window.myNick = nick;
-      ipc.send("setNick", nick);
+      ipc.send("set", {prop:"nickName",value:nick.split("#")[0]+"#"});
     }
     if (window.currentChannel !== "") {
       openChannel(window.currentChannel, nick);
@@ -228,10 +228,14 @@ $(function() {
 });
 
 function login(channel) {
-  if (myNick !== "") {
+  window.currentChannel = channel;
+  if (myNick==null||myNick == ""||myNick.split("#").length>1) {
     $("#nickPrompt").openModal();
-    $("#nickPrompt input.validate").focus();
+    $("#nickPrompt input.validate").val(myNick).focus();
     window.currentChannel = channel;
+  }
+  else{
+    openChannel(channel, nick);
   }
 }
 
