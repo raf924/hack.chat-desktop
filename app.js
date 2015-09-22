@@ -117,6 +117,15 @@ Channel.removeUser = function(channel, user) {
 $(function() {
   $(t.element).append($("<div></div>").text("Chatron"));
 
+  ipc.on("favourites", function (favourites) {
+    favourites.forEach(function (favourite) {
+      var $favourite = $("<li></li>").append($("<a></a>").attr("href","#").attr("data-opens",favourite).text(favourite)).appendTo($("#favourites"));
+      $favourite.find("a").click(function () {
+        login($(this).attr("data-opens"));
+      });
+    });
+  });
+  ipc.send("get","favourites", true);
   $("#channels-tabs").tabs("init");
   $(".button-collapse").sideNav({
     menuWidth: 300,
@@ -235,7 +244,7 @@ function login(channel) {
     window.currentChannel = channel;
   }
   else{
-    openChannel(channel, nick);
+    openChannel(channel, myNick);
   }
 }
 

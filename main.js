@@ -42,10 +42,13 @@ ipc.on("set", function(event, args) {
   config.save();
 });
 
-ipc.on("get", function(event, prop) {
+ipc.on("get", function(event, prop, async) {
   var value = config.get()[prop];
-  //event.sendReply(typeof(value) == "object" ? JSON.parse(value) : value);
-  event.returnValue = value||"";
+  if (async) {
+    event.sender.send(prop, value || "");
+  } else {
+    event.returnValue = value || "";
+  }
 });
 
 ipc.on("close", function(event) {
