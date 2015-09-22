@@ -61,7 +61,7 @@ var parseText = function (text) {
   var matches = text.match(/http(|s):[/][/].+(|[ ])/gi);
   if(matches!=null){
     matches.forEach(function (link) {
-      text = text.replace(link.trim(),$("<a></a>").attr("href",text.trim()).text(link.trim()).html());
+      text = text.replace(link.trim(),$("<a></a>").attr("href",link.trim()).attr("target","_blank").text(link.trim())[0].outerHTML);
     });
   }
   return text;
