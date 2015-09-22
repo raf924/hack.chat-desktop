@@ -36,6 +36,7 @@ var message_icons = require("./static/data/message_icons.json");
 var channels = {};
 var myNick = ipc.sendSync("get","nickName");
 var currentChannel;
+var favourites = [];
 
 function scrollToBottom() {
   $(".messages").each(function (index, element) {
@@ -118,6 +119,7 @@ $(function() {
   $(t.element).append($("<div></div>").text("Chatron"));
 
   ipc.on("favourites", function (favourites) {
+    window.favourites = favourites;
     favourites.forEach(function (favourite) {
       var $favourite = $("<li></li>").append($("<a></a>").attr("href","#").attr("data-opens",favourite).text(favourite)).appendTo($("#favourites"));
       $favourite.find("a").click(function () {
@@ -217,6 +219,11 @@ $(function() {
       e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
     }
   });
+  $("#menu").on("click", "a.fav", function (e) {
+    e.preventDefault();
+    favourites.push($(this).attr("data-add"));
+    ipc.send("set",{prop:"favourites", value: favourites});
+  });
   $("body").on("click", ".channel .title a, .user a.nick", function(e) {
     insertAtCursor("@" + $(this).text() + " ");
   });
@@ -254,10 +261,12 @@ function openChannel(channel, nick) {
   var $channel = views["channel"].clone();
   $channel.attr("id", channel);
   $channel.appendTo("#channels");
-  var $tab = $("<li></li>").addClass("tab");
-  var $link = $("<a href='#!'></a>").addClass("active").text(channel).attr("data-tab", channel);
+  var $tab = $("<li></li>").addClass("tab row");
+  var $fav_link = $("<a href=''#!''></a>").attr("data-add",channel).addClass("col s1 fav waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
+  var $link = $("<a href='#!'></a>").addClass("active col s10").text(channel).attr("data-tab", channel);
   var $badge = $("<span>0</span>").addClass("badge").css("right", 0);
   $link.append($badge);
+  $tab.append($fav_link);
   $tab.append($link);
   $("#channels-tabs").append($tab);
   $("form#send #textfield").removeAttr("disabled");
