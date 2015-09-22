@@ -167,7 +167,7 @@ $(function() {
     var nick = $(this).find("input.validate")[0].previousSibling.value;
     if (forAll.length > 0) {
       window.myNick = nick;
-      ipc.send("set", {prop:"nickName",value:nick.split("#")[0]+"#"});
+      ipc.send("set", JSON.stringify({prop:"nickName",value:nick.split("#")[0]+"#"}));
     }
     if (window.currentChannel !== "") {
       openChannel(window.currentChannel, nick);
