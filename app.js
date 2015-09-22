@@ -34,7 +34,7 @@ bind('minimize');
 var message_icons = require("./static/data/message_icons.json");
 
 var channels = {};
-var myNick = ipc.sendSync("get","nick");
+var myNick = ipc.sendSync("get","nickName");
 var currentChannel;
 
 function scrollToBottom() {

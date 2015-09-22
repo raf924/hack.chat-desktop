@@ -10,8 +10,6 @@ var config = require("./config.js");
 var fs = require('fs');
 
 var myNick = config.get().nickName;
-console.log(config.get().nickName);
-console.log(myNick);
 
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
@@ -45,7 +43,9 @@ ipc.on("set", function(event, args) {
 });
 
 ipc.on("get", function(event, prop) {
-  event.returnValue = config.get()[prop];
+  var value = config.get()[prop];
+  //event.sendReply(typeof(value) == "object" ? JSON.parse(value) : value);
+  event.returnValue = value||"";
 });
 
 ipc.on("close", function(event) {
@@ -94,12 +94,12 @@ app.on('ready', function() {
 
   webContents.on("new-window", function(e, url, frameName, disposition) {
     if (url.match(/https:[/][/]hack[.]chat/i) != null) {
+      event.PreventDefault();
       ipc.send("openChannel", url.split("?")[1]);
-      return false;
     } else {
       if (!config.get().openInside) {
+        event.PreventDefault();
         shell.openExternal("url");
-        return false;
       }
     }
   });
