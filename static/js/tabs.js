@@ -7,7 +7,7 @@
       // FIXME: When a tab is added the other tabs are still active
       var $tabs = that.find(tabSelector + " a");
       $tabs.each(function(i) {
-        var $div = $("#" + $(this).attr("data-tab"));
+        var $div = $("[id='"+$(this).attr("data-tab")+"']");
         $div.css("display", i == index ? "" : "none");
         $(this)[i == index ? "addClass" : "removeClass"]("active");
       });

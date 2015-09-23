@@ -1,4 +1,3 @@
-//TODO: Clean the code (but no rush)
 "use strict";
 
 window.$ = window.jQuery = require('./static/js/jquery.min.js');
@@ -8,9 +7,17 @@ var View = require("./static/js/views.js").View
 var ipc = require('ipc');
 var titlebar = require('titlebar');
 
-var views = {"message": null, "user": null, "users": null, "channel": null};
-for (var view in views) {
-  views[view] = new View(view).$element;
+var views = {
+  "message": null,
+  "user": null,
+  "users": null,
+  "channel": null
+};
+var view = null;
+for (view in views) {
+  if (views.hasOwnProperty(view)) {
+    views[view] = new View(view).$element;
+  }
 }
 
 var t = titlebar();
@@ -34,12 +41,12 @@ bind('minimize');
 var message_icons = require("./static/data/message_icons.json");
 
 var channels = {};
-var myNick = ipc.sendSync("get","nickName");
+var myNick = ipc.sendSync("get", "nickName");
 var currentChannel;
 var favourites = [];
 
 function scrollToBottom() {
-  $(".messages").each(function (index, element) {
+  $(".messages").each(function(index, element) {
     $(element).scrollTop(element.scrollHeight);
   });
 }
@@ -58,11 +65,11 @@ var appendMessage = function($messages, $message, args) {
   scrollToBottom();
 };
 
-var parseText = function (text) {
+var parseText = function(text) {
   var matches = text.match(/http(|s):[/][/].+(|[ ])/gi);
-  if(matches!=null){
-    matches.forEach(function (link) {
-      text = text.replace(link.trim(),$("<a></a>").attr("href",link.trim()).attr("target","_blank").text(link.trim())[0].outerHTML);
+  if (matches != null) {
+    matches.forEach(function(link) {
+      text = text.replace(link.trim(), $("<a></a>").attr("href", link.trim()).attr("target", "_blank").text(link.trim())[0].outerHTML);
     });
   }
   return text;
@@ -118,16 +125,16 @@ Channel.removeUser = function(channel, user) {
 $(function() {
   $(t.element).append($("<div></div>").text("Chatron"));
 
-  ipc.on("favourites", function (favourites) {
+  ipc.on("favourites", function(favourites) {
     window.favourites = favourites;
-    favourites.forEach(function (favourite) {
-      var $favourite = $("<li></li>").append($("<a></a>").attr("href","#").attr("data-opens",favourite).text(favourite)).appendTo($("#favourites"));
-      $favourite.find("a").click(function () {
+    favourites.forEach(function(favourite) {
+      var $favourite = $("<li></li>").append($("<a></a>").attr("href", "#").attr("data-opens", favourite).text(favourite)).appendTo($("#favourites"));
+      $favourite.find("a").click(function() {
         login($(this).attr("data-opens"));
       });
     });
   });
-  ipc.send("get","favourites", true);
+  ipc.send("get", "favourites", true);
   $("#channels-tabs").tabs("init");
   $(".button-collapse").sideNav({
     menuWidth: 300,
@@ -178,7 +185,10 @@ $(function() {
     var nick = $(this).find("input.validate")[0].previousSibling.value;
     if (forAll.length > 0) {
       window.myNick = nick;
-      ipc.send("set", JSON.stringify({prop:"nickName",value:nick.split("#")[0]+"#"}));
+      ipc.send("set", JSON.stringify({
+        prop: "nickName",
+        value: nick.split("#")[0] + "#"
+      }));
     }
     if (window.currentChannel !== "") {
       openChannel(window.currentChannel, nick);
@@ -192,20 +202,19 @@ $(function() {
   });
   $("#nickPrompt form input[type='text']").keyup(function(e) {
     var nick = e.currentTarget.value;
-  }).keydown(function (e) {
+  }).keydown(function(e) {
     e.currentTarget.previousSibling.keyCode = e.keyCode;
-  }).on("select", function (e) {
-    e.currentTarget.previousSibling.selectionEnd =  e.currentTarget.selectionEnd;
+  }).on("select", function(e) {
+    e.currentTarget.previousSibling.selectionEnd = e.currentTarget.selectionEnd;
     e.currentTarget.previousSibling.selectionStart = e.currentTarget.selectionStart;
-  }).on("input", function (e) {
+  }).on("input", function(e) {
     var prev = e.currentTarget.previousSibling;
     if (prev.value == null) {
       prev.value = "";
     }
     if (prev.keyCode == 8) {
       var value = prev.value;
-      prev.value = value.slice(0,prev.selectionStart - 1) + value.slice(prev.selectionEnd + 1, value.length-1);
-      console.log(prev.value);
+      prev.value = value.slice(0, prev.selectionStart - 1) + value.slice(prev.selectionEnd + 1, value.length - 1);
       return;
     }
     var nick = e.currentTarget.value;
@@ -219,10 +228,13 @@ $(function() {
       e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
     }
   });
-  $("#menu").on("click", "a.fav", function (e) {
+  $("#menu").on("click", "a.fav", function(e) {
     e.preventDefault();
     favourites.push($(this).attr("data-add"));
-    ipc.send("set",{prop:"favourites", value: favourites});
+    ipc.send("set", {
+      prop: "favourites",
+      value: favourites
+    });
   });
   $("body").on("click", ".channel .title a, .user a.nick", function(e) {
     insertAtCursor("@" + $(this).text() + " ");
@@ -245,25 +257,26 @@ $(function() {
 
 function login(channel) {
   window.currentChannel = channel;
-  if (myNick==null||myNick == ""||myNick.split("#").length>1) {
+  if (myNick == null || myNick == "" || myNick.split("#").length > 1 && myNick.split("#")[1].length == 0) {
     $("#nickPrompt").openModal();
     $("#nickPrompt input.validate").val(myNick).focus();
     window.currentChannel = channel;
-  }
-  else{
+  } else {
     openChannel(channel, myNick);
   }
 }
 
 function openChannel(channel, nick) {
   var ch = new Channel(channel, nick);
-  channels[channel] = ch;
+  var nickname = nick.split("#")[0] + (nick.split("#").length > 1 ? "#" : "");
+  var channelId = nickname + "@" + channel;
+  channels[channelId] = ch;
   var $channel = views["channel"].clone();
-  $channel.attr("id", channel);
+  $channel.attr("id", channelId);
   $channel.appendTo("#channels");
   var $tab = $("<li></li>").addClass("tab row");
-  var $fav_link = $("<a href=''#!''></a>").attr("data-add",channel).addClass("col s1 fav waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
-  var $link = $("<a href='#!'></a>").addClass("active col s10").text(channel).attr("data-tab", channel);
+  var $fav_link = $("<a href=''#!''></a>").attr("data-add", channelId).addClass("col s1 fav waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
+  var $link = $("<a href='#!'></a>").addClass("active col s10").text(channelId).attr("data-tab", channelId);
   var $badge = $("<span>0</span>").addClass("badge").css("right", 0);
   $link.append($badge);
   $tab.append($fav_link);
@@ -271,7 +284,7 @@ function openChannel(channel, nick) {
   $("#channels-tabs").append($tab);
   $("form#send #textfield").removeAttr("disabled");
   var $users = views["users"].clone();
-  $users.attr("for", channel);
+  $users.attr("for", channelId);
   $(".users").css("display:none");
   $("#users").append($users);
 }
