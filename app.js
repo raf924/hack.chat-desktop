@@ -164,7 +164,7 @@ $(function() {
     login(channel);
   });
 
-  $(".tabs").on("tabChanged", function(e, channel) {
+  $("#channels-tabs").on("tabChanged", function(e, channel) {
     loadUsers(channel);
     currentChannel = channel;
   });
@@ -245,14 +245,27 @@ $(function() {
       $("#menu,#settings").removeClass("flipped");
     });
   });
-  $("a[data-flips='settings']").click(function(e) {
+  $("a[data-flip='settings']").click(function(e) {
     if ($("#menu, #settings").hasClass("flipped")) {
       $("#menu,#settings").removeClass("flipped");
     } else {
       $("#menu,#settings").addClass("flipped");
     }
   });
+  $("#channels-tabs").on("tabClosed", function(e, channelId) {
+    closeChannel(channelId);
+    if($(this).find(".tab").length==0){
+      $("#send textarea").attr("disabled","");
+    }
+  });
 });
+
+function closeChannel(channelId) {
+  console.log(channelId);
+  $("[id='" + channelId + "'], [for='" + channelId + "']").remove();
+  channels[channelId].close();
+  channels.remove(channelId);
+}
 
 function login(channel) {
   window.currentChannel = channel;
@@ -272,12 +285,16 @@ function openChannel(channel, nick) {
   $channel.attr("id", ch.channelId);
   $channel.appendTo("#channels");
   var $tab = $("<li></li>").addClass("tab row");
-  var $fav_link = $("<a href=''#!''></a>").attr("data-add", ch.channelId).addClass("col s1 fav waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
-  var $link = $("<a href='#!'></a>").addClass("active col s10").text(ch.channelId.replace("#","")).attr("data-tab", ch.channelId);
-  var $badge = $("<span>0</span>").addClass("badge").css("right", 0);
-  $link.append($badge);
+  var $close_link = $("<a href='#!'></a>").attr("data-close", ch.channelId).addClass("col s1 ch-close btn-floating waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("close"));
+  var $fav_link = $("<a href='#!'></a>").attr("data-add", ch.channelId).addClass("col s1 fav waves-effect btn-floating waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
+  var $link = $("<a href='#!'></a>").addClass("active ch-link col s8").text(ch.channelId.replace("#", "")).attr("data-tab", ch.channelId);
+  var $badge = $("<a>0</a>").addClass("badge col s1");
+
   $tab.append($fav_link);
   $tab.append($link);
+  $tab.append($badge);
+  $tab.append($close_link);
+  $tab.attr("for", ch.channelId);
   $("#channels-tabs").append($tab);
   $("form#send #textfield").removeAttr("disabled");
   var $users = views["users"].clone();

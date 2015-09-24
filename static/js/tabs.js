@@ -5,23 +5,27 @@
     var tabSelector = ".tab";
     var activateTab = function(index) {
       // FIXME: When a tab is added the other tabs are still active
-      var $tabs = that.find(tabSelector + " a");
+      var $tabs = that.find(tabSelector + " a[data-tab]");
       $tabs.each(function(i) {
         var $div = $("[id='" + $(this).attr("data-tab") + "']");
         $div.css("display", i == index ? "" : "none");
         $(this)[i == index ? "addClass" : "removeClass"]("active");
       });
-      $(that).trigger("tabChanged", $(tabSelector + " a", that).attr("data-tab"));
+      $(that).trigger("tabChanged", $(tabSelector + " a[data-tab]", that).attr("data-tab"));
     };
     var observer = new MutationObserver(function(mutationRecord, mutationObserver) {
       mutationRecord.forEach(function(mutation) {
         if (mutation.type == "attributes") {
-          activateTab($(target).index(tabSelector + " a"));
+          activateTab($(target).index(tabSelector + " a[data-tab]"));
         }
         if (mutation.addedNodes != null) {
-          var tabs = $(mutation.addedNodes).find("a");
+          var tabs = $(mutation.addedNodes).find("a[data-tab]");
+          var closeTab = $(mutation.addedNodes).find("a[data-close]");
+          closeTab.click(function(e) {
+            $(that).trigger("tabClosed", $(this).attr("data-close"));
+          })
           tabs.click(function(e) {
-            activateTab($(this).index(tabSelector + " a"));
+            activateTab($(this).index(tabSelector + " a[data-tab]"));
           });
         }
       });

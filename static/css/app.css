@@ -128,3 +128,32 @@ form#send #textfield {
   width: 91%;
   max-height: 4em;
 }
+#channels-tabs a.btn-floating {
+  height: 37px;
+  width: 37px;
+  padding-right: 0px;
+  padding-left: 0px;
+  margin-top: 12px;
+  padding-bottom: 0px;
+  line-height: 37px;
+}
+#channels-tabs a.btn-floating.fav i.material-icons {
+  color: gold;
+}
+#channels-tabs a.btn-floating.ch-close i.material-icons {
+  color: red;
+}
+#channels-tabs li.tab {
+  padding-left: 0;
+  padding-right: 0;
+}
+#channels-tabs li.tab a.badge {
+  padding-left: 1px;
+  padding-right: 0px;
+}
+#channels-tabs li.tab a.ch-link {
+  /*text-overflow: ellipsis;*/
+  overflow: hidden;
+  padding-left: 0;
+  padding-right: 0;
+}

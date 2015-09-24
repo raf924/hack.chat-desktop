@@ -11,14 +11,14 @@ var Channel = function(name, nickName) {
       cmd: 'ping'
     });
   }, 50000);
-  ws.onopen = function() {
+  this.ws.onopen = function() {
     that.send({
       cmd: "join",
       channel: that.name,
       nick: that.nick
     });
   };
-  ws.onmessage = function(message) {
+  this.ws.onmessage = function(message) {
     console.log(message.data);
     var args = JSON.parse(message.data);
     if (args.nick != null && !that.users[args.nick]) {
@@ -51,6 +51,10 @@ Channel.prototype.sendMessage = function(message) {
     cmd: "chat",
     text: message
   });
+};
+
+Channel.prototype.close = function () {
+  this.ws.close();
 };
 
 exports.Channel = Channel;
