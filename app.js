@@ -78,7 +78,7 @@ var parseText = function(text) {
 Channel.messageReceived = function(args) {
   var that = this;
   var $message = views["message"].clone();
-  var $messages = $("#channels").find(".channel#" + that.name).find(".messages");
+  var $messages = $("#channels").find(".channel[id='" + that.channelId + "']").find(".messages");
   var message_icon = message_icons[args.cmd];
   switch (args.cmd) {
     case "onlineSet":
@@ -194,8 +194,8 @@ $(function() {
       openChannel(window.currentChannel, nick);
     }
     $("#nickPrompt").closeModal();
-    if (document.body.width < 992) {
-      $(".side-nav").css("left", "-310px");
+    if (document.body.clientWidth < 992) {
+      $(".button-collapse").sideNav("hide");
     }
     $(this).find("input.validate")[0].previousSibling.value = "";
     $(this).find("input.validate").val("");
@@ -239,8 +239,8 @@ $(function() {
   $("body").on("click", ".channel .title a, .user a.nick", function(e) {
     insertAtCursor("@" + $(this).text() + " ");
   });
-
   $(".button-collapse[data-activates='sidemenu']").click(function(e) {
+    $("div.drag-target").remove();
     $("body").on("click", "#sidenav-overlay:last-of-type", function(e) {
       $("#menu,#settings").removeClass("flipped");
     });
@@ -252,14 +252,13 @@ $(function() {
       $("#menu,#settings").addClass("flipped");
     }
   });
-  $("div.drag-target").remove();
 });
 
 function login(channel) {
   window.currentChannel = channel;
   if (myNick == null || myNick == "" || myNick.split("#").length > 1 && myNick.split("#")[1].length == 0) {
     $("#nickPrompt").openModal();
-    $("#nickPrompt input.validate").val(myNick).focus();
+    $("#nickPrompt input.validate").val(myNick).focus()[0].previousSibling.value = myNick;
     window.currentChannel = channel;
   } else {
     openChannel(channel, myNick);
@@ -268,15 +267,13 @@ function login(channel) {
 
 function openChannel(channel, nick) {
   var ch = new Channel(channel, nick);
-  var nickname = nick.split("#")[0] + (nick.split("#").length > 1 ? "#" : "");
-  var channelId = nickname + "@" + channel;
-  channels[channelId] = ch;
+  channels[ch.channelId] = ch;
   var $channel = views["channel"].clone();
-  $channel.attr("id", channelId);
+  $channel.attr("id", ch.channelId);
   $channel.appendTo("#channels");
   var $tab = $("<li></li>").addClass("tab row");
-  var $fav_link = $("<a href=''#!''></a>").attr("data-add", channelId).addClass("col s1 fav waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
-  var $link = $("<a href='#!'></a>").addClass("active col s10").text(channelId).attr("data-tab", channelId);
+  var $fav_link = $("<a href=''#!''></a>").attr("data-add", ch.channelId).addClass("col s1 fav waves-effect waves-teal btn-flat").append($("<i></i>").addClass("material-icons").text("grade"));
+  var $link = $("<a href='#!'></a>").addClass("active col s10").text(ch.channelId.replace("#","")).attr("data-tab", ch.channelId);
   var $badge = $("<span>0</span>").addClass("badge").css("right", 0);
   $link.append($badge);
   $tab.append($fav_link);
@@ -284,7 +281,7 @@ function openChannel(channel, nick) {
   $("#channels-tabs").append($tab);
   $("form#send #textfield").removeAttr("disabled");
   var $users = views["users"].clone();
-  $users.attr("for", channelId);
+  $users.attr("for", ch.channelId);
   $(".users").css("display:none");
   $("#users").append($users);
 }

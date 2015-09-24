@@ -7,7 +7,7 @@
       // FIXME: When a tab is added the other tabs are still active
       var $tabs = that.find(tabSelector + " a");
       $tabs.each(function(i) {
-        var $div = $("[id='"+$(this).attr("data-tab")+"']");
+        var $div = $("[id='" + $(this).attr("data-tab") + "']");
         $div.css("display", i == index ? "" : "none");
         $(this)[i == index ? "addClass" : "removeClass"]("active");
       });
@@ -32,11 +32,6 @@
       childList: true,
       characterData: false
     });
-    /*$(document).on("click", tabSelector + " a", function(e) {
-       $(this).addClass("active");
-       console.log("Activating tab");
-       activateTab($(this).index(tabSelector + " a"));
-     });*/
     switch (method) {
       case "init":
         if (data != null) {
@@ -50,7 +45,6 @@
         } else {
           //TODO: Find something to put here
         }
-        console.log("Initializing tabs");
         activateTab(0);
         break;
       case "activate":

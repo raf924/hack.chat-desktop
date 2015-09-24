@@ -1,6 +1,7 @@
 var Channel = function(name, nickName) {
   this.name = name;
   this.nick = nickName;
+  this.channelId = nickName.split("#")[0] + (nickName.split("#").length > 1 ? "#" : "") + "@" + name;
   this.users = {};
   var that = this;
   var ws = new WebSocket("wss://hack.chat/chat-ws");
