@@ -45,6 +45,15 @@ var myNick = ipc.sendSync("get", "nickName");
 var currentChannel;
 var favourites = [];
 
+var addFavourite = function(channelName) {
+  window.favourites.push(channelName);
+  var $favourite = $("<li></li>").append($("<a></a>").attr("href", "#").attr("data-open", channelName).text(channelName)).appendTo($("#favourites"));
+  var visibleHeight = $("#favourites").visibleHeight();
+  if($("#favourites").css("max-height")!=visibleHeight&&$("#favourites").height()<visibleHeight){
+    $("#favourites").css("max-height",visibleHeight);
+  }
+}
+
 function scrollToBottom() {
   $(".messages").each(function(index, element) {
     $(element).scrollTop(element.scrollHeight);
@@ -126,15 +135,14 @@ $(function() {
   $(t.element).append($("<div></div>").text("Chatron"));
 
   ipc.on("favourites", function(favourites) {
-    window.favourites = favourites;
     favourites.forEach(function(favourite) {
-      var $favourite = $("<li></li>").append($("<a></a>").attr("href", "#").attr("data-opens", favourite).text(favourite)).appendTo($("#favourites"));
-      $favourite.find("a").click(function() {
-        login($(this).attr("data-opens"));
-      });
+      addFavourite(favourite);
     });
   });
   ipc.send("get", "favourites", true);
+  $("#favourites").on("a[data-open]", "click", function(e) {
+    login($(this).attr("data-open"));
+  });
   $("#channels-tabs").tabs("init");
   $(".button-collapse").sideNav({
     menuWidth: 300,
@@ -230,7 +238,7 @@ $(function() {
   });
   $("#menu").on("click", "a.fav", function(e) {
     e.preventDefault();
-    favourites.push($(this).attr("data-add"));
+    addFavourite($(this).attr("data-add"));
     ipc.send("set", {
       prop: "favourites",
       value: favourites
@@ -254,8 +262,8 @@ $(function() {
   });
   $("#channels-tabs").on("tabClosed", function(e, channelId) {
     closeChannel(channelId);
-    if($(this).find(".tab").length==0){
-      $("#send textarea").attr("disabled","");
+    if ($(this).find(".tab").length == 0) {
+      $("#send textarea").attr("disabled", "");
     }
   });
 });
