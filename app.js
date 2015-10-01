@@ -6,6 +6,7 @@ var Channel = require("./static/js/channel.js").Channel;
 var View = require("./static/js/views.js").View
 var ipc = require('ipc');
 var titlebar = require('titlebar');
+var fs = require('fs');
 
 var views = {
   "message": null,
@@ -44,12 +45,22 @@ var channels = {};
 var myNick = ipc.sendSync("get", "nickName");
 var currentChannel;
 var favourites = [];
+var parsers = [];
+
+var loadParsers = function () {
+  fs.readdir("./parsers", function (err, files) {
+    files.forEach(function (file) {
+      if(file.match(/[.]js$/i)!=null){
+        parsers.push(require("./parsers/"+file));
+      }
+    });
+  });
+};
 
 var addFavourite = function(channelName) {
   window.favourites.push(channelName);
   var $favourite = $("<li></li>").append($("<a></a>").attr("href", "#").attr("data-open", channelName).text(channelName)).appendTo($("#favourites"));
   var visibleHeight = $("#favourites").visibleHeight();
-  console.log(visibleHeight, $("#favourites").height());
   if($("#favourites").css("max-height")!=visibleHeight&&$("#favourites").height()>visibleHeight){
     $("#favourites").css("max-height",visibleHeight);
   }
@@ -76,13 +87,9 @@ var appendMessage = function($messages, $message, args) {
 };
 
 var parseText = function(text) {
-  var matches = text.match(/http(|s):[/][/].+(|[ ])/gi);
-  if (matches != null) {
-    matches.forEach(function(link) {
-      text = text.replace(link.trim(), $("<a></a>").attr("href", link.trim()).attr("target", "_blank").text(link.trim())[0].outerHTML);
-    });
-  }
-  return text;
+  parsers.forEach(function (parser) {
+    text = parser.parse(text);
+  });
 }
 
 Channel.messageReceived = function(args) {
@@ -133,6 +140,7 @@ Channel.removeUser = function(channel, user) {
 };
 
 $(function() {
+  loadParsers();
   $(t.element).append($("<div></div>").text("Chatron"));
 
   ipc.on("favourites", function(favourites) {
