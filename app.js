@@ -49,7 +49,7 @@ var addFavourite = function(channelName) {
   window.favourites.push(channelName);
   var $favourite = $("<li></li>").append($("<a></a>").attr("href", "#").attr("data-open", channelName).text(channelName)).appendTo($("#favourites"));
   var visibleHeight = $("#favourites").visibleHeight();
-  if($("#favourites").css("max-height")!=visibleHeight&&$("#favourites").height()<visibleHeight){
+  if($("#favourites").css("max-height")!=visibleHeight&&$("#favourites").height()>visibleHeight){
     $("#favourites").css("max-height",visibleHeight);
   }
 }
