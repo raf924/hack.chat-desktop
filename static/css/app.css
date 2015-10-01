@@ -46,6 +46,9 @@ header {
 #sidemenu, #users {
   padding-top: 1em;
 }
+#sidemenu{
+  overflow: hidden;
+}
 #menu, #settings {
   -webkit-perspective: 1000px;
   top: 24px;
@@ -159,5 +162,5 @@ form#send #textfield {
 }
 
 #favourites{
-  overflow-y: scroll;
+  overflow-y: auto;
 }
