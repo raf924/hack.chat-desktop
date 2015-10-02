@@ -17,7 +17,7 @@ var views = {
 var view = null;
 for (view in views) {
   if (views.hasOwnProperty(view)) {
-    views[view] = new View(view).$element;
+    views[view] = new View(view).element;
   }
 }
 
@@ -90,11 +90,12 @@ var parseText = function(text) {
   parsers.forEach(function (parser) {
     text = parser.parse(text);
   });
+  return text;
 }
 
 Channel.messageReceived = function(args) {
   var that = this;
-  var $message = views["message"].clone();
+  var $message = $(views["message"]);
   var $messages = $("#channels").find(".channel[id='" + that.channelId + "']").find(".messages");
   var message_icon = message_icons[args.cmd];
   switch (args.cmd) {
@@ -126,7 +127,7 @@ function insertAtCursor(text) {
 }
 
 Channel.addUser = function(channel, user) {
-  var $user = views["user"].clone();
+  var $user = $(views["user"]);
   $user.attr("user", user).find(".nick").text(user);
   $("#users .users[for='" + channel + "']").append($user);
 };
@@ -149,7 +150,7 @@ $(function() {
     });
   });
   ipc.send("get", "favourites", true);
-  $("#favourites").on("a[data-open]", "click", function(e) {
+  $("#favourites").on("click", "li a[data-open]", function(e) {
     login($(this).attr("data-open"));
   });
   $("#channels-tabs").tabs("init");
@@ -298,7 +299,7 @@ function login(channel) {
 function openChannel(channel, nick) {
   var ch = new Channel(channel, nick);
   channels[ch.channelId] = ch;
-  var $channel = views["channel"].clone();
+  var $channel = $(views["channel"]);
   $channel.attr("id", ch.channelId);
   $channel.appendTo("#channels");
   var $tab = $("<li></li>").addClass("tab row");
@@ -314,7 +315,7 @@ function openChannel(channel, nick) {
   $tab.attr("for", ch.channelId);
   $("#channels-tabs").append($tab);
   $("form#send #textfield").removeAttr("disabled");
-  var $users = views["users"].clone();
+  var $users = $(views["users"]);
   $users.attr("for", ch.channelId);
   $(".users").css("display:none");
   $("#users").append($users);
