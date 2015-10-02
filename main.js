@@ -96,13 +96,13 @@ app.on('ready', function() {
   });
 
   webContents.on("new-window", function(e, url, frameName, disposition) {
-    if (url.match(/https:[/][/]hack[.]chat/i) != null) {
-      event.PreventDefault();
-      ipc.send("openChannel", url.split("?")[1]);
+    if (url.match(/(https:[/][/]hack[.]chat)|(file:[//].+[?].+)/i) != null) {
+      e.preventDefault();
+      this.send("openChannel", url.split("?")[1]);
     } else {
       if (!config.get().openInside) {
-        event.PreventDefault();
-        shell.openExternal("url");
+        e.preventDefault();
+        shell.openExternal(url);
       }
     }
   });
