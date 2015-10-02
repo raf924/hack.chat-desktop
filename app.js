@@ -51,7 +51,8 @@ var loadParsers = function () {
   fs.readdir("./parsers", function (err, files) {
     files.forEach(function (file) {
       if(file.match(/[.]js$/i)!=null){
-        parsers.push(require("./parsers/"+file));
+        var parser = require("./parsers/"+file);
+        parsers.push(parser);
       }
     });
   });
