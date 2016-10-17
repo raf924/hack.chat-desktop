@@ -162,7 +162,6 @@ ul.collection.messages {
 
 form#send #textfield {
     overflow-y: visible;
-    width: 91%;
     max-height: 4em;
 }
 

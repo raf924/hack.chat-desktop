@@ -25,11 +25,12 @@
 <ul id="sidemenu" class="side-nav fixed">
     <div id="menu">
         <li class="brand row">
-        <pre class="col s11" style="overflow:hidden;white-space: pre-line;line-height: initial;">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
+        <pre class="col s10" style="overflow:hidden;white-space: pre-line;line-height: initial;">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
           |&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp;'_|&nbsp;|&nbsp;&nbsp;_|&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp; |_|_|__/|___|_,_|.|___|_|_|__/|_|
         </pre>
-            <a class="waves-effect waves-teal btn-flat col s1" data-flip="settings" style="padding:0;"><i
-                    class="material-icons">settings</i></a>
+            <a class="waves-effect waves-teal btn-flat col s1 tooltipped" data-tooltip="Settings" data-delay="50"
+               data-flip="settings" style="padding:0;">
+                <i class="material-icons">settings</i></a>
         </li>
         <li class="addChannel">
             <form class="inputprompt">
@@ -56,8 +57,9 @@
     <div id="settings">
         <li class="brand row">
             <h4 class="col s10">Settings</h4>
-            <a class="waves-effect waves-teal btn-flat col s2" data-flip="settings"><i
-                    class="material-icons">list</i></a>
+            <a class="waves-effect waves-teal btn-flat col s2 tooltipped" data-delay="50" data-tooltip="Menu"
+               data-flip="settings">
+                <i class="material-icons">list</i></a>
         </li>
         <li class="section">
             Window
@@ -80,8 +82,8 @@
     <div id="channels">
     </div>
     <div id="input_container" class="row">
-        <a href="#!" data-activates="users" class="button-collapse col s1 btn"><i class="material-icons medium">recent_actors</i></a>
-        <form id="send" class="col s11">
+        <a href="#!" data-activates="users" class="button-collapse col s1 m1 btn"><i class="material-icons medium">recent_actors</i></a>
+        <form id="send" class="col s9 m8">
             <div class="input-field">
                 <textarea type="text" id="textfield" class="materialize-textarea" disabled></textarea>
                 <label for="textfield">Type your message here</label>
