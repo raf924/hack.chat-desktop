@@ -2,108 +2,111 @@
 <html>
 
 <head>
-  <title>hack.chat</title>
-  <link href="static/css/materialize.css" rel="stylesheet">
-  <link href="static/css/material-icons.css" rel="stylesheet">
-  <link href="static/css/app.css" rel="stylesheet">
+    <title>hack.chat</title>
+    <link href="static/css/materialize.css" rel="stylesheet">
+    <link href="node_modules/material-design-icons/iconfont/material-icons.css" rel="stylesheet">
+    <link href="static/css/app.css" rel="stylesheet">
 </head>
 
 <body>
-  <header>
+<header>
     <div class="row">
-      <a class="button-collapse hide-on-large-only col s1" data-activates="sidemenu" href="#"><i class="mdi-navigation-menu"></i></a>
-      <!--<div class="col s11">
-        <ul id="channels-tabs" class="tabs">
-          <li class="tab disabled col s1" style="visibility:hidden;">
-            <a href="#"></a>
-          </li>
-        </ul>
-      </div>-->
+        <a class="button-collapse hide-on-large-only col s1" data-activates="sidemenu" href="#"><i
+                class="mdi-navigation-menu"></i></a>
+        <!--<div class="col s11">
+          <ul id="channels-tabs" class="tabs">
+            <li class="tab disabled col s1" style="visibility:hidden;">
+              <a href="#"></a>
+            </li>
+          </ul>
+        </div>-->
     </div>
-  </header>
-  <ul id="sidemenu" class="side-nav fixed">
+</header>
+<ul id="sidemenu" class="side-nav fixed">
     <div id="menu">
-      <li class="brand row">
-        <pre class="col s11" style="overflow:hidden;white-space: pre-line">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
+        <li class="brand row">
+        <pre class="col s11" style="overflow:hidden;white-space: pre-line;line-height: initial;">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
           |&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp;'_|&nbsp;|&nbsp;&nbsp;_|&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp; |_|_|__/|___|_,_|.|___|_|_|__/|_|
         </pre>
-        <a class="waves-effect waves-teal btn-flat col s1" data-flip="settings" style="padding:0;"><i class="material-icons">settings</i></a>
-      </li>
-      <li class="addChannel">
-        <form class="inputprompt">
-          <button class="btn waves-effect waves-light" type="button">
-            Join Channel&nbsp;<i class="material-icons">chat</i>
-          </button>
-          <div class="input-field">
-            <input type="text" style="display:none;" class="validate" placeholder="Channel Name">
-          </div>
-        </form>
-      </li>
-      <li>
-        <p>Open channels</p>
-      </li>
-      <ul id="channels-tabs">
+            <a class="waves-effect waves-teal btn-flat col s1" data-flip="settings" style="padding:0;"><i
+                    class="material-icons">settings</i></a>
+        </li>
+        <li class="addChannel">
+            <form class="inputprompt">
+                <button class="btn waves-effect waves-light" type="button">
+                    Join Channel&nbsp;<i class="material-icons">chat</i>
+                </button>
+                <div class="input-field">
+                    <input type="text" style="display:none;" class="validate" placeholder="Channel Name">
+                </div>
+            </form>
+        </li>
+        <li>
+            <p>Open channels</p>
+        </li>
+        <ul id="channels-tabs">
 
-      </ul>
-      <li>
-        <p>Favourite Channels</p>
-      </li>
-      <ul id="favourites">
-      </ul>
+        </ul>
+        <li>
+            <p>Favourite Channels</p>
+        </li>
+        <ul id="favourites">
+        </ul>
     </div>
     <div id="settings">
-      <li class="brand row">
-        <h4 class="col s10">Settings</h4>
-        <a class="waves-effect waves-teal btn-flat col s2" data-flip="settings"><i class="material-icons">list</i></a>
-      </li>
-      <li class="section">
-        Window
-        <form>
-          <p class="range-field">
-            <label for="width">Width:</label>
-            <input type="range" id="width" value="0" min="800" max="1900">
-          </p>
-          <p class="range-field">
-            <label for="height">Height:</label>
-            <input type="range" id="height" value="0" min="600" max="1080">
-          </p>
-        </form>
-      </li>
+        <li class="brand row">
+            <h4 class="col s10">Settings</h4>
+            <a class="waves-effect waves-teal btn-flat col s2" data-flip="settings"><i
+                    class="material-icons">list</i></a>
+        </li>
+        <li class="section">
+            Window
+            <form>
+                <p class="range-field">
+                    <label for="width">Width:</label>
+                    <input type="range" id="width" value="0" min="800" max="1900">
+                </p>
+                <p class="range-field">
+                    <label for="height">Height:</label>
+                    <input type="range" id="height" value="0" min="600" max="1080">
+                </p>
+            </form>
+        </li>
     </div>
-  </ul>
-  <ul id="users" class="side-nav">
-  </ul>
-  <main id="container" class="container">
+</ul>
+<ul id="users" class="side-nav">
+</ul>
+<main id="container" class="container">
     <div id="channels">
     </div>
     <div id="input_container" class="row">
-      <a href="#!" data-activates="users" class="button-collapse col s1 btn"><i class="material-icons medium">recent_actors</i></a>
-      <form id="send" class="col s11">
-        <div class="input-field">
-          <textarea type="text" id="textfield" class="materialize-textarea" disabled></textarea>
-          <label for="textfield">Type your message here</label>
-        </div>
-      </form>
+        <a href="#!" data-activates="users" class="button-collapse col s1 btn"><i class="material-icons medium">recent_actors</i></a>
+        <form id="send" class="col s11">
+            <div class="input-field">
+                <textarea type="text" id="textfield" class="materialize-textarea" disabled></textarea>
+                <label for="textfield">Type your message here</label>
+            </div>
+        </form>
     </div>
-  </main>
-  <div id="nickPrompt" class="modal" style="display:none;">
+</main>
+<div id="nickPrompt" class="modal" style="display:none;">
     <div class="modal-content">
-      <h4>Enter a nickname</h4>
-      <form>
-        <div class="input-field">
-          <input type="hidden" value="">
-          <input type="text" class="validate" placeholder="nick[#password] (ex: bob#isadick)">
-        </div>
-        <input type="checkbox" id="forAll">
-        <label for="forAll">Use this nick for all channels</label>
-        <button class="btn" type="submit">Join channel</button>
-      </form>
+        <h4>Enter a nickname</h4>
+        <form>
+            <div class="input-field">
+                <input type="hidden" value="">
+                <input type="text" class="validate" placeholder="nick[#password] (ex: bob#isadick)">
+            </div>
+            <input type="checkbox" id="forAll">
+            <label for="forAll">Use this nick for all channels</label>
+            <button class="btn" type="submit">Join channel</button>
+        </form>
     </div>
-  </div>
-  <script src="app.js"></script>
-  <script src="static/js/materialize.js"></script>
-  <script src="static/js/tabs.js" charset="utf-8"></script>
-  <script src="static/js/visible-height.js" charset="utf-8"></script>
+</div>
+<script src="app.js"></script>
+<script src="static/js/materialize.js"></script>
+<script src="static/js/tabs.js" charset="utf-8"></script>
+<script src="static/js/visible-height.js" charset="utf-8"></script>
 </body>
 
 </html>

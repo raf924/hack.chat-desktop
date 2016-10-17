@@ -1,166 +1,219 @@
 body {
-  position: absolute;
-  width: 100%;
-  font-family: Roboto;
+    position: absolute;
+    width: 100%;
+    font-family: Roboto;
 }
+
 main#container {
-  margin-top: 5em;
-  top: 0;
-  position: fixed;
-  height: 100%;
-  overflow-y: visible;
+    margin-top: 5em;
+    top: 0;
+    position: fixed;
+    height: 100%;
+    overflow-y: visible;
 }
+
 header, main {
-  padding-left: 310px;
+    padding-left: 310px;
 }
+
 @media only screen and (max-width: 992px) {
-  header, main {
-    padding-left: 0;
-  }
-  main {
-    padding-left: 10%;
-    padding-right: 10%;
-  }
-  #input_container.row {
-    padding-left: 1%;
+    header, main {
+        padding-left: 0;
+    }
+
+    main {
+        padding-left: 10%;
+        padding-right: 10%;
+    }
+
+    #input_container.row {
+        padding-left: 1%;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        max-height: 20%;
+    }
+}
+
+.material-icon {
+    -webkit-user-select: none;
+}
+
+.button-collapse {
+    font-size: 3em;
+}
+
+header {
+    max-height: 20%;
+    padding-top: 24px;
+}
+
+#sidemenu li >
+
+(
+p, h4
+
+)
+{
+    cursor: default
+;
+    padding: 10px 0px
+;
+}
+#sidemenu, #users {
+    padding-top: 1em;
+}
+
+#sidemenu {
+    overflow: hidden;
+}
+
+#menu, #settings {
+    -webkit-perspective: 1000px;
+    top: 24px;
+    will-change: transform, opacity, z-index;
+    position: absolute;
+    width: 100%;
+    -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
+}
+
+#menu {
+    -webkit-transform: rotateY(0deg);
+    z-index: 800;
+}
+
+#settings {
+    opacity: 0;
+    z-index: 0;
+    -webkit-transform: rotateY(-180deg);
+}
+
+#menu.flipped, #settings.flipped {
+    -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
+}
+
+#menu.flipped {
+    -webkit-transform: rotateY(180deg);
+    opacity: 0;
+}
+
+#settings.flipped {
+    opacity: 1;
+    z-index: 800;
+    -webkit-transform: rotateY(0deg);
+}
+
+#users {
+    left: -310px;
+}
+
+#channels-tabs .tab a.active {
+    border-bottom: 1px red solid;
+}
+
+.channel form {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+}
+
+ul.collection.messages {
+    overflow-y: visible;
+    width: 100%;
+    max-height: 69%;
+    position: absolute;
+}
+
+.messages li .message {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    word-break: break-word;
+    white-space: pre-line;
+    font-family: Roboto;
+}
+
+.messages li.collection-item.avatar {
+    padding-top: 1px;
+    min-height: 45px;
+    padding-bottom: 0px;
+}
+
+#input_container.row {
     position: fixed;
     width: 100%;
     bottom: 0;
-    max-height: 20%;
-  }
-}
-.material-icon {
-  -webkit-user-select: none;
-}
-.button-collapse {
-  font-size: 3em;
-}
-header {
-  max-height: 20%;
-  padding-top: 24px;
-}
-#sidemenu li > (p, h4) {
-  cursor: default;
-  padding: 10px 0px;
-}
-#sidemenu, #users {
-  padding-top: 1em;
-}
-#sidemenu{
-  overflow: hidden;
-}
-#menu, #settings {
-  -webkit-perspective: 1000px;
-  top: 24px;
-  will-change: transform, opacity, z-index;
-  position: absolute;
-  width: 100%;
-  -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
-}
-#menu {
-  -webkit-transform: rotateY(0deg);
-  z-index: 800;
-}
-#settings {
-  opacity: 0;
-  z-index: 0;
-  -webkit-transform: rotateY(-180deg);
-}
-#menu.flipped, #settings.flipped {
-  -webkit-transition: all 400ms linear, z-index 620ms, opacity 800ms;
-}
-#menu.flipped {
-  -webkit-transform: rotateY(180deg);
-  opacity: 0;
-}
-#settings.flipped {
-  opacity: 1;
-  z-index: 800;
-  -webkit-transform: rotateY(0deg);
-}
-#users {
-  left: -310px;
-}
-#channels-tabs .tab a.active {
-  border-bottom: 1px red solid;
-}
-.channel form {
-  bottom: 0;
-  position: fixed;
-  width: 100%;
-}
-ul.collection.messages {
-  overflow-y: visible;
-  width: 100%;
-  max-height: 69%;
-  position: absolute;
-}
-.messages li .message {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  word-break: break-word;
-  white-space: pre-line;
-  font-family: Roboto;
-}
-.messages li.collection-item.avatar {
-  padding-top: 1px;
-  min-height: 45px;
-  padding-bottom: 0px;
-}
-#input_container.row {
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-  min-height: 11%;
-}
-.titlebar {
-  z-index: 1000;
-  position: fixed;
-  top: 0;
-  width: 100%;
-}
-.brand {
-  font-size: 10px;
-  line-height: 12px;
-  font-weight: bold;
-  -webkit-user-select: none;
-  cursor: default;
-}
-form#send #textfield {
-  overflow-y: visible;
-  width: 91%;
-  max-height: 4em;
-}
-#channels-tabs a.btn-floating {
-  height: 37px;
-  width: 37px;
-  padding-right: 0px;
-  padding-left: 0px;
-  margin-top: 12px;
-  padding-bottom: 0px;
-  line-height: 37px;
-}
-#channels-tabs a.btn-floating.fav i.material-icons {
-  color: gold;
-}
-#channels-tabs a.btn-floating.ch-close i.material-icons {
-  color: red;
-}
-#channels-tabs li.tab {
-  padding-left: 0;
-  padding-right: 0;
-}
-#channels-tabs li.tab a.badge {
-  padding-left: 1px;
-  padding-right: 0px;
-}
-#channels-tabs li.tab a.ch-link {
-  /*text-overflow: ellipsis;*/
-  overflow: hidden;
-  padding-left: 0;
-  padding-right: 0;
+    min-height: 11%;
 }
 
-#favourites{
-  overflow-y: auto;
+.titlebar {
+    z-index: 1000;
+    position: fixed;
+    top: 0;
+    width: 100%;
+}
+
+.brand {
+    font-size: 10px;
+    line-height: 12px;
+    font-weight: bold;
+    -webkit-user-select: none;
+    cursor: default;
+}
+
+form#send #textfield {
+    overflow-y: visible;
+    width: 91%;
+    max-height: 4em;
+}
+
+#channels-tabs a.btn-floating {
+    height: 37px;
+    width: 37px;
+    padding-right: 0px;
+    padding-left: 0px;
+    margin: 0px;
+    padding-bottom: 0px;
+    line-height: 37px;
+}
+
+#channels-tabs a.fav i.material-icons {
+    color: gold;
+}
+
+#channels-tabs a.ch-close i.material-icons {
+    color: red;
+}
+
+#channels-tabs a.ch-close, #channels-tabs a.fav{
+    padding:0;
+}
+
+#channels-tabs a.ch-close:hover, #channels-tabs a.fav:hover, #channels-tabs a.badge:hover{
+    background-color: inherit;
+}
+
+#channels-tabs li.tab {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#channels-tabs li.tab a.badge {
+    padding-left: 1px;
+    padding-right: 0px;
+}
+
+#channels-tabs li.tab a.ch-link {
+    /*text-overflow: ellipsis;*/
+    overflow: hidden;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#favourites {
+    overflow-y: auto;
+}
+
+.messages li span.trip{
+    margin-left: 1em;
+    font-size: 0.7em;
 }

@@ -1,11 +1,10 @@
-"use strict";
-
-var app = require('app'); // Module to control application life.
-var BrowserWindow = require('browser-window'); // Module to create native browser window.
-var Menu = require("menu");
-var shell = require('shell');
-var nativeImage = require("native-image");
-var ipc = require('ipc');
+const electron = require('electron');
+const app = electron.app; // Module to control application life.
+const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
+const Menu = electron.Menu;
+const shell = electron.Shell;
+const nativeImage = electron.NativeImage;
+const ipc = electron.ipcMain;
 var config = require("./config.js");
 var fs = require('fs');
 
@@ -13,7 +12,7 @@ var myNick = config.get().nickName;
 
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
-require('crash-reporter').start();
+electron.crashReporter.start({companyName:'raf924', submitURL:'http://127.0.0.1'});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
@@ -81,7 +80,7 @@ app.on('ready', function() {
   Menu.setApplicationMenu(null);
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/index.html');
+  mainWindow.loadURL(`file://${__dirname}/index.html`);
   webContents = mainWindow.webContents;
   mainWindow.flashFrame(true);
   // Open the devtools.

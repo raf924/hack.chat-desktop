@@ -4,8 +4,9 @@
   "main": "main.js",
   "build": {},
   "scripts": {
-    "start": "./node_modules/electron-prebuilt/dist/electron .",
-    "build": "node package.js"
+    "start": "./node_modules/electron/dist/electron .",
+    "build": "node package.js",
+    "postinstall": "node build.js"
   },
   "repository": {
     "type": "git",
@@ -19,12 +20,16 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "fs": "*",
-    "titlebar": "*"
+    "fs": "0.0.1-security",
+    "jquery": "^3.1.1",
+    "material-design-icons": "^3.0.1",
+    "materialize-css": "^0.97.7",
+    "titlebar": "^1.4.0"
   },
   "devDependencies": {
-    "electron-builder": "*",
-    "electron-packager": "*",
-    "electron-prebuilt": "*"
+    "adm-zip": "^0.4.7",
+    "electron": "^1.4.1",
+    "electron-builder": "^7.14.1",
+    "electron-packager": "^8.1.0"
   }
 }
