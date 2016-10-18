@@ -177,7 +177,7 @@ $(function () {
     });
     $(".addChannel form input").keydown(function (e) {
         if (e.keyCode === 13) {
-            ipc.send("join", $(this).val());
+            login($(this).val(), null);
             $(".addChannel form button").css("display", "");
             $(".addChannel form input").css("display", "none");
             $(this).val("");
@@ -223,9 +223,9 @@ $(function () {
             }));
             window.myNick = nick;
         }
-        if (window.hasOwnProperty("currentChannel") && window.currentChannel !== undefined && window.currentChannel !== "") {
+        /*if (window.hasOwnProperty("currentChannel") && window.currentChannel !== undefined && window.currentChannel !== "") {
             openChannel(window.currentChannel, nick);
-        }
+        }*/
         $("#nickPrompt").closeModal();
         if (document.body.clientWidth < 992) {
             $(".button-collapse").sideNav("hide");
@@ -318,8 +318,7 @@ function closeChannel(channelId) {
 function login(channel, nick) {
     if (nick !== undefined && nick !== "") {
         openChannel(channel, nick);
-    }
-    else if (myNick == null || myNick == "" || myNick.split("#").length > 1 && myNick.split("#")[1].length == 0) {
+    } else if (myNick == null || myNick == "" || myNick.split("#").length > 1 && myNick.split("#")[1].length == 0) {
         $("#nickPrompt").openModal();
         $("#nickPrompt input.validate").val(myNick).data("realNick", myNick).data("channel", channel);
     } else {
@@ -355,6 +354,7 @@ function openChannel(channel, nick) {
     $users.attr("for", ch.channelId);
     $(".users").css("display:none");
     $("#users").append($users);
+    $("#channels-tabs").tabs("activate", $("#channels-tabs").children().length - 1);
 
     window.currentChannel = channel;
 }
