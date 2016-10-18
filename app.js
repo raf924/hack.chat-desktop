@@ -3,11 +3,11 @@
 window.$ = window.jQuery = require('jquery');
 window.Hammer = require('./static/js/hammer.min');
 
-var Channel = require("./static/js/channel.js").Channel;
-var View = require("./static/js/views.js").View;
-var ipc = require('electron').ipcRenderer;
-var titlebar = require('titlebar');
-var fs = require('fs');
+const Channel = require("./static/js/channel.js").Channel;
+const View = require("./static/js/views.js").View;
+const ipc = require('electron').ipcRenderer;
+const titlebar = require('titlebar');
+const fs = require('fs');
 
 var views = {
     "message": null,
@@ -95,33 +95,6 @@ var parseText = function (text) {
         text = parser.parse(text);
     });
     return text;
-}
-
-Channel.messageReceived = function (args) {
-    var that = this;
-    var $message = $(views["message"]);
-    var $messages = $("#channels").find(".channel[id='" + that.channelId + "']").find(".messages");
-    var message_icon = message_icons[args.cmd];
-    switch (args.cmd) {
-        case "onlineSet":
-            args.text = "Users online : " + args.nicks.join(", ");
-            break;
-        case "onlineRemove":
-            args.text = args.nick + " has left";
-            break;
-        case "onlineAdd":
-            args.text = args.nick + " has joined";
-            break;
-        case "chat":
-            args.text = parseText(args.text);
-            break;
-    }
-    if (message_icon.title) {
-        args.nick = message_icon.title;
-
-    }
-    setMaterialIcon($message, message_icon.icon, message_icon.color);
-    appendMessage($messages, $message, args);
 };
 
 function insertAtCursor(text) {
@@ -131,20 +104,50 @@ function insertAtCursor(text) {
     $("form#send #textfield").val(new_val)[0].selectionStart = pos + text.length;
 }
 
-Channel.addUser = function (channel, user) {
-    var $user = $(views["user"]);
-    $user.attr("user", user).find(".nick").text(user);
-    $("#users .users[for='" + channel + "']").append($user);
+var channelEventListener = {
+    addUser: function (channel, user) {
+        var $user = $(views["user"]);
+        $user.attr("user", user).find(".nick").text(user);
+        $(`#users .users[for='${channel}']`).append($user);
+    },
+    tripCodeSet: function (channel, user, tripCode) {
+        $(`#users .users[for='${channel}']`).find(".user[user='" + user + "']").find(".trip").text(tripCode);
+    },
+    removeUser: function (channel, user) {
+        $(`#users .users[for='${channel}']`).find(".user[user='" + user + "']").remove();
+    },
+    messageReceived: function (args) {
+        var that = this;
+        var $message = $(views["message"]);
+        var $messages = $("#channels").find(".channel[id='" + that.channelId + "']").find(".messages");
+        var message_icon = message_icons[args.cmd];
+        switch (args.cmd) {
+            case "onlineSet":
+                args.text = "Users online : " + args.nicks.join(", ");
+                break;
+            case "onlineRemove":
+                args.text = args.nick + " has left";
+                break;
+            case "onlineAdd":
+                args.text = args.nick + " has joined";
+                break;
+            case "chat":
+                args.text = parseText(args.text);
+                break;
+        }
+        if (message_icon.title) {
+            args.nick = message_icon.title;
+
+        }
+        setMaterialIcon($message, message_icon.icon, message_icon.color);
+        appendMessage($messages, $message, args);
+    }
 };
 
-Channel.setTripCode = function (channel, user, tripCode) {
-    $("#users .users[for='" + channel + "']").find(".user[user='" + user + "']").find(".trip").text(tripCode);
-};
 
-Channel.removeUser = function (channel, user) {
-    $("#users .users[for='" + channel + "']").find(".user[user='" + user + "']").remove();
-};
+function loadUsers(channel) {
 
+}
 $(function () {
     loadParsers();
     $(t.element).append($("<div></div>").text("Chatron"));
@@ -163,14 +166,9 @@ $(function () {
         menuWidth: 300,
         closeOnClick: false
     });
+
     $(".addChannel form").submit(function (e) {
         e.preventDefault();
-        var $nick = $(this).find("input");
-        myNick = $nick.data("realNick");
-        ipc.send("join", $(this).val());
-        $nick.val("").data("realNick", "").data("channel", "");
-        $(".addChannel form button").css("display", "");
-        $(".addChannel form input").css("display", "none");
     });
     $(".addChannel form button").click(function (e) {
         e.preventDefault();
@@ -178,18 +176,71 @@ $(function () {
         $(".addChannel form input").css("display", "").focus();
     });
     $(".addChannel form input").keydown(function (e) {
+        if (e.keyCode === 13) {
+            ipc.send("join", $(this).val());
+            $(".addChannel form button").css("display", "");
+            $(".addChannel form input").css("display", "none");
+            $(this).val("");
+        }
+    }).blur(function (e) {
+        $(".addChannel form button").css("display", "");
+        $(".addChannel form input").css("display", "none");
+    });
+
+
+    ipc.on("openChannel", function (e, data) {
+        console.log(data);
+        var {"channel": channel, "nick": nick} = JSON.parse(data);
+        login(channel, nick);
+    });
+
+    $("#channels-tabs").on("tabChanged", function (e, channel) {
+        loadUsers(channel);
+        window.currentChannel = channel;
+    });
+
+    $("form#send").submit(function (e) {
+        e.preventDefault();
+    });
+    $("form#send #textfield").keydown(function (e) {
+        if (e.keyCode === 13 && !e.shiftKey) {
+            e.preventDefault();
+            channels[$("#channels-tabs .tab a.active").attr("data-tab")].sendMessage($(this).val());
+            $(this).val("");
+        }
+    });
+    $("#nickPrompt form").submit(function (e) {
+        e.preventDefault();
+        var $nick = $(this).find("input.validate");
+        var nick = $nick.data("realNick");
+        ipc.send("join", JSON.stringify({"channel": $nick.data("channel"), "nick": nick}));
+        $nick.val("").data("realNick", "").data("channel", "");
+        var forAll = $(this).find("#forAll:checked");
+        if (forAll.length > 0) {
+            ipc.send("set", JSON.stringify({
+                prop: "nickName",
+                value: nick.split("#")[0] + "#"
+            }));
+            window.myNick = nick;
+        }
+        if (window.hasOwnProperty("currentChannel") && window.currentChannel !== undefined && window.currentChannel !== "") {
+            openChannel(window.currentChannel, nick);
+        }
+        $("#nickPrompt").closeModal();
+        if (document.body.clientWidth < 992) {
+            $(".button-collapse").sideNav("hide");
+        }
+    });
+    $("#nickPrompt form input[type='text']").keydown(function (e) {
         $(this).data("keyCode", e.keyCode);
         if ((e.keyCode !== 8 && e.keyCode != 46) || $(this).data("selectionStart") == null) {
             $(this).data("selectionEnd", e.currentTarget.selectionEnd);
             $(this).data("selectionStart", e.currentTarget.selectionStart);
         }
-    }).blur(function (e) {
-        $(".addChannel form button").css("display", "");
-        $(".addChannel form input").css("display", "none");
     }).click(function (e) {
         $(this).data("selectionEnd", e.currentTarget.selectionEnd);
         $(this).data("selectionStart", e.currentTarget.selectionStart);
-    }).on("select", function () {
+    }).on("select", function (e) {
         $(this).data("selectionEnd", e.currentTarget.selectionEnd);
         $(this).data("selectionStart", e.currentTarget.selectionStart);
     }).on("input", function (e) {
@@ -224,75 +275,6 @@ $(function () {
         $(this).data("selectionStart", null);
         $(this).data("selectionEnd", null);
         $(this).data("keyCode", null);
-    });
-
-    ipc.on("openChannel", function (channel) {
-        login(channel);
-    });
-
-    $("#channels-tabs").on("tabChanged", function (e, channel) {
-        loadUsers(channel);
-        currentChannel = channel;
-    });
-
-    $("form#send").submit(function (e) {
-        e.preventDefault();
-    });
-    $("form#send #textfield").keydown(function (e) {
-        if (e.keyCode === 13 && !e.shiftKey) {
-            e.preventDefault();
-            channels[$("#channels-tabs .tab a.active").attr("data-tab")].sendMessage($(this).val());
-            $(this).val("");
-        }
-    });
-    $("#nickPrompt form").submit(function (e) {
-        e.preventDefault();
-        var forAll = $(this).find("#forAll:checked");
-        var nick = $(this).find("input.validate")[0].previousSibling.value;
-        if (forAll.length > 0) {
-            window.myNick = nick;
-            ipc.send("set", JSON.stringify({
-                prop: "nickName",
-                value: nick.split("#")[0] + "#"
-            }));
-        }
-        if (window.currentChannel !== "") {
-            openChannel(window.currentChannel, nick);
-        }
-        $("#nickPrompt").closeModal();
-        if (document.body.clientWidth < 992) {
-            $(".button-collapse").sideNav("hide");
-        }
-        $(this).find("input.validate")[0].previousSibling.value = "";
-        $(this).find("input.validate").val("");
-    });
-    $("#nickPrompt form input[type='text']").keyup(function (e) {
-        var nick = e.currentTarget.value;
-    }).keydown(function (e) {
-        e.currentTarget.previousSibling.keyCode = e.keyCode;
-    }).on("select", function (e) {
-        e.currentTarget.previousSibling.selectionEnd = e.currentTarget.selectionEnd;
-        e.currentTarget.previousSibling.selectionStart = e.currentTarget.selectionStart;
-    }).on("input", function (e) {
-        var prev = e.currentTarget.previousSibling;
-        if (prev.value == null) {
-            prev.value = "";
-        }
-        if (prev.keyCode == 8) {
-            var value = prev.value;
-            prev.value = value.slice(0, prev.selectionStart - 1) + value.slice(prev.selectionEnd + 1, value.length - 1);
-            return;
-        }
-        var nick = e.currentTarget.value;
-        var lastChar = nick[nick.length - 1];
-        if (nick.length > prev.value.length) {
-            prev.value += lastChar;
-        }
-        var matches = nick.match(/#(.+)/i);
-        if (matches !== null) {
-            var password = nick.match(/#(.+)/i)[1];
-            e.currentTarget.value = nick.replace(/#(.+)/, "#" + password.replace(/./g, "*"));
-        }
     });
     $("#menu").on("click", "a.fav", function (e) {
         e.preventDefault();
@@ -333,12 +315,13 @@ function closeChannel(channelId) {
     $("[id='" + channelId + "'], [for='" + channelId + "']").remove();
 }
 
-function login(channel) {
-    window.currentChannel = channel;
-    if (myNick == null || myNick == "" || myNick.split("#").length > 1 && myNick.split("#")[1].length == 0) {
+function login(channel, nick) {
+    if (nick !== undefined && nick !== "") {
+        openChannel(channel, nick);
+    }
+    else if (myNick == null || myNick == "" || myNick.split("#").length > 1 && myNick.split("#")[1].length == 0) {
         $("#nickPrompt").openModal();
-        $("#nickPrompt input.validate").val(myNick).focus()[0].previousSibling.value = myNick;
-        window.currentChannel = channel;
+        $("#nickPrompt input.validate").val(myNick).data("realNick", myNick).data("channel", channel);
     } else {
         openChannel(channel, myNick);
     }
@@ -346,6 +329,11 @@ function login(channel) {
 
 function openChannel(channel, nick) {
     var ch = new Channel(channel, nick);
+    for (event in channelEventListener) {
+        if (channelEventListener.hasOwnProperty(event)) {
+            ch.on(event, channelEventListener[event]);
+        }
+    }
     channels[ch.channelId] = ch;
     var $channel = $(views["channel"]);
     $channel.attr("id", ch.channelId);
@@ -367,4 +355,6 @@ function openChannel(channel, nick) {
     $users.attr("for", ch.channelId);
     $(".users").css("display:none");
     $("#users").append($users);
+
+    window.currentChannel = channel;
 }

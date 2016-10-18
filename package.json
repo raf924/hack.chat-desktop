@@ -6,7 +6,7 @@
   "scripts": {
     "start": "./node_modules/electron/dist/electron .",
     "build": "node package.js",
-    "postinstall": "node build.js"
+    "postinstall": "node build.js && ./node_modules/typescript/bin/tsc"
   },
   "repository": {
     "type": "git",
@@ -20,16 +20,19 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "events": "^1.1.1",
     "fs": "0.0.1-security",
     "jquery": "^3.1.1",
     "material-design-icons": "^3.0.1",
     "materialize-css": "^0.97.7",
+    "require-rebuild": "^1.2.8",
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
     "adm-zip": "^0.4.7",
     "electron": "^1.4.1",
     "electron-builder": "^7.14.1",
-    "electron-packager": "^8.1.0"
+    "electron-packager": "^8.1.0",
+    "typescript": "^2.0.3"
   }
 }

@@ -6,6 +6,6 @@ var parse = function (text) {
     });
   }
   return text;
-}
+};
 
 exports.parse = parse;

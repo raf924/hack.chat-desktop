@@ -5,6 +5,9 @@ const Menu = electron.Menu;
 const shell = electron.Shell;
 const nativeImage = electron.NativeImage;
 const ipc = electron.ipcMain;
+
+require('require-rebuild')();
+
 var config = require("./config.js");
 var fs = require('fs');
 
@@ -14,7 +17,7 @@ var myNick = config.get().nickName;
 
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
-electron.crashReporter.start({companyName: 'raf924', submitURL: 'http://127.0.0.1'});
+//electron.crashReporter.start({companyName: 'raf924', submitURL: 'http://127.0.0.1'});
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
@@ -33,8 +36,9 @@ app.on('window-all-closed', function () {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 
-ipc.on("join", function (event, channel) {
-    event.sender.send("openChannel", channel);
+ipc.on("join", function (event, data) {
+    console.log(data);
+    event.sender.send("openChannel", data);
 });
 
 ipc.on("set", function (event, args) {
