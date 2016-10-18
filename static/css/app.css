@@ -48,20 +48,28 @@ header {
     padding-top: 24px;
 }
 
-#sidemenu li >
-
-(
-p, h4
-
-)
-{
-    cursor: default
-;
-    padding: 10px 0px
-;
+#sidemenu li > p, #sidemenu li > h4 {
+    cursor: default;
+    padding: 10px 0px;
 }
+
 #sidemenu, #users {
     padding-top: 1em;
+}
+
+#sidemenu .collapsible > li {
+    background-color: transparent;
+}
+
+#sidemenu .collapsible-header .caret::after{
+    content: '\E313';
+    float: right;
+    font-family: "Material Icons", sans-serif;
+    font-size: x-large;
+}
+
+#sidemenu .collapsible-header.active .caret::after{
+    content: '\E316';
 }
 
 #sidemenu {
@@ -183,11 +191,11 @@ form#send #textfield {
     color: red;
 }
 
-#channels-tabs a.ch-close, #channels-tabs a.fav{
-    padding:0;
+#channels-tabs a.ch-close, #channels-tabs a.fav {
+    padding: 0;
 }
 
-#channels-tabs a.ch-close:hover, #channels-tabs a.fav:hover, #channels-tabs a.badge:hover{
+#channels-tabs a.ch-close:hover, #channels-tabs a.fav:hover, #channels-tabs a.badge:hover {
     background-color: inherit;
 }
 
@@ -212,7 +220,7 @@ form#send #textfield {
     overflow-y: auto;
 }
 
-.messages li span.trip{
+.messages li span.trip {
     margin-left: 1em;
     font-size: 0.7em;
 }

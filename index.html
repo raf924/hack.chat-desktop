@@ -25,9 +25,9 @@
 <ul id="sidemenu" class="side-nav fixed">
     <div id="menu">
         <li class="brand row">
-        <pre class="col s10" style="overflow:hidden;white-space: pre-line;line-height: initial;">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
+            <pre class="col s10" style="overflow:hidden;white-space: pre-line;line-height: initial;">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
           |&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp;'_|&nbsp;|&nbsp;&nbsp;_|&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp; |_|_|__/|___|_,_|.|___|_|_|__/|_|
-        </pre>
+            </pre>
             <a class="waves-effect waves-teal btn-flat col s1 tooltipped" data-tooltip="Settings" data-delay="50"
                data-flip="settings" style="padding:0;">
                 <i class="material-icons">settings</i></a>
@@ -43,16 +43,24 @@
             </form>
         </li>
         <li>
-            <p>Open channels</p>
-        </li>
-        <ul id="channels-tabs">
+            <ul class="collapsible" data-collapsible="expandable">
+                <li>
+                    <div class="collapsible-header active">Open channels<span class="caret"></span></div>
+                    <div class="collapsible-body">
+                        <ul id="channels-tabs">
 
-        </ul>
-        <li>
-            <p>Favourite Channels</p>
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <div class="collapsible-header">Favourite Channels<span class="caret"></span></div>
+                    <div class="collapsible-body">
+                        <ul id="favourites">
+                        </ul>
+                    </div>
+                </li>
+            </ul>
         </li>
-        <ul id="favourites">
-        </ul>
     </div>
     <div id="settings">
         <li class="brand row">
