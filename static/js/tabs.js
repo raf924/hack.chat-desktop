@@ -10,7 +10,7 @@
                 $div.css("display", i == index ? "" : "none");
                 $(this)[i == index ? "addClass" : "removeClass"]("active");
             });
-            $(that).trigger("tabChanged", `${tabSelector} a[data-tab]`, that).attr("data-tab");
+            $(that).trigger("tabChanged", $(`${tabSelector} a[data-tab].active`, that).attr("data-tab"));
         };
         var observer = new MutationObserver(function (mutationRecord) {
             mutationRecord.forEach(function (mutation) {

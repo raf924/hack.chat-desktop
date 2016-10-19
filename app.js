@@ -48,6 +48,13 @@ var myNick = ipc.sendSync("get", "nickName");
 var currentChannel;
 var favourites = [];
 var parsers = [];
+var notify = {
+    "onlineSet": false,
+    "onlineAdd": true,
+    "onlineRemove": true,
+    "chat": true,
+    "warn": true
+}; //TODO: get the notify values from the config
 
 var loadParsers = function () {
     fs.readdir("./parsers", function (err, files) {
@@ -114,22 +121,23 @@ var channelEventListener = {
         $(`#users .users[for='${channel}']`).find(".user[user='" + user + "']").find(".trip").text(tripCode);
     },
     removeUser: function (channel, user) {
-        $(`#users .users[for='${channel}']`).find(".user[user='" + user + "']").remove();
+        $(`#users .users[for='${channel}']`).find(`.user[user='${user}']`).remove();
     },
     messageReceived: function (args) {
         var that = this;
         var $message = $(views["message"]);
-        var $messages = $("#channels").find(".channel[id='" + that.channelId + "']").find(".messages");
+        var $channel = $("#channels").find(`.channel[id='${that.channelId}']`);
+        var $messages = $channel.find(".messages");
         var message_icon = message_icons[args.cmd];
         switch (args.cmd) {
             case "onlineSet":
-                args.text = "Users online : " + args.nicks.join(", ");
+                args.text = `Users online : ${args.nicks.join(", ")}`;
                 break;
             case "onlineRemove":
-                args.text = args.nick + " has left";
+                args.text = `${args.nick} has left`;
                 break;
             case "onlineAdd":
-                args.text = args.nick + " has joined";
+                args.text = `${args.nick} has joined`;
                 break;
             case "chat":
                 args.text = parseText(args.text);
@@ -137,7 +145,13 @@ var channelEventListener = {
         }
         if (message_icon.title) {
             args.nick = message_icon.title;
-
+        }
+        if (this.channelId !== window.currentChannel && notify[args.cmd]){
+            var $badge = $(`.tab[for='${that.channelId}'] .badge`);
+            var count = Number($badge.text());
+            count++;
+            $badge.text(count);
+            //TODO: add notificiations
         }
         setMaterialIcon($message, message_icon.icon, message_icon.color);
         appendMessage($messages, $message, args);
@@ -197,6 +211,7 @@ $(function () {
     $("#channels-tabs").on("tabChanged", function (e, channel) {
         loadUsers(channel);
         window.currentChannel = channel;
+        $(`.tab[for='${channel}'] .counter`).text(0);
     });
 
     $("form#send").submit(function (e) {
@@ -224,8 +239,8 @@ $(function () {
             window.myNick = nick;
         }
         /*if (window.hasOwnProperty("currentChannel") && window.currentChannel !== undefined && window.currentChannel !== "") {
-            openChannel(window.currentChannel, nick);
-        }*/
+         openChannel(window.currentChannel, nick);
+         }*/
         $("#nickPrompt").closeModal();
         if (document.body.clientWidth < 992) {
             $(".button-collapse").sideNav("hide");
@@ -341,7 +356,7 @@ function openChannel(channel, nick) {
     var $close_link = $("<a href='#!'></a>").attr("data-close", ch.channelId).addClass("col s1 ch-close waves-effect waves-teal").append($("<i></i>").addClass("material-icons").text("close"));
     var $fav_link = $("<a href='#!'></a>").attr("data-add", ch.channelId).addClass("col s1 fav waves-effect waves-teal").append($("<i></i>").addClass("material-icons").text("grade"));
     var $link = $("<a href='#!'></a>").addClass("active ch-link col s8").text(ch.channelId.replace("#", "")).attr("data-tab", ch.channelId);
-    var $badge = $("<a>0</a>").addClass("badge col s1");
+    var $badge = $("<a>").addClass("col counter badge s1").text(0);
 
     $tab.append($fav_link);
     $tab.append($link);
