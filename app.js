@@ -354,7 +354,6 @@ function openChannel(channel, nick) {
     $users.attr("for", ch.channelId);
     $(".users").css("display:none");
     $("#users").append($users);
-    $("#channels-tabs").tabs("activate", $("#channels-tabs").children().length - 1);
 
     window.currentChannel = channel;
 }
