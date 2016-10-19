@@ -16,7 +16,7 @@ entries.forEach((zipEntry)=>{
 
 const execFile = require('child_process').execFile;
 var tscPath = 'node_modules/.bin/tsc';
-if(process.platform = "win32"){
+if(process.platform == "win32"){
     tscPath += ".cmd";
 }
 const child = execFile(tscPath.replace(/\//g, path.sep),[], (error, stdout, stderr)=> {
