@@ -4,7 +4,7 @@
   "main": "main.js",
   "build": {},
   "scripts": {
-    "start": "./node_modules/electron/dist/electron .",
+    "start": "node ./node_modules/electron/cli.js .",
     "build": "node package.js",
     "postinstall": "node build.js && ./node_modules/typescript/bin/tsc"
   },
