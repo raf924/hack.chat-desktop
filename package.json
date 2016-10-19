@@ -7,7 +7,7 @@
   },
   "scripts": {
     "start": "node start.js",
-    "build": "node package.js",
+    "package": "node package.js",
     "postinstall": "node build.js"
   },
   "repository": {

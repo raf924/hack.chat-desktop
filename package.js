@@ -1,19 +1,22 @@
-var packager = require('electron-packager');
+const packager = require('electron-packager');
+const fs = require('fs');
 
+var package = fs.readFileSync('./node_modules/electron/package.json', 'utf-8');
+var info = JSON.parse(package);
 var args = process.argv;
-args.slice(0, 2);
 
 packager({
     dir: ".",
     name: "Chatron",
-    platform: args[0] | "all",
+    platform: args[2] || "all",
     overwrite: true,
-    version: "0.30.4",
-    arch: args[1] | "all",
+    version: `${info.version}`,
+    arch: args[3] || "all",
     out: "dist",
-    ignore: "node_modules/(electron-builder|.bin)|dist|.bin",
     asar: true,
-    icon:"icon.ico"
+    ignore: ["build.js", "start.js", "package.js", "ts", "tsconfig.json", ".idea", ".gitattributes", ".gitignore", "data.json"],
+    icon: "icon.ico",
+    prune: false //TODO: find out why it must be set to false to work
 }, function done(err, appPath) {
     console.log(err);
     console.log(appPath);
