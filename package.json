@@ -2,11 +2,13 @@
   "name": "hack.chat-desktop",
   "version": "0.1.0",
   "main": "main.js",
-  "build": {},
+  "engines": {
+    "node": ">=6.5.0"
+  },
   "scripts": {
-    "start": "./node_modules/electron/dist/electron .",
+    "start": "node start.js",
     "build": "node package.js",
-    "postinstall": "node build.js && ./node_modules/typescript/bin/tsc"
+    "postinstall": "node build.js"
   },
   "repository": {
     "type": "git",
@@ -29,6 +31,7 @@
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
+    "@types/node": "^6.0.45",
     "adm-zip": "^0.4.7",
     "electron": "^1.4.1",
     "electron-builder": "^7.14.1",

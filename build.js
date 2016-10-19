@@ -13,3 +13,12 @@ entries.forEach((zipEntry)=>{
         zFile.extractEntryTo(zipEntry.entryName, `./static/${zipEntry.entryName.split("/")[1]}`, false, true);
     }
 });
+
+const execFile = require('child_process').execFile;
+
+const child = execFile('node',['./node_modules/typescript/bin/tsc'], (error, stdout, stderr)=> {
+    if(error){
+        throw error;
+    }
+    console.log(stdout);
+});
