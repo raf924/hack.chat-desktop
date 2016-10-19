@@ -59,7 +59,7 @@ var notify = {
 var loadParsers = function () {
     fs.readdir("./parsers", function (err, files) {
         files.forEach(function (file) {
-            if (file.match(/[.]js$/i) != null) {
+            if (file.match(/\.js$/i) != null) {
                 var parser = require("./parsers/" + file);
                 parsers.push(parser);
             }
@@ -93,6 +93,9 @@ var appendMessage = function ($messages, $message, args) {
     $message.find(".nick").text(args.nick);
     $message.find(".message").html(args.text);
     $message.find(".trip").text(args.trip);
+    if(args.mod){
+        $message.find(".mod").removeClass("hide");
+    }
     $messages.append($message);
     scrollToBottom();
 };
@@ -151,7 +154,7 @@ var channelEventListener = {
             var count = Number($badge.text());
             count++;
             $badge.text(count);
-            //TODO: add notificiations
+            //TODO: add notifications
         }
         setMaterialIcon($message, message_icon.icon, message_icon.color);
         appendMessage($messages, $message, args);
@@ -160,7 +163,7 @@ var channelEventListener = {
 
 
 function loadUsers(channel) {
-
+    //TODO: load users
 }
 $(function () {
     loadParsers();
@@ -223,6 +226,9 @@ $(function () {
             channels[$("#channels-tabs .tab a.active").attr("data-tab")].sendMessage($(this).val());
             $(this).val("");
         }
+        //TODO: add nickname autocompletion
+        //TODO: add commands handling
+        //TODO: add history
     });
     $("#nickPrompt form").submit(function (e) {
         e.preventDefault();

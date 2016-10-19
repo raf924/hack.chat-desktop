@@ -12,6 +12,7 @@ var config = require("./config.js");
 var fs = require('fs');
 
 //TODO: Add remote config
+//TODO: Add tray icon
 
 var myNick = config.get().nickName;
 

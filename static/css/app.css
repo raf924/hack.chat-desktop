@@ -35,8 +35,14 @@ header, main {
     }
 }
 
-.material-icon {
+.material-icons {
     -webkit-user-select: none;
+}
+
+.mod {
+    margin-top: 0.1em;
+    position: absolute;
+    font-size: 1.3em;
 }
 
 .button-collapse {
@@ -61,14 +67,14 @@ header {
     background-color: transparent;
 }
 
-#sidemenu .collapsible-header .caret::after{
+#sidemenu .collapsible-header .caret::after {
     content: '\E313';
     float: right;
     font-family: "Material Icons", sans-serif;
     font-size: x-large;
 }
 
-#sidemenu .collapsible-header.active .caret::after{
+#sidemenu .collapsible-header.active .caret::after {
     content: '\E316';
 }
 
