@@ -6,12 +6,12 @@
   "info": {
     "icon": "info_outline",
     "color": "green",
-    "title": ""
+    "title": true
   },
   "onlineSet": {
     "icon": "recent_actors",
     "color": "green",
-    "title": ""
+    "title": true
   },
   "onlineAdd": {
     "icon": "perm_identity",
@@ -20,11 +20,11 @@
   "onlineRemove": {
     "icon": "perm_identity",
     "color": "yellow",
-    "title": ""
+    "title": true
   },
   "warn": {
     "icon": "warning",
     "color": "red",
-    "title": ""
+    "title": true
   }
 }

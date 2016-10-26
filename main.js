@@ -38,7 +38,6 @@ app.on('window-all-closed', function () {
 // initialization and is ready to create browser windows.
 
 ipc.on("join", function (event, data) {
-    console.log(data);
     event.sender.send("openChannel", data);
 });
 

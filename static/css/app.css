@@ -118,7 +118,7 @@ header {
 }
 
 #users {
-    left: -310px;
+    "left: -310px;"
 }
 
 #channels-tabs .tab a.active {
@@ -229,4 +229,8 @@ form#send #textfield {
 .messages li span.trip {
     margin-left: 1em;
     font-size: 0.7em;
+}
+
+#sidenav-overlay {
+    display: none;
 }

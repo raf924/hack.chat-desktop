@@ -4,7 +4,9 @@
     "target": "es6",
     "noImplicitAny": false,
     "sourceMap": false,
-    "outDir": "static/js"
+    /*"outDir": "static/js",*/
+    "declaration": true,
+    "outFile": "static/js/final.js"
   },
   "include": [
     "ts/*"

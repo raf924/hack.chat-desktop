@@ -1,14 +1,23 @@
 import {EventEmitter} from 'events';
 
+interface MessageData{
+    nick: string,
+    trip: string,
+    mod: boolean,
+    cmd: string,
+    nicks : string[],
+    text : string
+}
+
 class Channel extends EventEmitter{
-    name : String;
-    nick : String;
-    channelId : String;
-    users : Map<String, String>;
+    name : string;
+    nick : string;
+    channelId : string;
+    users : Map<string, string>;
     ws : WebSocket;
     constructor(name, nickName){
         super();
-        this.users = new Map<String, String>();
+        this.users = new Map<string, string>();
         this.name = name;
         this.nick = nickName;
         this.channelId = nickName.split("#")[0] + (nickName.split("#").length > 1 ? "#" : "") + "@" + name;
@@ -27,10 +36,9 @@ class Channel extends EventEmitter{
             });
         };
         this.ws.onmessage = function (message) {
-            console.log(message.data);
-            var args = JSON.parse(message.data);
-            if (args.nick != null && !that.users[args.nick]) {
-                that.users[args.nick] = args.trip || "";
+            let args : MessageData = JSON.parse(message.data);
+            if (args.cmd == "onlineAdd") {
+                that.users[args.nick] =  "";
                 that.addUser(args.nick);
             } else if (args.trip) {
                 that.setTripCode(args.nick, args.trip);
@@ -75,4 +83,4 @@ class Channel extends EventEmitter{
     }
 }
 
-export {Channel};
+export {Channel, MessageData};

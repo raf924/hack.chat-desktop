@@ -31,6 +31,9 @@
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
+    "@types/electron": "^1.4.24",
+    "@types/jquery": "^2.0.33",
+    "@types/materialize-css": "^0.97.31",
     "@types/node": "^6.0.45",
     "adm-zip": "^0.4.7",
     "electron": "^1.4.1",

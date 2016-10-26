@@ -74,7 +74,7 @@ var addFavourite = function (channelName) {
     if ($("#favourites").css("max-height") != visibleHeight && $("#favourites").height() > visibleHeight) {
         $("#favourites").css("max-height", visibleHeight);
     }
-}
+};
 
 function scrollToBottom() {
     $(".messages").each(function (index, element) {
@@ -93,7 +93,7 @@ var appendMessage = function ($messages, $message, args) {
     $message.find(".nick").text(args.nick);
     $message.find(".message").html(args.text);
     $message.find(".trip").text(args.trip);
-    if(args.mod){
+    if (args.mod) {
         $message.find(".mod").removeClass("hide");
     }
     $messages.append($message);
@@ -108,25 +108,41 @@ var parseText = function (text) {
 };
 
 function insertAtCursor(text) {
-    var pos = $("form#send #textfield")[0].selectionStart || 0;
-    var value = $("form#send #textfield").val();
+    let $textfield = $("form#send #textfield");
+    var pos = $textfield[0].selectionStart || 0;
+    var value = $textfield.val();
     var new_val = [value.slice(0, pos), text, value.slice(pos)].join('');
-    $("form#send #textfield").val(new_val)[0].selectionStart = pos + text.length;
+    $textfield.val(new_val)[0].selectionStart = pos + text.length;
 }
 
 var channelEventListener = {
-    addUser: function (channel, user) {
+    addUser: function (user) {
         var $user = $(views["user"]);
         $user.attr("user", user).find(".nick").text(user);
-        $(`#users .users[for='${channel}']`).append($user);
+        $(`#users`).find(`.users[for='${this.channelId}']`).append($user);
     },
-    tripCodeSet: function (channel, user, tripCode) {
-        $(`#users .users[for='${channel}']`).find(".user[user='" + user + "']").find(".trip").text(tripCode);
+    tripCodeSet: function (user, tripCode) {
+        $(`#users`).find(`.users[for='${this.channelId}'] .user[user='${user}'] .trip`).text(tripCode);
     },
-    removeUser: function (channel, user) {
-        $(`#users .users[for='${channel}']`).find(`.user[user='${user}']`).remove();
+    removeUser: function (user) {
+        $(`#users`).find(`.users[for='${this.channelId}'] .user[user='${user}']`).remove();
     },
     messageReceived: function (args) {
+        switch (args.cmd) {
+            case "onlineSet":
+                args.text = `Users online : ${args.nicks.join(", ")}`;
+                loadUsers(that.channelId);
+                break;
+            case "onlineRemove":
+                args.text = `${args.nick} has left`;
+                break;
+            case "onlineAdd":
+                args.text = `${args.nick} has joined`;
+                break;
+            case "chat":
+                args.text = parseText(args.text);
+                break;
+        }
         var that = this;
         var $message = $(views["message"]);
         var $channel = $("#channels").find(`.channel[id='${that.channelId}']`);
@@ -135,6 +151,7 @@ var channelEventListener = {
         switch (args.cmd) {
             case "onlineSet":
                 args.text = `Users online : ${args.nicks.join(", ")}`;
+                loadUsers(that.channelId);
                 break;
             case "onlineRemove":
                 args.text = `${args.nick} has left`;
@@ -149,7 +166,7 @@ var channelEventListener = {
         if (message_icon.title) {
             args.nick = message_icon.title;
         }
-        if (this.channelId !== window.currentChannel && notify[args.cmd]){
+        if (this.channelId !== window.currentChannel && notify[args.cmd]) {
             var $badge = $(`.tab[for='${that.channelId}'] .badge`);
             var count = Number($badge.text());
             count++;
@@ -164,6 +181,16 @@ var channelEventListener = {
 
 function loadUsers(channel) {
     //TODO: load users
+    var $users = $(`.users[for='${channel}']`);
+    $users.css("display", "");
+    var users = channels[channel].users;
+    for (var user in users){
+        var $user = $(views["user"]);
+        $user.find(".nick").text(user);
+        $user.find(".trip").text(users[user]);
+        $user.attr("user", user);
+        $users.append($user);
+    }
 }
 $(function () {
     loadParsers();
@@ -206,13 +233,14 @@ $(function () {
 
 
     ipc.on("openChannel", function (e, data) {
-        console.log(data);
         var {"channel": channel, "nick": nick} = JSON.parse(data);
         login(channel, nick);
     });
 
     $("#channels-tabs").on("tabChanged", function (e, channel) {
-        loadUsers(channel);
+        //TODO: show users
+        $(".users").css("display", "none");
+        $(`.users[for='${channel}']`).css("display", "");
         window.currentChannel = channel;
         $(`.tab[for='${channel}'] .counter`).text(0);
     });
@@ -252,7 +280,7 @@ $(function () {
             $(".button-collapse").sideNav("hide");
         }
     });
-    $("#nickPrompt form input[type='text']").keydown(function (e) {
+    $("#nickPrompt").find("form input[type='text']").keydown(function (e) {
         $(this).data("keyCode", e.keyCode);
         if ((e.keyCode !== 8 && e.keyCode != 46) || $(this).data("selectionStart") == null) {
             $(this).data("selectionEnd", e.currentTarget.selectionEnd);
@@ -321,14 +349,16 @@ $(function () {
             $("#menu,#settings").addClass("flipped");
         }
     });
+    $("a[data-activates='users']").click(function () {
+        $("div.drag-target").remove();
+    });
     $("#channels-tabs").on("tabClosed", function (e, channelId) {
         closeChannel(channelId);
         if ($(this).find(".tab").length == 0) {
             $("#send textarea").attr("disabled", "");
         }
     });
-})
-;
+});
 
 function closeChannel(channelId) {
     channels[channelId].close();
