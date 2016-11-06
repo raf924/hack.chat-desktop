@@ -24,21 +24,22 @@
   "dependencies": {
     "events": "^1.1.1",
     "fs": "0.0.1-security",
+    "hammer": "0.0.5",
     "jquery": "^3.1.1",
     "material-design-icons": "^3.0.1",
-    "materialize-css": "^0.97.7",
+    "materialize-css": "^0.97.8",
     "require-rebuild": "^1.2.8",
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
-    "@types/electron": "^1.4.24",
+    "@types/electron": "^1.4.25",
     "@types/jquery": "^2.0.33",
-    "@types/materialize-css": "^0.97.31",
-    "@types/node": "^6.0.45",
+    "@types/materialize-css": "^0.97.32",
+    "@types/node": "^6.0.46",
     "adm-zip": "^0.4.7",
-    "electron": "^1.4.1",
-    "electron-builder": "^7.14.1",
-    "electron-packager": "^8.1.0",
-    "typescript": "^2.0.3"
+    "electron": "^1.4.5",
+    "electron-builder": "^7.18.0",
+    "electron-packager": "^8.2.0",
+    "typescript": "^2.0.6"
   }
 }

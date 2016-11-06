@@ -4,11 +4,10 @@
     "target": "es6",
     "noImplicitAny": false,
     "sourceMap": false,
-    /*"outDir": "static/js",*/
-    "declaration": true,
-    "outFile": "static/js/final.js"
+    "outDir": "./lib",
+    "allowJs": true
   },
   "include": [
-    "ts/*"
+    "src/**/*"
   ]
 }

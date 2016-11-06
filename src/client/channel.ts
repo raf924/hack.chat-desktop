@@ -37,20 +37,27 @@ class Channel extends EventEmitter{
         };
         this.ws.onmessage = function (message) {
             let args : MessageData = JSON.parse(message.data);
-            if (args.cmd == "onlineAdd") {
-                that.users[args.nick] =  "";
-                that.addUser(args.nick);
-            } else if (args.trip) {
-                that.setTripCode(args.nick, args.trip);
-            } else if (args.cmd == "onlineRemove") {
-                that.removeUser(args.nick);
-            } else if (args.nicks) {
-                for (var nick of args.nicks) {
-                    if (!that.users[nick]) {
-                        that.users[nick] = "";
-                        that.addUser(nick);
+            switch (args.cmd){
+                case "onlineAdd":
+                    that.users[args.nick] =  "";
+                    that.addUser(args.nick);
+                    break;
+                case "chat":
+                    that.setTripCode(args.nick, args.trip);
+                    break;
+                case "onlineRemove":
+                    that.removeUser(args.nick);
+                    break;
+                case "onlineSet":
+                    for (let nick of args.nicks) {
+                        if (!that.users[nick]) {
+                            that.users[nick] = "";
+                            that.addUser(nick);
+                        }
                     }
-                }
+                    break;
+                default:
+                    throw "Unknown command";
             }
             that.receiveMessage(args);
         };

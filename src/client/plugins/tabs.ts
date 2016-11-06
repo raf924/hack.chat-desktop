@@ -1,27 +1,27 @@
 (function ($) {
     $.fn.tabs = function (method, data) {
-        if (this.length == 0) return;
-        var that = this;
-        var tabSelector = ".tab";
-        var activateTab = function (index) {
+        if (this.length == 0) return this;
+        let that = this;
+        let tabSelector = ".tab";
+        let activateTab = function (index) {
             var $tabs = that.find(`${tabSelector} a[data-tab]`);
             $tabs.each(function (i) {
-                var $div = $("[id='" + $(this).attr("data-tab") + "']");
+                let $div = $(`[id='${$(this).attr("data-tab")}']`);
                 $div.css("display", i == index ? "" : "none");
                 $(this)[i == index ? "addClass" : "removeClass"]("active");
             });
             $(that).trigger("tabChanged", $(`${tabSelector} a[data-tab].active`, that).attr("data-tab"));
         };
-        var observer = new MutationObserver(function (mutationRecord) {
+        let observer = new MutationObserver(function (mutationRecord) {
             mutationRecord.forEach(function (mutation) {
                 switch (mutation.type) {
                     case "attributes":
-                        activateTab($(target).index(`${tabSelector} a[data-tab]`));
+                        activateTab($(mutation.target).index(`${tabSelector} a[data-tab]`));
                         break;
                     case "childList":
-                        if (mutation.addedNodes != null) {
-                            var $tabs = $(mutation.addedNodes).find("a[data-tab]");
-                            var $closeTab = $(mutation.addedNodes).find("a[data-close]");
+                        if (mutation.addedNodes.length > 0) {
+                            let $tabs = $(mutation.addedNodes).find("a[data-tab]");
+                            let $closeTab = $(mutation.addedNodes).find("a[data-close]");
                             $closeTab.click(function (e) {
                                 $(that).trigger("tabClosed", $(this).attr("data-close"));
                             });
@@ -35,8 +35,8 @@
             });
         });
         observer.observe(this[0], {
-            attributes: false,
-            subTree: true,
+            attributes: true,
+            subtree: false,
             childList: true,
             characterData: false
         });
@@ -71,5 +71,6 @@
                 break;
 
         }
+        return this;
     }
 }(jQuery));

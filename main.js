@@ -43,13 +43,13 @@ ipc.on("join", function (event, data) {
 
 ipc.on("set", function (event, args) {
     //TODO: Add a remote config
-    var obj = JSON.parse(args);
+    let obj = JSON.parse(args);
     config.get()[obj.prop] = obj.value;
     config.save();
 });
 
 ipc.on("get", function (event, prop, async) {
-    var value = config.get()[prop];
+    let value = config.get()[prop];
     if (async) {
         event.sender.send(prop, value || "");
     } else {

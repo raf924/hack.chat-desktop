@@ -1,6 +1,9 @@
-///<reference path="../node_modules/@types/jquery/index.d.ts" />
-///<reference path="../node_modules/@types/materialize-css/index.d.ts"/>
-///<reference path="tabs.d.ts" />
+///<reference path="../../node_modules/@types/jquery/index.d.ts" />
+///<reference path="../../node_modules/@types/materialize-css/index.d.ts"/>
+///<reference path="plugins/visibleHeight.d.ts"/>
+///<reference path="plugins/tabs.d.ts"/>
+
+//TODO: add keyboard shortcuts
 
 import {ChannelUI} from "./channelUI"
 const titlebar = require('titlebar');
@@ -14,11 +17,20 @@ export interface MessageIcon {
     title: boolean
 }
 
-export interface Views {
-    message: View,
-    channel: View,
-    user: View,
-    users: View
+export class Views {
+    message: View;
+    channel: View;
+    user: View;
+    users: View;
+    accessLink: View;
+
+    constructor() {
+        this.message = new View("message");
+        this.channel = new View("channel");
+        this.users = new View("users");
+        this.user = new View("user");
+        this.accessLink = new View("accessLink");
+    }
 }
 
 interface Titlebar {
@@ -43,10 +55,10 @@ class UI {
     private static titleBar: Titlebar;
     private static ipc: Electron.IpcRenderer;
     private static nick: string;
-    static currentChannel: string;
+    public static currentChannel: string;
     private static parsers: Function[];
     private static channelUIs: Map<string, ChannelUI>;
-    static notifyConfig: NotifyConfig;
+    public static notifyConfig: NotifyConfig;
     public static views: Views;
     private static nickPrompt: JQuery;
 
@@ -55,11 +67,19 @@ class UI {
         let $favouriteLink = $("<a>").attr("href", "#").attr("data-open", channelName).text(channelName);
         let $favourite = $("<li>").append($favouriteLink);
         UI.favouritesUI.append($favourite);
+        let visibleHeight: Number = UI.favouritesUI.visibleHeight();
+        if (UI.favouritesUI.css("max-height") != visibleHeight.toString() && UI.favouritesUI.height() > visibleHeight) {
+            UI.favouritesUI.css("max-height", visibleHeight.toString());
+        }
     }
 
     public static init() {
+        UI.channelUIs = new Map<string, ChannelUI>();
+        UI.favourites = [];
+        UI.parsers = [];
         UI.loadViews();
         UI.nickPrompt = $("#nickPrompt");
+        UI.nickPrompt.modal();
         UI.notifyConfig = {
             "onlineSet": false,
             "onlineAdd": true,
@@ -74,18 +94,19 @@ class UI {
         $(UI.titleBar.element).append($("<div>").text("Chatron"));
         UI.loadParsers();
 
-        $("#favourites").on("click", "li a[data-open]", function (e) {
+        UI.favouritesUI = $("#favourites");
+        UI.favouritesUI.on("click", "li a[data-open]", function (e) {
             UI.login($(this).attr("data-open"));
         });
 
-        UI.message_icons = require("./static/data/message_icons.json");
+        UI.message_icons = require("../data/message_icons.json");
 
-        UI.loadViews();
         UI.loadUIEvents();
         UI.loadChatEvents();
         UI.loadIpcEvents();
         UI.loadLoginEvents();
         UI.loadTabEvents();
+        UI.loadChannelEvents();
     }
 
     private static loadTitleBarEvents(): void {
@@ -93,23 +114,19 @@ class UI {
             UI.titleBar.on(event, function (e) {
                 UI.ipc.send(event, function () {
 
-                })
+                });
             });
         }
     }
 
     private static loadViews(): void {
-        for (let view in UI.views) {
-            if (UI.views.hasOwnProperty(view)) {
-                UI.views[view] = new View(view);
-            }
-        }
+        UI.views = new Views();
     }
 
     private static loadParsers(): void {
         fs.readdir("./parsers", function (err, files) {
             files.forEach(function (file) {
-                let parser: Function = require(`./parsers/${file}`).parse;
+                let parser: Function = require(`../../parsers/${file}`).parse;
                 UI.parsers.push(parser);
             });
         });
@@ -161,7 +178,7 @@ class UI {
                 }));
                 UI.nick = nick;
             }
-            UI.nickPrompt.closeModal();
+            UI.nickPrompt.modal('close');
             if (document.body.clientWidth < 992) {
                 $(".button-collapse").sideNav("hide");
             }
@@ -262,19 +279,23 @@ class UI {
     }
 
     private static loadTabEvents(): void {
-        $("#channels-tabs").tabs("init").on("tabChanged", function (e, channel) {
-            //TODO: show users
-            $(".users").css("display", "none");
-            UI.channelUIs[channel].usersUI.css("display", "");
-            UI.channelUIs[channel].messageCounter.text(0);
-            UI.currentChannel = channel;
-        }).on("tabClosed", function (e, channelId) {
-            UI.channelUIs[channelId].close();
-            delete UI.channelUIs[channelId];
-            if ($(this).find(".tab").length == 0) {
-                $("#send").find("textarea").attr("disabled", "");
-            }
-        });
+        $("#channels-tabs")
+            .tabs("init")
+            .on("tabChanged", function (e, channelId) {
+                //TODO: show users
+                $(".users").css("display", "none");
+                UI.channelUIs[channelId].usersUI.css("display", "");
+                UI.channelUIs[channelId].unreadMessageCount = 0;
+                UI.channelUIs[channelId].messageCounter.text(0);
+                UI.currentChannel = channelId;
+            })
+            .on("tabClosed", function (e, channelId) {
+                UI.channelUIs[channelId].close();
+                delete UI.channelUIs[channelId];
+                if ($(this).find(".tab").length == 0) {
+                    $("#send").find("textarea").attr("disabled", "");
+                }
+            });
         $(".button-collapse").sideNav({
             menuWidth: 300,
             closeOnClick: false
@@ -282,10 +303,10 @@ class UI {
     }
 
     private static login(channelName: string, nick?: string): void {
-        if (nick !== undefined && nick !== "") {
+        if (nick !== undefined && nick !== null && nick !== "") {
             UI.openChannel(channelName, nick);
         } else if (UI.nick === null || UI.nick === "" || UI.nick.split("#").length > 1 && UI.nick.split("#")[1].length == 0) {
-            UI.nickPrompt.openModal();
+            UI.nickPrompt.modal('open');
             UI.nickPrompt.find("input.validate").val(UI.nick).data("realNick", UI.nick).data("channel", channelName);
         } else {
             UI.openChannel(channelName, UI.nick);
@@ -293,8 +314,32 @@ class UI {
     }
 
     private static openChannel(channelName: string, nick: string): void {
-        UI.channelUIs[channelName] = new ChannelUI(new Channel(channelName, nick));
-        UI.currentChannel = channelName;
+        let channel = new Channel(channelName, nick);
+        UI.channelUIs[channel.channelId] = new ChannelUI(channel);
+        UI.currentChannel = channel.channelId;
+    }
+
+    private static loadChannelEvents() {
+        let $addChannelForm = $(".addChannel form");
+        $addChannelForm.submit(function (e) {
+            e.preventDefault();
+        });
+        $addChannelForm.find("button").click(function (e) {
+            e.preventDefault();
+            $(this).css("display", "none");
+            $addChannelForm.find("input").css("display", "").focus();
+        });
+        $addChannelForm.find("input").keydown(function (e) {
+            if (e.keyCode === 13) {
+                UI.login($(this).val(), null);
+                $addChannelForm.find("button").css("display", "");
+                $(this).css("display", "none");
+                $(this).val("");
+            }
+        }).blur(function (e) {
+            $addChannelForm.find("button").css("display", "");
+            $(this).css("display", "none");
+        });
     }
 }
 

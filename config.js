@@ -1,8 +1,8 @@
 "use strict";
 
-var fs = require("fs");
+const fs = require("fs");
 
-var config = {
+let config = {
   "width": 1280,
   "height": 720,
   "nickName": "",
