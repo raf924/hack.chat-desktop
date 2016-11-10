@@ -242,3 +242,7 @@ form#send #textfield {
 .user .invite{
     margin: 0 !important;
 }
+
+.mention{
+    //TODO: set color for mention
+}

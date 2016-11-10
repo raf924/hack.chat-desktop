@@ -2,27 +2,19 @@ import {Channel} from "./channel";
 import {MessageData} from "./channel";
 import {MessageIcon, UI} from "./ui";
 
-export class ChannelEventListener {
+export abstract class ChannelEventListener {
     protected static events = ["addUser", "removeUser", "tripCodeSet", "messageReceived"];
 
-    addUser(user: string) {
-        throw "Not implemented";
-    }
+    abstract addUser(user: string): void
 
-    removeUser(user: string) {
-        throw "Not implemented";
-    }
+    abstract removeUser(user: string) : void
 
-    tripCodeSet(user: string, trip: string) {
-        throw "Not implemented";
-    }
+    abstract tripCodeSet(user: string, trip: string) : void
 
-    messageReceived(args: MessageData) {
-        throw "Not implemented";
-    }
+    abstract messageReceived(args: MessageData) : void
 }
 
-class ChannelUI extends ChannelEventListener {
+export class ChannelUI extends ChannelEventListener {
     private messagesUI: JQuery;
     private usersUI: JQuery;
     private channel: Channel;
@@ -153,5 +145,3 @@ class ChannelUI extends ChannelEventListener {
         $("#channels-tabs").append(this.accessLink);
     }
 }
-
-export {ChannelUI};
