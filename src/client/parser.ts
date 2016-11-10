@@ -1,6 +1,7 @@
-abstract class Parser{
-    abstract getRegex() : RegExp
-    abstract parse(text : string): string
+class Parser{
+    parse(text : string): string {
+        throw "Not implemented";
+    }
 }
 
 export {Parser}
