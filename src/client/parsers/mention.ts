@@ -1,5 +1,4 @@
 import {Parser} from "../parser"
-import {isUndefined} from "util";
 import {isNullOrUndefined} from "util";
 
 class MentionParser implements Parser{
