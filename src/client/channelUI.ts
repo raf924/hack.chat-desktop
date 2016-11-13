@@ -17,19 +17,21 @@ export abstract class ChannelEventListener {
 export class ChannelUI extends ChannelEventListener {
     private messagesUI: JQuery;
     private usersUI: JQuery;
-    private channel: Channel;
+    private readonly channel: Channel;
     private accessLink: JQuery;
     private ui: JQuery;
     private messageCounter: JQuery;
     private unreadMessageCount: number;
+
+    public getChannel() : Channel {
+        return this.channel;
+    }
 
     constructor(channel: Channel) {
         super();
         this.channel = channel;
         this.createAccessLink();
         this.unreadMessageCount = 0;
-        $("form#send #textfield").removeAttr("disabled");
-
         $(".users").css("display", "none");
         this.usersUI = $(UI.views.users.element).attr("for", channel.channelId).appendTo('#users');
         this.ui = $(UI.views.channel.element).attr("id", this.channel.channelId).appendTo("#channels");
@@ -38,7 +40,7 @@ export class ChannelUI extends ChannelEventListener {
     }
 
     public close() {
-        //TODO: ask for confirmation
+        //TODO: ask for confirmation (if config allows it)
         this.channel.close();
         this.accessLink.remove();
         this.usersUI.remove();
@@ -116,6 +118,7 @@ export class ChannelUI extends ChannelEventListener {
         switch (args.cmd) {
             case "onlineSet":
                 args.text = `Users online : ${args.nicks.join(", ")}`;
+                UI.chatInputForm.find("#textfield").removeAttr('disabled');
                 break;
             case "onlineRemove":
                 args.text = `${args.nick} has left`;

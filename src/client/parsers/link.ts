@@ -15,4 +15,4 @@ class LinkParser extends Parser{
     }
 }
 
-export {LinkParser}
+module.exports = LinkParser;

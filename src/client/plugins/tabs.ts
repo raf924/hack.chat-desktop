@@ -3,14 +3,18 @@
         if (this.length == 0) return this;
         let that = this;
         let tabSelector = ".tab";
-        let activateTab = function (index) {
+        let activateTab = function (index, newTab? : boolean) {
             var $tabs = that.find(`${tabSelector} a[data-tab]`);
             $tabs.each(function (i) {
                 let $div = $(`[id='${$(this).attr("data-tab")}']`);
                 $div.css("display", i == index ? "" : "none");
                 $(this)[i == index ? "addClass" : "removeClass"]("active");
             });
+            if(newTab){
+                $(that).trigger("tabOpened", $(`${tabSelector} a[data-tab].active`, that).attr("data-tab"));
+            }
             $(that).trigger("tabChanged", $(`${tabSelector} a[data-tab].active`, that).attr("data-tab"));
+
         };
         let observer = new MutationObserver(function (mutationRecord) {
             mutationRecord.forEach(function (mutation) {
@@ -28,7 +32,7 @@
                             $tabs.click(function (e) {
                                 activateTab($(this).index(`${tabSelector} a[data-tab]`));
                             });
-                            activateTab($tabs.index(`${tabSelector} a[data-tab]`));
+                            activateTab($tabs.index(`${tabSelector} a[data-tab]`), true);
                         }
                         break;
                 }

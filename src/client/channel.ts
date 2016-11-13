@@ -15,11 +15,16 @@ class Channel extends EventEmitter{
     channelId : string;
     users : Map<string, string>;
     ws : WebSocket;
+    private online : boolean;
+    public get isOnline(): boolean {
+        return this.online;
+    }
     constructor(name, nickName){
         super();
         this.users = new Map<string, string>();
         this.name = name;
         this.nick = nickName;
+        this.online = false;
         this.channelId = nickName.split("#")[0] + (nickName.split("#").length > 1 ? "#" : "") + "@" + name;
         var that = this;
         this.ws = new WebSocket("wss://hack.chat/chat-ws");
@@ -49,6 +54,7 @@ class Channel extends EventEmitter{
                     that.removeUser(args.nick);
                     break;
                 case "onlineSet":
+                    that.online = true;
                     for (let nick of args.nicks) {
                         if (!that.users[nick]) {
                             that.users[nick] = "";

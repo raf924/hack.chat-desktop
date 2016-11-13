@@ -10,6 +10,7 @@ const titlebar = require('titlebar');
 import fs = require('fs');
 import {View} from "./view";
 import {Channel} from "./channel";
+import {Parser} from "./parser";
 
 export interface MessageIcon {
     icon: string,
@@ -34,10 +35,10 @@ export class Views {
 }
 
 interface Titlebar {
-    appendTo(el: HTMLElement): Function;
+    appendTo(el: HTMLElement): Titlebar;
     element: HTMLElement;
-    destroy(): Function;
-    on(event: string, callback: Function): Function;
+    destroy(): void;
+    on(event: string, callback: Function): Titlebar;
 }
 
 export interface NotifyConfig {
@@ -56,11 +57,16 @@ class UI {
     private static ipc: Electron.IpcRenderer;
     private static nick: string;
     public static currentChannel: string;
-    private static parsers: Function[];
+    private static parsers: Parser[];
     private static channelUIs: Map<string, ChannelUI>;
     public static notifyConfig: NotifyConfig;
     public static views: Views;
     private static nickPrompt: JQuery;
+    public static chatInputForm : JQuery;
+
+    public static getCurrentChannelUI(): ChannelUI {
+        return UI.channelUIs[UI.currentChannel];
+    }
 
     private static addFavourite(channelName: string) {
         UI.favourites.push(channelName);
@@ -79,6 +85,7 @@ class UI {
         UI.parsers = [];
         UI.loadViews();
         UI.nickPrompt = $("#nickPrompt");
+        UI.chatInputForm = $("form#send");
         UI.nickPrompt.modal();
         UI.notifyConfig = {
             "onlineSet": false,
@@ -99,7 +106,7 @@ class UI {
             UI.login($(this).attr("data-open"));
         });
 
-        UI.message_icons = require("../data/message_icons.json");
+        UI.message_icons = require("../../static/data/message_icons.json");
 
         UI.loadUIEvents();
         UI.loadChatEvents();
@@ -107,10 +114,11 @@ class UI {
         UI.loadLoginEvents();
         UI.loadTabEvents();
         UI.loadChannelEvents();
+        UI.loadTitleBarEvents();
     }
 
     private static loadTitleBarEvents(): void {
-        for (let event in ["close", "minimize", "fullscreen"]) {
+        for (let event of ["close", "minimize", "fullscreen"]) {
             UI.titleBar.on(event, function (e) {
                 UI.ipc.send(event, function () {
 
@@ -124,23 +132,32 @@ class UI {
     }
 
     private static loadParsers(): void {
-        fs.readdir("./parsers", function (err, files) {
-            files.forEach(function (file) {
-                let parser: Function = require(`../../parsers/${file}`).parse;
-                UI.parsers.push(parser);
-            });
+        fs.readdir(`${__dirname}/parsers`, function (err, files) {
+            if (err === null) {
+                files.forEach(function (file) {
+                    try {
+                        let parser = require(`./parsers/${file}`);
+                        UI.parsers.push(new parser());
+                    } catch (e) {
+                        console.warn(`./parsers/${file} doesn't contain a Parser`);
+                    }
+                });
+            } else {
+                console.error("Cannot load parsers: lib/client/parsers access error.");
+            }
         });
     }
 
     static parseText(text: string): string {
-        UI.parsers.forEach(function (parser) {
-            text = parser.apply(null, text);
+        let div = $("<div>").html(text);
+        UI.parsers.forEach(function (parser: Parser) {
+            text = parser.parse(text);
         });
         return text;
     }
 
     private static insertAtCursor(text): void {
-        let textfield: HTMLTextAreaElement = <HTMLTextAreaElement>$("form#send #textfield")[0];
+        let textfield: HTMLTextAreaElement = <HTMLTextAreaElement>UI.chatInputForm.find("#textfield")[0];
         let pos = textfield.selectionStart || 0;
         let value = textfield.value;
         textfield.value = [value.slice(0, pos), text, value.slice(pos)].join('');
@@ -148,10 +165,9 @@ class UI {
     }
 
     private static loadChatEvents(): void {
-        $("form#send").submit(function (e) {
+        UI.chatInputForm.submit(function (e) {
             e.preventDefault();
-        });
-        $("form#send #textfield").keydown(function (e) {
+        }).find("#textfield").keydown(function (e) {
             if (e.keyCode === 13 && !e.shiftKey) {
                 e.preventDefault();
                 UI.channelUIs[UI.currentChannel].channel.sendMessage($(this).val());
@@ -174,7 +190,7 @@ class UI {
             if (forAll.length > 0) {
                 UI.ipc.send("set", JSON.stringify({
                     prop: "nickName",
-                    value: nick.split("#")[0] + "#"
+                    value: `${nick.split("#")[0]}#`
                 }));
                 UI.nick = nick;
             }
@@ -281,6 +297,11 @@ class UI {
     private static loadTabEvents(): void {
         $("#channels-tabs")
             .tabs("init")
+            .on("tabOpened", function (e, channelId) {
+                if(!UI.channelUIs[channelId].channel.isOnline){
+                    UI.chatInputForm.find("#textfield").attr("disabled", "");
+                }
+            })
             .on("tabChanged", function (e, channelId) {
                 //TODO: show users
                 $(".users").css("display", "none");
@@ -288,12 +309,15 @@ class UI {
                 UI.channelUIs[channelId].unreadMessageCount = 0;
                 UI.channelUIs[channelId].messageCounter.text(0);
                 UI.currentChannel = channelId;
+                if(UI.channelUIs[channelId].channel.isOnline){
+                    UI.chatInputForm.find("#textfield").removeAttr("disabled");
+                }
             })
             .on("tabClosed", function (e, channelId) {
                 UI.channelUIs[channelId].close();
                 delete UI.channelUIs[channelId];
                 if ($(this).find(".tab").length == 0) {
-                    $("#send").find("textarea").attr("disabled", "");
+                    UI.chatInputForm.find("#textfield").attr("disabled", "");
                 }
             });
         $(".button-collapse").sideNav({

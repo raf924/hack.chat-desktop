@@ -1,4 +1,3 @@
-const zip = require('adm-zip');
 const fs = require('fs');
 const path = require("path");
 
@@ -13,3 +12,5 @@ const child = execFile(tscPath.replace(/\//g, path.sep),[], (error, stdout, stde
     }
     console.log(stdout);
 });
+
+//TODO: add less compiling

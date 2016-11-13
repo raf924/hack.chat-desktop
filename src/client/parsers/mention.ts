@@ -1,33 +1,31 @@
 import {Parser} from "../parser"
 import {isNullOrUndefined} from "util";
+import {UI} from "../ui";
 
 class MentionParser implements Parser{
-    private users : string[];
-    private ownNick : string;
-    constructor(userList : string[], ownNick : string){
-        this.users = userList;
-        this.ownNick = ownNick;
-    }
     getRegex() : RegExp{
         return /(\s*|^)(@?)([^\s]+)(\s*|$)/g;
     }
     parse(message: string): string {
+        let channel =  UI.getCurrentChannelUI().getChannel();
+        let users = channel.users;
+        let ownNick = channel.nick.split("#")[0];
         let m;
-        while ((m = this.getRegex().exec(message)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === this.getRegex().lastIndex) {
-                this.getRegex().lastIndex++;
-            }
+        let newMessage = message;
+        const re = new RegExp(this.getRegex());
+        while ((m = re.exec(message)) !== null) {
             let nick = m[3];
-            if(nick === this.ownNick){
-                message = `<span class="mention">${message}</span>`;
+            if(nick === ownNick){
+                newMessage = `<span class="mention">${newMessage}</span>`;
             }
 
-            if(!isNullOrUndefined(this.users[nick])){ //TODO: add condition from config : highlightedMention
-                message.replace(this.getRegex(), `$1<span style="color: ${this.users[nick]};">@$3</span>$4`);
+            if(!isNullOrUndefined(users[nick])){ //TODO: add condition from config : highlightedMention
+                let userReg = new RegExp(`(\\s*|^|<span>)(@?)${nick}(</span>|\\s*|$)`,'g');
+                newMessage = newMessage.replace(userReg, `$1<span style="color: ${users[nick]||"#ABCDEF"};">@${nick}</span>$3`);
             }
         }
-        return message;
+        return newMessage;
     }
-
 }
+
+module.exports = MentionParser;
