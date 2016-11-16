@@ -1,0 +1,38 @@
+@media only screen and (max-width: 992px) {
+  header, main {
+    padding-left: 0;
+  }
+
+  main {
+    padding-left: 4%;
+  }
+
+  #input_container.row {
+    padding-left: 1%;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    max-height: 20%;
+    & form#send {
+      width: 88%;
+    }
+  }
+
+  ul.collection.messages {
+    width: 94%;
+  }
+
+  #sidemenu, #users {
+    z-index: 1001;
+  }
+
+  #sidenav-overlay {
+    display: unset;
+  }
+}
+
+@media handheld {
+  .drag-target {
+    display: unset;
+  }
+}

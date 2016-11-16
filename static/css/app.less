@@ -16,28 +16,12 @@ main#container {
   position: fixed;
   height: 100%;
   overflow-y: visible;
+  max-width: unset;
+  width: 100%;
 }
 
 header, main {
   padding-left: @sideNavWidth;
-}
-
-@media only screen and (max-width: 992px) {
-  header, main {
-    padding-left: 0;
-  }
-
-  main {
-    padding-left: 3%;
-  }
-
-  #input_container.row {
-    padding-left: 1%;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-    max-height: 20%;
-  }
 }
 
 .material-icons {
@@ -57,6 +41,12 @@ header, main {
 header {
   max-height: 20%;
   padding-top: 24px;
+  & .button-collapse {
+    width: 4%;
+    position: absolute;
+    z-index: 1000;
+  }
+
 }
 
 #sidemenu li > p, #sidemenu li > h4 {
@@ -65,7 +55,7 @@ header {
 }
 
 #sidemenu, #users {
-  padding-top: 1em;
+  top: 22px;
 }
 
 #sidemenu {
@@ -135,31 +125,37 @@ header {
   border-bottom: 1px red solid;
 }
 
-.channel form {
-  bottom: 0;
-  position: fixed;
-  width: 100%;
+.channel {
+  padding: 0 1%;
+  & form {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+  }
 }
 
 ul.collection.messages {
-  overflow-y: visible;
-  width: 100%;
+  //overflow-y: visible;
   max-height: 69%;
   position: absolute;
-}
-
-.messages li .message {
-  margin-top: 0;
-  margin-bottom: 0;
-  word-break: normal;
-  white-space: pre-line;
-  font-family: Roboto, sans-serif;
-}
-
-.messages li.collection-item.avatar {
-  padding-top: 1px;
-  min-height: 45px;
-  padding-bottom: 0;
+  width: ~"calc(99% - 300px)";
+  &:hover {
+    overflow-y: visible;
+  }
+  & li {
+    &.collection-item.avatar {
+      padding-top: 1px;
+      min-height: 45px;
+      padding-bottom: 0;
+    }
+    & .message {
+      margin-top: 0;
+      margin-bottom: 0;
+      word-break: normal;
+      white-space: pre-line;
+      font-family: Roboto, sans-serif;
+    }
+  }
 }
 
 #input_container.row {
@@ -167,10 +163,18 @@ ul.collection.messages {
   width: 100%;
   bottom: 0;
   min-height: 11%;
+  margin-bottom: 0;
+  & form#send {
+    width: ~"calc(92% - 300px)";
+    & #textfield {
+      overflow-y: visible;
+      max-height: 4em;
+    }
+  }
 }
 
 .titlebar {
-  z-index: 1000;
+  z-index: 1002;
   position: fixed;
   top: 0;
   width: 100%;
@@ -194,11 +198,6 @@ ul.collection.messages {
   & [data-flip] {
     padding: 0 !important;
   }
-}
-
-form#send #textfield {
-  overflow-y: visible;
-  max-height: 4em;
 }
 
 #channels-tabs a.btn-floating {
@@ -271,3 +270,5 @@ form#send #textfield {
     padding: 0 16px;
   }
 }
+
+@import "small-screen";
