@@ -46,7 +46,6 @@ header {
     position: absolute;
     z-index: 1000;
   }
-
 }
 
 #sidemenu li > p, #sidemenu li > h4 {
@@ -174,7 +173,7 @@ ul.collection.messages {
 }
 
 .titlebar {
-  z-index: 1002;
+  z-index: 1003;
   position: fixed;
   top: 0;
   width: 100%;
@@ -188,12 +187,16 @@ ul.collection.messages {
   font-size: 10px;
   line-height: 12px;
   font-weight: bold;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   cursor: default;
   & > pre {
     overflow: hidden;
     white-space: pre-line;
     line-height: initial;
+    user-select: inherit;
   }
   & [data-flip] {
     padding: 0 !important;

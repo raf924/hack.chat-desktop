@@ -3,18 +3,17 @@ const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
 const shell = electron.Shell;
-const nativeImage = electron.NativeImage;
 const ipc = electron.ipcMain;
 
 require('require-rebuild')();
 
-var config = require("./config.js");
-var fs = require('fs');
+let config = require("./config.js");
+const fs = require('fs');
 
 //TODO: Add remote config
 //TODO: Add tray icon
 
-var myNick = config.get().nickName;
+let myNick = config.get().nickName;
 
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
@@ -22,8 +21,8 @@ Menu.setApplicationMenu(null);
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is GCed.
-var mainWindow = null;
-var webContents = null;
+let mainWindow = null;
+let webContents = null;
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -80,8 +79,8 @@ app.on('ready', function () {
         height: config.get().height,
         frame: false,
         icon: "./static/img/icon128.png",
-        "min-width": 800,
-        "min-height": 600
+        minWidth: 400,
+        minHeight: 400
     });
 
     Menu.setApplicationMenu(null);
@@ -102,7 +101,7 @@ app.on('ready', function () {
     });
 
     webContents.on("new-window", function (e, url, frameName, disposition) {
-        if (url.match(/(https:[/][/]hack[.]chat)|(file:[//].+[?].+)/i) != null) {
+        if (url.match(/(https:(\/\/)hack\.chat)|(file:(\/\/).+\?.+)/i) != null) {
             e.preventDefault();
             this.send("openChannel", url.split("?")[1]);
         } else {

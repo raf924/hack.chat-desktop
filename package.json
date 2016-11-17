@@ -32,16 +32,16 @@
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
-    "@types/electron": "^1.4.25",
+    "@types/electron": "^1.4.27",
     "@types/jquery": "^2.0.33",
     "@types/materialize-css": "^0.97.32",
-    "@types/node": "^6.0.46",
+    "@types/node": "^6.0.48",
     "adm-zip": "^0.4.7",
-    "electron": "^1.4.5",
-    "electron-builder": "^7.18.0",
-    "electron-packager": "^8.2.0",
+    "electron": "^1.4.7",
+    "electron-builder": "^7.26.0",
+    "electron-packager": "^8.3.0",
     "install": "^0.8.2",
     "less": "^2.7.1",
-    "typescript": "^2.0.6"
+    "typescript": "^2.0.10"
   }
 }
