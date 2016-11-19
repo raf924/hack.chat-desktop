@@ -7,6 +7,7 @@
   },
   "scripts": {
     "start": "node start.js",
+    "dev": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
     "package": "node package.js",
     "postinstall": "node build.js"
   },
@@ -38,7 +39,7 @@
     "@types/node": "^6.0.48",
     "adm-zip": "^0.4.7",
     "electron": "^1.4.7",
-    "electron-builder": "^7.26.0",
+    "electron-builder": "^8.6.0",
     "electron-packager": "^8.3.0",
     "install": "^0.8.2",
     "less": "^2.7.1",

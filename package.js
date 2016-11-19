@@ -1,3 +1,5 @@
+require('./build');
+
 const packager = require('electron-packager');
 const fs = require('fs');
 
