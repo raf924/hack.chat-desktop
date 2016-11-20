@@ -168,14 +168,26 @@ ul.collection.messages {
   }
 }
 
+@titlebarButtonSize: 0.8em;
+@titleBarButtonIconPadding: 25%;
+@titleBarButtonIconSize: calc(@titlebarButtonSize ~"-" @titleBarButtonIconPadding);
+
 .titlebar {
   z-index: 1003;
   position: fixed;
   top: 0;
   width: 100%;
-  & .titlebar-stoplight > div > svg {
-    margin-top: 1px !important;
-    margin-left: 1px !important;
+  & .titlebar-stoplight > div {
+    width: @titlebarButtonSize;
+    height: @titlebarButtonSize;
+    & > svg {
+      margin-top: 0 !important;
+      margin-left: 0 !important;
+      padding-top: @titleBarButtonIconPadding !important;
+      padding-left: @titleBarButtonIconPadding !important;
+      width: @titleBarButtonIconSize;
+      height: @titleBarButtonIconSize;
+    }
   }
 }
 
