@@ -172,10 +172,9 @@ class UI {
                 UI.channelUIs[UI.currentChannel].channel.sendMessage($(this).val());
                 $(this).val("");
             }
-            //TODO: add nickname autocompletion
             //TODO: add commands handling
             //TODO: add history
-        });
+        }).autocomplete();
     }
 
     private static loadLoginEvents(): void {
@@ -281,7 +280,7 @@ class UI {
         if (nick !== undefined && nick !== null && nick !== "") {
             UI.openChannel(channelName, nick);
         } else if (UI.nick === null || UI.nick === "" || UI.nick.split("#").length > 1 && UI.nick.split("#")[1].length == 0) {
-            UI.nickPrompt.modal('open');
+            UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
             UI.nickPrompt.find("input.validate").val(UI.nick).data("realNick", UI.nick).data("channel", channelName);
         } else {
             UI.openChannel(channelName, UI.nick);

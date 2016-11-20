@@ -58,8 +58,8 @@ export class ChannelUI extends ChannelEventListener {
     }
 
     public appendMessage(args: MessageData) {
-        var $message = $(UI.views.message.element);
-        var message_icon: MessageIcon = UI.message_icons[args.cmd];
+        let $message = $(UI.views.message.element);
+        let message_icon: MessageIcon = UI.message_icons[args.cmd];
         $message.find(".nick").text(args.nick);
         $message.find(".message").html(args.text);
         $message.find(".trip").text(args.trip);
@@ -76,7 +76,7 @@ export class ChannelUI extends ChannelEventListener {
 
     private static setMessageIcon($message: JQuery, icon: string, color: string) {
         $message.addClass("avatar");
-        var $icon = $("<i>");
+        let $icon = $("<i>");
         $icon.addClass("material-icons circle").addClass(color).text(icon);
         $message.prepend($icon);
     }
@@ -104,6 +104,7 @@ export class ChannelUI extends ChannelEventListener {
             .find(".nick")
             .text(user);
         this.usersUI.append($user);
+        UI.chatInputForm.find("#textfield").autocomplete("addItem", user);
     }
 
     tripCodeSet(user, tripCode) {
@@ -112,6 +113,7 @@ export class ChannelUI extends ChannelEventListener {
 
     removeUser(user) {
         this.usersUI.find(`.user[user='${user}']`).remove();
+        UI.chatInputForm.find("#textfield").autocomplete("removeItem", user);
     }
 
     messageReceived(args) {
