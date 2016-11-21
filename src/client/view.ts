@@ -3,7 +3,7 @@ class View {
     element: string;
 
     constructor(name) {
-        this.element = fs.readFileSync(`static/views/${name}.html`).toString();
+        this.element = fs.readFileSync(`${__dirname}/../../static/views/${name}.html`).toString();
     }
 }
 export {View};
