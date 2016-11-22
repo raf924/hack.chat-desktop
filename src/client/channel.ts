@@ -26,7 +26,7 @@ class Channel extends EventEmitter{
         this.nick = nickName;
         this.online = false;
         this.channelId = nickName.split("#")[0] + (nickName.split("#").length > 1 ? "#" : "") + "@" + name;
-        var that = this;
+        let that = this;
         this.ws = new WebSocket("wss://hack.chat/chat-ws");
         window.setInterval(function () {
             that.send({
@@ -61,6 +61,8 @@ class Channel extends EventEmitter{
                             that.addUser(nick);
                         }
                     }
+                    break;
+                case "warn":
                     break;
                 default:
                     throw "Unknown command";

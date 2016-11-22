@@ -2,7 +2,7 @@ const electron = require('electron');
 const app = electron.app; // Module to control application life.
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
-const shell = electron.Shell;
+const shell = electron.shell;
 const ipc = electron.ipcMain;
 
 require('require-rebuild')();
@@ -82,6 +82,7 @@ app.on('ready', function () {
         minWidth: 400,
         minHeight: 400
     });
+    mainWindow.setTitle("Chatron");
 
     Menu.setApplicationMenu(null);
 
@@ -101,7 +102,7 @@ app.on('ready', function () {
     });
 
     webContents.on("new-window", function (e, url, frameName, disposition) {
-        if (url.match(/(https:(\/\/)hack\.chat)|(file:(\/\/).+\?.+)/i) != null) {
+        if (url.match(/(https:\/\/hack\.chat)|(file:\/\/.+\?.+)/i) != null) {
             e.preventDefault();
             this.send("openChannel", url.split("?")[1]);
         } else {

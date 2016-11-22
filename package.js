@@ -16,9 +16,9 @@ packager({
     arch: args[3] || "all",
     out: "dist",
     asar: true,
-    ignore: ["build.js", "start.js", "package.js", "src", "tsconfig.json", ".idea", ".gitattributes", ".gitignore", "data.json"],
+    ignore: ["build.js", "start.js", "package.js$", "src", "tsconfig.json", ".idea", ".gitattributes", ".gitignore", "data.json"],
     icon: "icon.ico",
-    prune: false //TODO: find out why it must be set to false to work
+    prune: true
 }, function done(err, appPath) {
     console.log(err);
     console.log(appPath);
