@@ -63,6 +63,7 @@ class Channel extends EventEmitter{
                     }
                     break;
                 case "warn":
+                case "info":
                     break;
                 default:
                     throw "Unknown command";
