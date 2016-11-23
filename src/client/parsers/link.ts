@@ -2,7 +2,7 @@
 import {Parser} from "../parser";
 class LinkParser extends Parser{
     getRegex(): RegExp {
-        return /(\s|^)((http(|s):\/\/.+(|[\s]))|(\?[^\s]+))/gi;
+        return /(\s|^)((http(|s):\/\/)|\?)[^\s]+/gi;
     }
     parse(text: string): string {
         let matches = text.match(this.getRegex()); //TODO: ?\ntext makes a link we don't want that
