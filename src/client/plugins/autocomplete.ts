@@ -12,7 +12,7 @@
             this.data("items", []);
             this.keyup(function (e) {
                 if (e.keyCode !== 9) {
-                    let beforeWordReg = /($|\W|@)[\w]/ig;
+                    let beforeWordReg = /(^|\W|@)[\w]/ig;
                     let match: RegExpExecArray;
                     let wordBeginning;
                     if (e.target.value.length > 0) {
