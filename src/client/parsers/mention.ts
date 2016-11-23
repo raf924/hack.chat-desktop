@@ -19,7 +19,7 @@ class MentionParser implements Parser{
                 newMessage = `<span class="mention">${newMessage}</span>`;
             }
 
-            if(!isNullOrUndefined(users[nick])){ //TODO: add condition from config : highlightedMention
+            if(!isNullOrUndefined(users[nick]) && users.hasOwnProperty(nick)){ //TODO: add condition from config : highlightedMention
                 let userReg = new RegExp(`(\\s*|^|<span>)(@?)${nick}(</span>|\\s*|$)`,'g');
                 newMessage = newMessage.replace(userReg, `$1<span style="color: ${users[nick]||"#ABCDEF"};">@${nick}</span>$3`);
             }
