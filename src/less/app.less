@@ -11,7 +11,7 @@ body {
 }
 
 main#container {
-  margin-top: 3em;
+  margin-top: 2em;
   top: 0;
   position: fixed;
   height: 100%;
@@ -131,7 +131,7 @@ header {
 
 ul.collection.messages {
   //overflow-y: visible;
-  max-height: 69%;
+  max-height: ~"calc(100% - 10em)";
   position: absolute;
   width: ~"calc(99% - 300px)";
   &:hover {
@@ -157,7 +157,7 @@ ul.collection.messages {
   position: fixed;
   width: 100%;
   bottom: 0;
-  min-height: 11%;
+  height: 7em;
   margin-bottom: 0;
   & form#send {
     width: ~"calc(92% - 300px)";
