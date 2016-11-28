@@ -56,7 +56,7 @@ class UI {
     private static ipc: Electron.IpcRenderer;
     private static nick: string;
     public static currentChannel: string;
-    private static parsers: Parser[];
+    public static parsers: Parser[];
     private static channelUIs: Map<string, ChannelUI>;
     public static notifyConfig: NotifyConfig;
     public static views: Views;
@@ -148,7 +148,6 @@ class UI {
     }
 
     static parseText(text: string): string {
-        let div = $("<div>").html(text);
         UI.parsers.forEach(function (parser: Parser) {
             text = parser.parse(text);
         });

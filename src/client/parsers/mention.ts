@@ -1,13 +1,20 @@
 import {Parser} from "../parser"
-import {isNullOrUndefined} from "util";
 import {UI} from "../ui";
 
-class MentionParser implements Parser{
-    getRegex() : RegExp{
+class MentionParser implements Parser {
+    private mention: boolean;
+
+    getRegex(): RegExp {
         return /(\s*|^)(@?)([^\s]+)(\s*|$)/g;
     }
+
+    get hasMention(): boolean {
+        return this.mention;
+    }
+
     parse(message: string): string {
-        let channel =  UI.getCurrentChannelUI().getChannel();
+        this.mention = false;
+        let channel = UI.getCurrentChannelUI().getChannel();
         let users = channel.users;
         let ownNick = channel.nick.split("#")[0];
         let m;
@@ -15,13 +22,12 @@ class MentionParser implements Parser{
         const re = new RegExp(this.getRegex());
         while ((m = re.exec(message)) !== null) {
             let nick = m[3];
-            if(nick === ownNick){
-                newMessage = `<span class="mention">${newMessage}</span>`;
-            }
+            this.mention = this.mention || (nick === ownNick);
 
-            if(!isNullOrUndefined(users[nick]) && users.hasOwnProperty(nick)){ //TODO: add condition from config : highlightedMention
-                let userReg = new RegExp(`(\\s*|^|<span>)(@?)${nick}(</span>|\\s*|$)`,'g');
-                newMessage = newMessage.replace(userReg, `$1<span style="color: ${users[nick]||"#ABCDEF"};">@${nick}</span>$3`);
+            if (users[nick] !== undefined && users.hasOwnProperty(nick)) { //TODO: add condition from config : highlightedMention
+                let userReg = new RegExp(`(\\s*|^|<span>)(@?)${nick}(</span>|\\s*|$)`, 'g');
+                let html = $("<span>").css("color", users[nick] || "#AAADEF").text(`@${nick}`)[0].outerHTML; //TODO: set default highlight color
+                newMessage = newMessage.replace(userReg, `$1${html}$3`);
             }
         }
         return newMessage;

@@ -135,6 +135,11 @@ export class ChannelUI extends ChannelEventListener {
                 break;
             case "chat":
                 args.text = UI.parseText(args.text);
+                UI.parsers.forEach(function (parser) {
+                   if(parser.hasOwnProperty("hasMention")){
+                       args.mention = parser["hasMention"];
+                   }
+                });
                 break;
         }
         if (this.channel.channelId !== UI.currentChannel && UI.notifyConfig[args.cmd]) {
