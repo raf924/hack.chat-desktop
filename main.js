@@ -91,7 +91,11 @@ app.on('ready', function () {
     webContents = mainWindow.webContents;
     mainWindow.flashFrame(true);
     // Open the devtools.
-    mainWindow.openDevTools();
+    process.argv.forEach(function (item) {
+        if (item === "dev") {
+            mainWindow.webContents.openDevTools({mode: "undocked"});
+        }
+    });
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
