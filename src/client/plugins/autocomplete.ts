@@ -15,22 +15,27 @@
                     let beforeWordReg = /(^|\W|@)[\w]/ig;
                     let match: RegExpExecArray;
                     let wordBeginning;
+                    let items: string[] = that.data("items");
+                    that.data("possibleItems", items);
                     if (e.target.value.length > 0) {
                         while ((match = beforeWordReg.exec(e.target.value.substr(0, e.target.selectionEnd))) !== null) {
                             wordBeginning = match.index;
                         }
                         match = /[\w]+/i.exec(e.target.value);
-                        wordBeginning = match.index;
+                        if(match !== null){
+                            wordBeginning = match.index;
+                        }
                     } else {
                         wordBeginning = 0;
                     }
-                    let items: string[] = that.data("items");
-                    let possibleItems = items.filter(function (item) {
-                        return match.length > 0 && item.startsWith(match[0]);
-                    });
-                    that.data("possibleItems", possibleItems);
-                    that.data("startPos", wordBeginning);
-                    that.data("endPos", wordBeginning + match[0].length);
+                    if(match !== undefined && match !== null){
+                        let possibleItems = items.filter(function (item) {
+                            return match.length > 0 && item.startsWith(match[0]);
+                        });
+                        that.data("possibleItems", possibleItems.length > 0? possibleItems:items);
+                        that.data("startPos", wordBeginning);
+                        that.data("endPos", wordBeginning + match[0].length);
+                    }
                     that.data("nextIndex", 0);
                     that.data("originalString", e.target.value);
                 }
@@ -40,7 +45,7 @@
                     let startPos = that.data("startPos");
                     let endPos = that.data("endPos");
                     let currentIndex = that.data("nextIndex");
-                    let items = that.data("items");
+                    let items = that.data("possibleItems");
                     let originalString = that.data("originalString");
                     let strBefore = originalString.substr(0, startPos);
                     let strAfter = originalString.substr(endPos + 1);
