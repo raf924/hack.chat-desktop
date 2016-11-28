@@ -253,14 +253,19 @@ class UI {
                 }
             })
             .on("tabChanged", function (e, channelId) {
-                //TODO: show users
                 $(".users").css("display", "none");
-                UI.channelUIs[channelId].usersUI.css("display", "");
-                UI.channelUIs[channelId].unreadMessageCount = 0;
-                UI.channelUIs[channelId].messageCounter.text(0);
+                let currentChannelUI : ChannelUI = UI.channelUIs[channelId];
+                currentChannelUI.usersUI.css("display", "");
+                currentChannelUI.unreadMessageCount = 0;
+                currentChannelUI.messageCounter.text(0);
                 UI.currentChannel = channelId;
-                if(UI.channelUIs[channelId].channel.isOnline){
+                if(currentChannelUI.channel.isOnline){
                     UI.chatInputForm.find("#textfield").removeAttr("disabled");
+                    let users : string[] = [];
+                    for(let user in UI.channelUIs[channelId].channel.users){
+                        users.push(user);
+                    }
+                    UI.chatInputForm.find("#textfield").autocomplete("setItems", users);
                 }
             })
             .on("tabClosed", function (e, channelId) {

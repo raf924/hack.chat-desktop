@@ -15,13 +15,13 @@ export abstract class ChannelEventListener {
 }
 
 export class ChannelUI extends ChannelEventListener {
-    private messagesUI: JQuery;
-    private usersUI: JQuery;
-    private readonly channel: Channel;
-    private accessLink: JQuery;
-    private ui: JQuery;
-    private messageCounter: JQuery;
-    private unreadMessageCount: number;
+    public messagesUI: JQuery;
+    public usersUI: JQuery;
+    public readonly channel: Channel;
+    public accessLink: JQuery;
+    public ui: JQuery;
+    public messageCounter: JQuery;
+    public unreadMessageCount: number;
 
     public getChannel() : Channel {
         return this.channel;
@@ -33,7 +33,7 @@ export class ChannelUI extends ChannelEventListener {
         this.createAccessLink();
         this.unreadMessageCount = 0;
         $(".users").css("display", "none");
-        this.usersUI = $(UI.views.users.element).attr("for", channel.channelId).appendTo('#users');
+        this.usersUI = $(UI.views.users.element).attr("for", this.channel.channelId).appendTo('#users');
         this.ui = $(UI.views.channel.element).attr("id", this.channel.channelId).appendTo("#channels");
         this.messagesUI = this.ui.find(".messages");
         this.bindEvents();
@@ -104,7 +104,9 @@ export class ChannelUI extends ChannelEventListener {
             .find(".nick")
             .text(user);
         this.usersUI.append($user);
-        UI.chatInputForm.find("#textfield").autocomplete("addItem", user);
+        if(UI.currentChannel === this.channel.channelId) {
+            UI.chatInputForm.find("#textfield").autocomplete("addItem", user);
+        }
     }
 
     tripCodeSet(user, tripCode) {
@@ -113,7 +115,10 @@ export class ChannelUI extends ChannelEventListener {
 
     removeUser(user) {
         this.usersUI.find(`.user[user='${user}']`).remove();
-        UI.chatInputForm.find("#textfield").autocomplete("removeItem", user);
+        if(UI.currentChannel === this.channel.channelId){
+            UI.chatInputForm.find("#textfield").autocomplete("removeItem", user);
+        }
+
     }
 
     messageReceived(args) {
