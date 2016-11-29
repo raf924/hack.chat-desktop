@@ -134,6 +134,7 @@ export class ChannelUI extends ChannelEventListener {
                 args.text = `${args.nick} has joined`;
                 break;
             case "chat":
+                args.text = new Option(args.text).innerHTML;
                 args.text = UI.parseText(args.text);
                 UI.parsers.forEach(function (parser) {
                    if(parser.hasOwnProperty("hasMention")){

@@ -5,8 +5,7 @@ class MentionParser implements Parser {
     private mention: boolean;
 
     getRegex(): RegExp {
-        return /(\s*|^)(@?)([^\s]+)(\s*|$)/g;
-    }
+        return /(\s+|^|<span>|)(@?)([^\s]+)(<\/span>|\s+|$|)/g;    }
 
     get hasMention(): boolean {
         return this.mention;
@@ -25,12 +24,12 @@ class MentionParser implements Parser {
             this.mention = this.mention || (nick === ownNick);
 
             if (users[nick] !== undefined && users.hasOwnProperty(nick)) { //TODO: add condition from config : highlightedMention
-                let userReg = new RegExp(`(\\s*|^|<span>)(@?)${nick}(</span>|\\s*|$)`, 'g');
-                let html = $("<span>").css("color", users[nick] || "#AAADEF").text(`@${nick}`)[0].outerHTML; //TODO: set default highlight color
-                newMessage = newMessage.replace(userReg, `$1${html}$3`);
+                let userReg = new RegExp(`(\\s+|^|<span>)(@?)${nick}(</span>|\\s+|$)`, 'g');
+                let html = $("<span>").css("color", users[nick] || "#b7ef72").text(`@${nick}`)[0].outerHTML; //TODO: set default highlight color
+                message = newMessage.replace(userReg, `$1${html}$3`);
             }
         }
-        return newMessage;
+        return message;
     }
 }
 
