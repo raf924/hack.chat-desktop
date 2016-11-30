@@ -11,30 +11,33 @@
             this.data("autocomplete", true);
             this.data("items", []);
             this.keyup(function (e) {
-                if (e.keyCode !== 9) {
-                    let beforeWordReg = /(^|\W|@)[\w]/ig;
+                if (e.keyCode !== 9 && e.target.value !== that.data("originalString")) {
+                    let beforeWordReg = /(^|\s|@)[\w]*$/ig;
                     let match: RegExpExecArray;
-                    let wordBeginning;
+                    let wordBeginning: number;// = that.data("startPos");
                     let items: string[] = that.data("items");
                     that.data("possibleItems", items);
                     if (e.target.value.length > 0) {
                         while ((match = beforeWordReg.exec(e.target.value.substr(0, e.target.selectionEnd))) !== null) {
                             wordBeginning = match.index;
                         }
-                        match = /[\w]+/i.exec(e.target.value);
+                        match = /[\w]+/i.exec(e.target.value.substr(wordBeginning, e.target.value.length - e.target.selectionEnd));
                         if(match !== null){
-                            wordBeginning = match.index;
+                            wordBeginning += match.index;
+                            that.data("endPos", wordBeginning + match[0].length);
+                        } else {
+                            that.data("endPos", ++wordBeginning);
                         }
                     } else {
                         wordBeginning = 0;
+                        that.data("endPos", 0);
                     }
+                    that.data("startPos", wordBeginning);
                     if(match !== undefined && match !== null){
                         let possibleItems = items.filter(function (item) {
                             return match.length > 0 && item.startsWith(match[0]);
                         });
                         that.data("possibleItems", possibleItems.length > 0? possibleItems:items);
-                        that.data("startPos", wordBeginning);
-                        that.data("endPos", wordBeginning + match[0].length);
                     }
                     that.data("nextIndex", 0);
                     that.data("originalString", e.target.value);
