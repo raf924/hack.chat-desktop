@@ -21,7 +21,7 @@
                         while ((match = beforeWordReg.exec(e.target.value.substr(0, e.target.selectionEnd))) !== null) {
                             wordBeginning = match.index;
                         }
-                        match = /[\w]+/i.exec(e.target.value.substr(wordBeginning, e.target.value.length - e.target.selectionEnd));
+                        match = /[\w]+/i.exec(e.target.value.substr(wordBeginning, e.target.value.length - wordBeginning));
                         if(match !== null){
                             wordBeginning += match.index;
                             that.data("endPos", wordBeginning + match[0].length);
@@ -37,7 +37,7 @@
                         let possibleItems = items.filter(function (item) {
                             return match.length > 0 && item.startsWith(match[0]);
                         });
-                        that.data("possibleItems", possibleItems.length > 0? possibleItems:items);
+                        that.data("possibleItems", possibleItems);
                     }
                     that.data("nextIndex", 0);
                     that.data("originalString", e.target.value);
@@ -45,14 +45,14 @@
             }).keydown(function (e) {
                 if (e.keyCode === 9) {
                     e.preventDefault();
-                    let startPos = that.data("startPos");
-                    let endPos = that.data("endPos");
-                    let currentIndex = that.data("nextIndex");
-                    let items = that.data("possibleItems");
-                    let originalString = that.data("originalString");
+                    let startPos = that.data("startPos") || 0;
+                    let endPos = that.data("endPos") || 0;
+                    let currentIndex = that.data("nextIndex") || 0;
+                    let items = that.data("possibleItems") || that.data("items");
+                    let originalString = that.data("originalString") || "";
                     let strBefore = originalString.substr(0, startPos);
                     let strAfter = originalString.substr(endPos + 1);
-                    e.target.value = strBefore + items[currentIndex] + strAfter;
+                    e.target.value = strBefore + items[currentIndex] + " " + strAfter;
                     if (currentIndex === items.length - 1) {
                         currentIndex = -1;
                     }
