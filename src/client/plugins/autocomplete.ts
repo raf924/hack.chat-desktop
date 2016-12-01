@@ -75,7 +75,7 @@
                     let oldItem = value;
                     items = this.data("items");
                     let index = items.indexOf(oldItem);
-                    items = items.splice(index, 1);
+                    items.splice(index, 1);
                     this.data("items", items);
                     break;
                 case "setItems":

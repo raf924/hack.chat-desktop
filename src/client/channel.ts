@@ -44,7 +44,6 @@ class Channel extends EventEmitter{
             let args : MessageData = JSON.parse(message.data);
             switch (args.cmd){
                 case "onlineAdd":
-                    that.users[args.nick] =  "";
                     that.addUser(args.nick);
                     break;
                 case "chat":
@@ -86,12 +85,15 @@ class Channel extends EventEmitter{
         this.ws.close();
     }
     addUser(user){
+        this.users[user] =  "";
         super.emit("addUser", user);
     }
     removeUser(user){
+        delete this.users[user];
         super.emit("removeUser", user);
     }
     setTripCode(user, tripCode){
+        this.users[user] = tripCode;
         super.emit("tripCodeSet", user, tripCode);
     }
     receiveMessage(args){
