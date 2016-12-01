@@ -285,7 +285,7 @@ class UI {
             UI.openChannel(channelName, nick);
         } else if (UI.nick === null || UI.nick === "" || UI.nick.split("#").length > 1 && UI.nick.split("#")[1].length == 0) {
             UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
-            UI.nickPrompt.find("input.validate").val(UI.nick).data("realNick", UI.nick).data("channel", channelName);
+            UI.nickPrompt.find("input.validate").val(UI.nick).data("realNick", UI.nick).data("channel", channelName).focus();
         } else {
             UI.openChannel(channelName, UI.nick);
         }
@@ -301,20 +301,16 @@ class UI {
         let $addChannelForm = $(".addChannel form");
         $addChannelForm.submit(function (e) {
             e.preventDefault();
+            UI.login($(this).find("input").val(), null);
+            $(this).find("button").css("display", "");
+            $(this).find("input").css("display", "none").val("");
         });
         $addChannelForm.find("button").click(function (e) {
             e.preventDefault();
             $(this).css("display", "none");
             $addChannelForm.find("input").css("display", "").focus();
         });
-        $addChannelForm.find("input").keydown(function (e) {
-            if (e.keyCode === 13) {
-                UI.login($(this).val(), null);
-                $addChannelForm.find("button").css("display", "");
-                $(this).css("display", "none");
-                $(this).val("");
-            }
-        }).blur(function (e) {
+        $addChannelForm.find("input").blur(function (e) {
             $addChannelForm.find("button").css("display", "");
             $(this).css("display", "none");
         });
