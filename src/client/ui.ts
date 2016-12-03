@@ -160,6 +160,7 @@ class UI {
         let value = textfield.value;
         textfield.value = [value.slice(0, pos), text, value.slice(pos)].join('');
         textfield.selectionStart = pos + text.length;
+        textfield.focus();
     }
 
     private static loadChatEvents(): void {
