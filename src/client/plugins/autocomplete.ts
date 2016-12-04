@@ -45,18 +45,20 @@
             }).keydown(function (e) {
                 if (e.keyCode === 9) {
                     e.preventDefault();
-                    let startPos = that.data("startPos") || 0;
-                    let endPos = that.data("endPos") || 0;
-                    let currentIndex = that.data("nextIndex") || 0;
                     let items = that.data("possibleItems") || that.data("items");
-                    let originalString = that.data("originalString") || "";
-                    let strBefore = originalString.substr(0, startPos);
-                    let strAfter = originalString.substr(endPos + 1);
-                    e.target.value = strBefore + items[currentIndex] + " " + strAfter;
-                    if (currentIndex === items.length - 1) {
-                        currentIndex = -1;
+                    if(items.length>0){
+                        let startPos = that.data("startPos") || 0;
+                        let endPos = that.data("endPos") || 0;
+                        let currentIndex = that.data("nextIndex") || 0;
+                        let originalString = that.data("originalString") || "";
+                        let strBefore = originalString.substr(0, startPos);
+                        let strAfter = originalString.substr(endPos + 1);
+                        e.target.value = strBefore + items[currentIndex] + " " + strAfter;
+                        if (currentIndex === items.length - 1) {
+                            currentIndex = -1;
+                        }
+                        that.data("nextIndex", currentIndex + 1);
                     }
-                    that.data("nextIndex", currentIndex + 1);
                 }
             });
         } else {
