@@ -71,7 +71,12 @@ export class ChannelUI extends ChannelEventListener {
         }
         ChannelUI.setMessageIcon($message, message_icon.icon, message_icon.color);
         this.messagesUI.append($message);
-        this.scrollToBottom();
+        let scrollTop = this.messagesUI.scrollTop();
+        let scrollHeight = this.messagesUI[0].scrollHeight;
+        let messageHeight = $message.height();
+        if(scrollTop + this.messagesUI.visibleHeight() >= scrollHeight - messageHeight){
+            this.scrollToBottom();
+        }
     }
 
     private static setMessageIcon($message: JQuery, icon: string, color: string) {
@@ -154,7 +159,7 @@ export class ChannelUI extends ChannelEventListener {
     private createAccessLink() {
         this.accessLink = $(UI.views.accessLink.element).attr("for", this.channel.channelId);
         this.accessLink.find(".ch-close").attr("data-close", this.channel.channelId);
-        this.accessLink.find(".fav").attr("data-add", this.channel.channelId);
+        this.accessLink.find(".fav").attr("data-add", this.channel.name);
         this.accessLink.find(".ch-link").text(`${this.channel.nick.split("#")[0]}@${this.channel.name}`)
             .attr("data-tab", this.channel.channelId);
         this.messageCounter = this.accessLink.find(".counter");
