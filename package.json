@@ -30,6 +30,7 @@
     "material-design-icons": "^3.0.1",
     "materialize-css": "^0.97.8",
     "require-rebuild": "^1.2.8",
+    "sequelize": "^3.27.0",
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
@@ -37,6 +38,7 @@
     "@types/jquery": "^2.0.33",
     "@types/materialize-css": "^0.97.32",
     "@types/node": "^6.0.48",
+    "@types/sequelize": "^4.0.39",
     "adm-zip": "^0.4.7",
     "electron": "^1.4.7",
     "electron-builder": "^8.6.0",

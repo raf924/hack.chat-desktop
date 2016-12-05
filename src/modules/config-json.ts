@@ -1,8 +1,9 @@
 const fs = require("fs");
 
 class ConfigJSONObject extends ConfigObject {
-    windowWidth: number;
-    windowHeight: number;
+    windowWidth?: number;
+    windowHeight?: number;
+    configDatabase?: string;
 }
 
 class ConfigJSON implements Config {
