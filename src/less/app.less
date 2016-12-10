@@ -131,13 +131,10 @@ header {
 }
 
 ul.collection.messages {
-  //overflow-y: visible;
+  overflow-y: visible;
   max-height: ~"calc(100% - 10em)";
   position: absolute;
   width: ~"calc(99% - 300px)";
-  &:hover {
-    overflow-y: visible;
-  }
   & li {
     &.collection-item.avatar {
       padding-top: 1px;
@@ -150,6 +147,13 @@ ul.collection.messages {
       word-break: normal;
       white-space: pre-line;
       font-family: Roboto, sans-serif;
+    }
+  }
+  &::-webkit-scrollbar{
+    width: 0.3em;
+    &-thumb{
+      background-color: rgba(0, 0, 0, 0.46);
+      border-radius: 1em;
     }
   }
 }
