@@ -9,7 +9,7 @@
   },
   "files": [
     {
-      "includePattern": "app\\.(.*)\\.tar.gz",
+      "includePattern": "app.*",
       "matrixParams": {
         "override": 1
       }
