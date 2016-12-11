@@ -9,7 +9,7 @@
   },
   "files": [
     {
-      "includePattern": "app.*",
+      "includePattern": "app(.*)",
       "matrixParams": {
         "override": 1
       }
