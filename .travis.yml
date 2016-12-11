@@ -1,0 +1,17 @@
+os:
+  - linux
+  - osx
+language: node_js
+node_js: node
+cache:
+  directories:
+    - node_modules
+before_script: npm install
+script: npm package
+before_deploy: zip -r app.$TRAVIS_OS_NAME.zip dist/
+deploy:
+  provider: bintray
+  file: bintray.json
+  user: raf924
+  key:
+    secure: LJQvyHlM3ClbktUrvuThtA4h9JMefXW2gSR+V2m3EUFXlPyZYfL6DgjBb0pYeM2Ospuw6B4uUgXiCmsF0kuS8O3Dj9zcdf8JLnik3ncum9glOYO9A78sPdE4ZZ/CH3/4+iUVjGeePD4AC+y7o37DcDWqv8Wckfmr/wNiBT6Al4KfJECwlxL+KiaRE6+AeEva7qWVtHzOn1i/QacTz2XZ5UcsBrIWYJrLtBJcrkJpIhMcwWW+Y222Cnv3lh8H1kIKe1Ge2rC34o/1lTWg9cJ6rISblYsko4aTtaCfrP7cF4SdVBRl68MKhowhO+5x2Gd8hzDNUNmoSwysRduhtL/iXF/010U69WQxt52uqvp83gqDyhGQvVj8LpdIY4TAdbMiMNNom279c8wwKIT1altJ/OONFMDbrDmR3hTggIlRwSWNOgAyS1i65NkaSS+8Kd5mKZOsIyUB5frfYEg4wCLT7Vt3kwSYvIRPDJ7cfHFCW7EO0b+HMULtYPMUdvIGauwYXMeirTNp8m4LNx0tS8+tca/+y9u++tAiVDfW3CBeCjGXxXA+2Yg9Dbb8YSSOVLPGnsfLwx2h36TwzkYnrnYYuiDTdw1IAjPp8uXqWJ4Q/cC2FuueJptjJ1PtwiHfSu97Qb37ySNyFUj2R3mgKU6cB0QAmk7/l9BaSU6cxHlZ/C4=
