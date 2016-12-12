@@ -4,7 +4,7 @@ node_js: node
 cache:
   directories:
     - node_modules
-script: travis_wait npm run package && travis_wait npm run package linux x64
+script: travis_wait 30 npm run package && travis_wait 30 npm run package linux x64
 before_deploy: zip -r app.macos.zip dist/ && ls
 deploy:
   provider: bintray
