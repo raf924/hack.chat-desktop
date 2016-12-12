@@ -9,7 +9,7 @@
   },
   "files": [
     {
-      "includePattern": "app(.*)",
+      "includePattern": "app(.*).zip",
       "matrixParams": {
         "override": 1
       }
