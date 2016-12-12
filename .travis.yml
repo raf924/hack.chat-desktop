@@ -7,7 +7,7 @@ cache:
   directories:
     - node_modules
 script: npm run package
-before_deploy: zip -r app."$TRAVIS_OS_NAME".zip dist/
+before_deploy: zip -r app.$TRAVIS_OS_NAME.zip dist/ && ls
 deploy:
   provider: bintray
   file: bintray.json
