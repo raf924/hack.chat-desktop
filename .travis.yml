@@ -1,13 +1,12 @@
 os:
-  - linux
   - osx
 language: node_js
 node_js: node
 cache:
   directories:
     - node_modules
-script: npm run package
-before_deploy: zip -r app.$TRAVIS_OS_NAME.zip dist/ && ls
+script: npm run package && npm run package linux x64
+before_deploy: zip -r app.macos.zip dist/ && ls
 deploy:
   provider: bintray
   file: bintray.json

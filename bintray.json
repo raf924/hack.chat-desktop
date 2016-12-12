@@ -9,7 +9,7 @@
   },
   "files": [
     {
-      "includePattern": "app.$TRAVIS_OS_NAME.zip",
+      "includePattern": "app.macos.zip",
       "matrixParams": {
         "override": 1
       }
