@@ -1,8 +1,12 @@
-os: osx
+os:
+  - osx
+  - linux
 language: node_js
 node_js: '6'
-script: travis_wait 30 npm run package && travis_wait 30 npm run package linux x64
-before_deploy: zip -r app.macos.zip dist/ && ls
+script:
+  - if [[ "$TRAVIS_OS_NAME" == 'osx' ]]; travis_wait 30 npm run package; fi
+  - if [[ "$TRAVIS_OS_NAME" == 'linux ]]; npm run package; fi
+before_deploy: zip -r app.$TRAVIS_OS_NAME.zip dist/ && echo $(ls)
 deploy:
   provider: bintray
   file: bintray.json
