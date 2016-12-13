@@ -10,7 +10,7 @@
   "files": [
     {
       "includePattern": "app.linux.zip",
-      "uploadPattern": "app.osx.zip",
+      "uploadPattern": "app.linux.zip",
       "matrixParams": {
         "override": 1
       }
