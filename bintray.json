@@ -9,7 +9,15 @@
   },
   "files": [
     {
-      "includePattern": "app.(linux|osx).zip", "uploadPattern":"app.$1.zip",
+      "includePattern": "app.linux.zip",
+      "uploadPattern": "app.osx.zip",
+      "matrixParams": {
+        "override": 1
+      }
+    },
+    {
+      "includePattern": "app.osx.zip",
+      "uploadPattern": "app.osx.zip",
       "matrixParams": {
         "override": 1
       }
