@@ -6,7 +6,7 @@ class ConfigJSONObject extends ConfigObject {
     configDatabase?: string;
 }
 
-class ConfigJSON implements Config {
+class ConfigJSON extends Config {
     readonly config: ConfigJSONObject;
     readonly filePath: string;
 
@@ -22,6 +22,7 @@ class ConfigJSON implements Config {
     }
 
     constructor(filePath: string) {
+        super();
         this.config = new ConfigJSONObject();
         if (filePath !== undefined && filePath !== null)
             if (fs.existsSync(filePath)) {

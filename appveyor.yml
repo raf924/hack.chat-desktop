@@ -1,0 +1,30 @@
+version: 1.0.{build}
+platform: x64
+environment:
+  NODE_VERSION: 6.9
+install:
+- ps: Install-Product node $env:NODE_VERSION
+- npm install
+cache: node_modules -> package.json
+xamarin:
+  email: rafael.naciri.dev@gmail.com
+  password:
+    secure: Tf4GAv15ctSjj0Y0ZWzlcw==
+build_script:
+- cmd: npm run package win32 x64
+- cmd: 7z a app.win32.zip %APPVEYOR_BUILD_FOLDER%\dist
+test: off
+artifacts:
+- path: app.win32.zip
+  name: Apps
+deploy:
+- provider: BinTray
+  username: raf924
+  api_key:
+    secure: v0r+T1BLWw22MNmGtaHD2ZXmCoMidBI4L9PClbIXvXJWG62n+E28N8UxXFuWSTOk
+  subject: raf924
+  repo: hack.chat-desktop
+  package: release
+  version: latest
+  publish: true
+  override: true

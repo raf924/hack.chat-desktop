@@ -7,8 +7,9 @@
   },
   "scripts": {
     "start": "node start.js",
-    "dev": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
-    "package": "node package.js",
+    "dev": "node_modules\\.bin\\electron.cmd . dev",
+    "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
+    "package": "node build.js && node package.js",
     "postinstall": "node build.js"
   },
   "repository": {
@@ -40,7 +41,7 @@
     "@types/node": "^6.0.48",
     "@types/sequelize": "^4.0.39",
     "adm-zip": "^0.4.7",
-    "electron": "^1.4.7",
+    "electron": "^1.4.12",
     "electron-builder": "^8.6.0",
     "electron-packager": "^8.3.0",
     "install": "^0.8.2",

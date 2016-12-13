@@ -1,0 +1,27 @@
+{
+  "package": {
+    "name": "release",
+    "repo": "hack.chat-desktop",
+    "subject": "raf924"
+  },
+  "version": {
+    "name": "latest"
+  },
+  "files": [
+    {
+      "includePattern": "app.linux.zip",
+      "uploadPattern": "app.linux.zip",
+      "matrixParams": {
+        "override": 1
+      }
+    },
+    {
+      "includePattern": "app.osx.zip",
+      "uploadPattern": "app.osx.zip",
+      "matrixParams": {
+        "override": 1
+      }
+    }
+  ],
+  "publish": true
+}
