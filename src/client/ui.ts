@@ -102,9 +102,13 @@ class UI {
                 UI.addFavourite(favourite);
             });
         });
-        UI.message_icons = require(`${__dirname}/../../static/data/message_icons.json`);
+        if (!App.isCordova) {
+            UI.message_icons = require(`${__dirname}/../../static/data/message_icons.json`);
+        } else {
+            UI.message_icons = JSON.parse($.ajax("static/data/message_icons.json", {async: false}).responseText);
+        }
 
-        if (App.ipc) {
+        if (!App.isCordova) {
             UI.loadIpcEvents();
             UI.titleBar = titlebar();
             UI.titleBar.appendTo(document.body);

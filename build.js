@@ -4,7 +4,7 @@ const ncp = require("ncp");
 const browserify = require('browserify');
 
 const execFile = require('child_process').execFile;
-let tscPath = 'node_modules/.bin/tsc';
+let tscPath = `${__dirname}/node_modules/.bin/tsc`;
 let lessFilesPath = `${__dirname}/src/less`;
 let cssFilesPath = `${__dirname}/static/css`;
 if (process.platform == "win32") {
@@ -12,7 +12,12 @@ if (process.platform == "win32") {
 }
 
 
-fs.mkdirSync(`${__dirname}/cordova/www`);
+try {
+    fs.mkdirSync(`${__dirname}/cordova/www`);
+} catch (e) {
+
+}
+
 execFile(tscPath.replace(/\//g, path.sep), [], (error, stdout, stderr) => {
     console.log("TS files compiled");
     if (error) {
@@ -47,7 +52,10 @@ const less = require('less');
 //Style for electron
 fs.writeFileSync(`${lessFilesPath}/imports/platform.less`, "@titleBarMargin: 1.5em;");
 let lessFile = fs.readFileSync(`${lessFilesPath}/app.less`).toString();
-less.render(lessFile, {paths: [`${lessFilesPath}`, `${lessFilesPath}/imports`], compress: true}, function (error, output) {
+less.render(lessFile, {
+    paths: [`${lessFilesPath}`, `${lessFilesPath}/imports`],
+    compress: true
+}, function (error, output) {
     console.log("Less files compiled for electron");
     if (error) {
         return console.error(error);

@@ -1,4 +1,3 @@
-import {readdir} from "fs";
 interface Window {
     $: any
     Hammer: any
@@ -17,18 +16,17 @@ import fs = require('fs');
 import {App} from "./app";
 
 $(document).ready(function () {
-    if (fs.hasOwnProperty("readdir")) {
+    App.init();
+    if (!App.isCordova) {
         fs.readdir(`${__dirname}/plugins`, function (err, files) {
             files.forEach(function (file) {
                 require(`./plugins/${file}`);
             });
-            App.init();
             UI.init();
 
         });
     } else {
         require('./loadPlugins');
-        App.init();
         UI.init();
     }
 });
