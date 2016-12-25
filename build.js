@@ -14,6 +14,7 @@ if (process.platform == "win32") {
 
 fs.mkdirSync(`${__dirname}/cordova/www`);
 execFile(tscPath.replace(/\//g, path.sep), [], (error, stdout, stderr) => {
+    console.log("TS files compiled");
     if (error) {
         console.error(`Failed to compile typescript files :\n ${error} \n ${stdout} \n ${stderr}`);
         return;
@@ -38,7 +39,7 @@ execFile(tscPath.replace(/\//g, path.sep), [], (error, stdout, stderr) => {
         if (err) {
             return console.error(err);
         }
-        console.log("TS files compiled");
+        console.log("Lib files distributed to cordova");
     });
 });
 
@@ -47,6 +48,7 @@ const less = require('less');
 fs.writeFileSync(`${lessFilesPath}/imports/platform.less`, "@titleBarMargin: 1.5em;");
 let lessFile = fs.readFileSync(`${lessFilesPath}/app.less`).toString();
 less.render(lessFile, {paths: [`${lessFilesPath}`, `${lessFilesPath}/imports`], compress: true}, function (error, output) {
+    console.log("Less files compiled for electron");
     if (error) {
         return console.error(error);
     }
@@ -66,9 +68,10 @@ less.render(lessFile, {paths: [`${lessFilesPath}`, `${lessFilesPath}/imports`], 
                 return console.error(error);
             }
             fs.writeFileSync(`${__dirname}/cordova/www/static/css/app.css`, output.css);
+            console.log("Less files compiled for cordova");
         });
     });
-    console.log("Less files compiled");
+
 });
 
 ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (err) {
@@ -76,6 +79,7 @@ ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (
         return console.error(err);
     }
     fs.appendFileSync(`${__dirname}/cordova/www/index.html`, "<script src='cordova.js'></script>");
+    console.log("index.html adapted for cordova");
 });
 
 try {
