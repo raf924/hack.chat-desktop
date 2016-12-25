@@ -1,17 +1,18 @@
 import {Channel} from "./channel";
 import {MessageData} from "./channel";
 import {MessageIcon, UI} from "./ui";
+import {App} from "./app";
 
 export abstract class ChannelEventListener {
     protected static events = ["addUser", "removeUser", "tripCodeSet", "messageReceived"];
 
     abstract addUser(user: string): void
 
-    abstract removeUser(user: string) : void
+    abstract removeUser(user: string): void
 
-    abstract tripCodeSet(user: string, trip: string) : void
+    abstract tripCodeSet(user: string, trip: string): void
 
-    abstract messageReceived(args: MessageData) : void
+    abstract messageReceived(args: MessageData): void
 }
 
 export class ChannelUI extends ChannelEventListener {
@@ -23,7 +24,7 @@ export class ChannelUI extends ChannelEventListener {
     public messageCounter: JQuery;
     public unreadMessageCount: number;
 
-    public getChannel() : Channel {
+    public getChannel(): Channel {
         return this.channel;
     }
 
@@ -74,7 +75,7 @@ export class ChannelUI extends ChannelEventListener {
         let scrollTop = this.messagesUI.scrollTop();
         let scrollHeight = this.messagesUI[0].scrollHeight;
         let messageHeight = $message.height();
-        if(scrollTop + this.messagesUI.visibleHeight() >= scrollHeight - messageHeight){
+        if (scrollTop + this.messagesUI.visibleHeight() >= scrollHeight - messageHeight) {
             this.scrollToBottom();
         }
     }
@@ -109,7 +110,7 @@ export class ChannelUI extends ChannelEventListener {
             .find(".nick")
             .text(user);
         this.usersUI.append($user);
-        if(UI.currentChannel === this.channel.channelId) {
+        if (App.currentChannel === this.channel.channelId) {
             UI.chatInputForm.find("#textfield").autocomplete("addItem", user);
         }
     }
@@ -120,7 +121,7 @@ export class ChannelUI extends ChannelEventListener {
 
     removeUser(user) {
         this.usersUI.find(`.user[user='${user}']`).remove();
-        if(UI.currentChannel === this.channel.channelId){
+        if (App.currentChannel === this.channel.channelId) {
             UI.chatInputForm.find("#textfield").autocomplete("removeItem", user);
         }
 
@@ -140,15 +141,15 @@ export class ChannelUI extends ChannelEventListener {
                 break;
             case "chat":
                 args.text = new Option(args.text).innerHTML;
-                args.text = UI.parseText(args.text);
-                UI.parsers.forEach(function (parser) {
-                   if(parser.hasOwnProperty("hasMention")){
-                       args.mention = parser["hasMention"];
-                   }
+                args.text = App.parseText(args.text);
+                App.parsers.forEach(function (parser) {
+                    if (parser.hasOwnProperty("hasMention")) {
+                        args.mention = parser["hasMention"];
+                    }
                 });
                 break;
         }
-        if (this.channel.channelId !== UI.currentChannel && UI.notifyConfig[args.cmd]) {
+        if (this.channel.channelId !== App.currentChannel && UI.notifyConfig[args.cmd]) {
             this.unreadMessageCount++;
             this.messageCounter.text(this.unreadMessageCount);
             //TODO: add notifications
@@ -163,6 +164,6 @@ export class ChannelUI extends ChannelEventListener {
         this.accessLink.find(".ch-link").text(`${this.channel.nick.split("#")[0]}@${this.channel.name}`)
             .attr("data-tab", this.channel.channelId);
         this.messageCounter = this.accessLink.find(".counter");
-        $("#channels-tabs").append(this.accessLink);
+        UI.channelTabs.append(this.accessLink);
     }
 }
