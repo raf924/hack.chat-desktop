@@ -10,6 +10,9 @@ let cssFilesPath = `${__dirname}/static/css`;
 if (process.platform == "win32") {
     tscPath += ".cmd";
 }
+
+
+fs.mkdirSync(`${__dirname}/cordova/www`);
 execFile(tscPath.replace(/\//g, path.sep), [], (error, stdout, stderr) => {
     if (error) {
         console.error(`Failed to compile typescript files :\n ${error} \n ${stdout} \n ${stderr}`);
