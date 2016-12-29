@@ -161,17 +161,17 @@ class UI {
     }
 
     private static loadLoginEvents(): void {
-        UI.nickPrompt.find("form").submit(function (e) {
+        UI.nickPrompt.find("form")[0].onsubmit = function (e) {
             e.preventDefault();
-            let $nick = $(this).find("input.validate");
+            let $nick = $(e.target).find("input.validate");
             let nick = $nick.data("realNick");
-            if (App.ipc) {
+            if (!App.isCordova) {
                 App.ipc.send("join", JSON.stringify({"channel": $nick.data("channel"), "nick": nick}));
             } else {
                 UI.login($nick.data("channel"), nick);
             }
             $nick.val("").data("realNick", "").data("channel", "");
-            let forAll = $(this).find("#forAll:checked");
+            let forAll = $(e.target).find("#forAll:checked");
             if (forAll.length > 0) {
                 App.userData.set("nickName", nick);
                 App.nick = nick;
@@ -180,7 +180,7 @@ class UI {
             if (document.body.clientWidth < 992) {
                 $(".button-collapse").sideNav("hide");
             }
-        });
+        };
         UI.nickPrompt.find("form input.validate").mixedLogin();
     }
 
