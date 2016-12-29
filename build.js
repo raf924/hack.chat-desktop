@@ -86,8 +86,7 @@ ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (
     if (err) {
         return console.error(err);
     }
-    fs.appendFileSync(`${__dirname}/cordova/www/index.html`, "<script src='cordova.js'></script>");
-    console.log("index.html adapted for cordova");
+    console.log("index.html loaded for cordova");
 });
 
 try {

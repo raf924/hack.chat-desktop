@@ -15,12 +15,19 @@ export class App {
     public static userData: UserData;
     public static ipc: Electron.IpcRenderer; //TODO: replace by abstract communication class
     public static isCordova: boolean;
+    public static isAndroid: boolean;
 
     public static init(): void {
         App.isCordova = !!window.cordova;
         if (!window.cordova) {
             App.ipc = require('electron').ipcRenderer;
+        } else{
+            document.addEventListener("deviceready", function () {
+                window.cordova.plugins.backgroundMode.setDefaults({ text:'Chatron is running'});
+                window.cordova.plugins.backgroundMode.enable();
+            });
         }
+        App.isAndroid = !!navigator.userAgent.match(/Android/i);
         App.favourites = [];
         App.parsers = [];
         App.userData = new platformUserDataClass();
