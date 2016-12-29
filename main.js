@@ -6,14 +6,15 @@ const shell = electron.shell;
 const ipc = electron.ipcMain;
 
 require('require-rebuild')();
+const ConfigJSON = require("./lib/modules/config-json");
 
-let config = require("./config.js");
+const localConfig = new ConfigJSON(`${__dirname}/data.json`);
 const fs = require('fs');
 
 //TODO: Add remote config
 //TODO: Add tray icon
 
-let myNick = config.get().nickName;
+let myNick = localConfig.get("nickName");
 
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
@@ -42,13 +43,12 @@ ipc.on("join", function (event, data) {
 
 ipc.on("set", function (event, args) {
     //TODO: Add a remote config
-    let obj = args;
-    config.get()[obj.prop] = obj.value;
-    config.save();
+    localConfig.set(args.prop, args.value);
+    localConfig.save();
 });
 
 ipc.on("get", function (event, prop, async) {
-    let value = config.get()[prop];
+    let value = localConfig.get(prop);
     if (async) {
         event.sender.send(prop, value || "");
     } else {
@@ -75,8 +75,8 @@ ipc.on("fullscreen", function (event) {
 app.on('ready', function () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: config.get().width,
-        height: config.get().height,
+        width: localConfig.get("width"),
+        height: localConfig.get("height"),
         frame: false,
         icon: "./static/img/icon128.png",
         minWidth: 400,

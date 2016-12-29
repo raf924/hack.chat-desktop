@@ -9,7 +9,7 @@ const titlebar = require('titlebar');
 import fs = require('fs');
 import {View} from "./view";
 import {Channel} from "./channel";
-import {Parser} from "./parser";
+import {App} from "./app";
 
 export interface MessageIcon {
     icon: string,
@@ -48,27 +48,24 @@ export interface NotifyConfig {
     warn: boolean
 }
 
+//TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
 class UI {
     static message_icons: MessageIcon;
-    private static favourites: string[];
     private static favouritesUI: JQuery;
     private static titleBar: Titlebar;
-    private static ipc: Electron.IpcRenderer;
-    private static nick: string;
-    public static currentChannel: string;
-    public static parsers: Parser[];
     private static channelUIs: Map<string, ChannelUI>;
     public static notifyConfig: NotifyConfig;
     public static views: Views;
     private static nickPrompt: JQuery;
-    public static chatInputForm : JQuery;
+    public static chatInputForm: JQuery;
+    public static channelTabs: JQuery;
 
     public static getCurrentChannelUI(): ChannelUI {
-        return UI.channelUIs[UI.currentChannel];
+        return UI.channelUIs[App.currentChannel];
     }
 
     private static addFavourite(channelName: string) {
-        UI.favourites.push(channelName);
+        App.favourites.push(channelName);
         let $favouriteLink = $("<a>").attr("href", "#").attr("data-open", channelName).text(channelName);
         let $favourite = $("<li>").append($favouriteLink);
         UI.favouritesUI.append($favourite);
@@ -79,9 +76,11 @@ class UI {
     }
 
     public static init() {
+        //TODO: See hammer.js for swipe (already imported for materialize-css)
+
         UI.channelUIs = new Map<string, ChannelUI>();
-        UI.favourites = [];
-        UI.parsers = [];
+        //TODO: Load UI components from component/selector maps stored in JSON
+        UI.channelTabs = $("#channels-tabs");
         UI.loadViews();
         UI.nickPrompt = $("#nickPrompt");
         UI.chatInputForm = $("form#send");
@@ -92,34 +91,42 @@ class UI {
             "onlineRemove": true,
             "chat": true,
             "warn": true
-        }; //TODO: get the notify values from the config file
-        UI.ipc = require('electron').ipcRenderer;
-        UI.nick = UI.ipc.sendSync("get", "nickName");
-        UI.titleBar = titlebar();
-        UI.titleBar.appendTo(document.body);
-        $(UI.titleBar.element).append($("<div>").text("Chatron"));
-        UI.loadParsers();
+        }; //TODO: get the notify values from the App.userData
 
         UI.favouritesUI = $("#favourites");
         UI.favouritesUI.on("click", "li a[data-open]", function (e) {
             UI.login($(this).attr("data-open"));
         });
+        App.userData.get("favourites", function (favourites) {
+            favourites.forEach(function (favourite) {
+                UI.addFavourite(favourite);
+            });
+        });
+        if (!App.isCordova) {
+            UI.message_icons = require(`${__dirname}/../../static/data/message_icons.json`);
+        } else {
+            UI.message_icons = JSON.parse($.ajax("static/data/message_icons.json", {async: false}).responseText);
+        }
 
-        UI.message_icons = require("../../static/data/message_icons.json");
-
+        if (!App.isCordova) {
+            UI.loadIpcEvents();
+            UI.titleBar = titlebar();
+            UI.titleBar.appendTo(document.body);
+            $(UI.titleBar.element).append($("<div>").text("Chatron"));
+            UI.loadTitleBarEvents();
+        }
         UI.loadUIEvents();
         UI.loadChatEvents();
-        UI.loadIpcEvents();
         UI.loadLoginEvents();
         UI.loadTabEvents();
         UI.loadChannelEvents();
-        UI.loadTitleBarEvents();
+
     }
 
     private static loadTitleBarEvents(): void {
         for (let event of ["close", "minimize", "fullscreen"]) {
             UI.titleBar.on(event, function (e) {
-                UI.ipc.send(event, function () {
+                App.ipc.send(event, function () {
 
                 });
             });
@@ -128,30 +135,6 @@ class UI {
 
     private static loadViews(): void {
         UI.views = new Views();
-    }
-
-    private static loadParsers(): void {
-        fs.readdir(`${__dirname}/parsers`, function (err, files) {
-            if (err === null) {
-                files.forEach(function (file) {
-                    try {
-                        let parser = require(`./parsers/${file}`);
-                        UI.parsers.push(new parser());
-                    } catch (e) {
-                        console.warn(`./parsers/${file} doesn't contain a Parser`);
-                    }
-                });
-            } else {
-                console.error("Cannot load parsers: lib/client/parsers access error.");
-            }
-        });
-    }
-
-    static parseText(text: string): string {
-        UI.parsers.forEach(function (parser: Parser) {
-            text = parser.parse(text);
-        });
-        return text;
     }
 
     private static insertAtCursor(text): void {
@@ -169,7 +152,7 @@ class UI {
         }).find("#textfield").keydown(function (e) {
             if (e.keyCode === 13 && !e.shiftKey) {
                 e.preventDefault();
-                UI.channelUIs[UI.currentChannel].channel.sendMessage($(this).val());
+                UI.channelUIs[App.currentChannel].channel.sendMessage($(this).val());
                 $(this).val("");
             }
             //TODO: add commands handling
@@ -178,25 +161,26 @@ class UI {
     }
 
     private static loadLoginEvents(): void {
-        UI.nickPrompt.find("form").submit(function (e) {
+        UI.nickPrompt.find("form")[0].onsubmit = function (e) {
             e.preventDefault();
-            let $nick = $(this).find("input.validate");
+            let $nick = $(e.target).find("input.validate");
             let nick = $nick.data("realNick");
-            UI.ipc.send("join", JSON.stringify({"channel": $nick.data("channel"), "nick": nick}));
+            if (!App.isCordova) {
+                App.ipc.send("join", JSON.stringify({"channel": $nick.data("channel"), "nick": nick}));
+            } else {
+                UI.login($nick.data("channel"), nick);
+            }
             $nick.val("").data("realNick", "").data("channel", "");
-            let forAll = $(this).find("#forAll:checked");
+            let forAll = $(e.target).find("#forAll:checked");
             if (forAll.length > 0) {
-                UI.ipc.send("set", JSON.stringify({
-                    prop: "nickName",
-                    value: `${nick.split("#")[0]}#`
-                }));
-                UI.nick = nick;
+                App.userData.set("nickName", nick);
+                App.nick = nick;
             }
             UI.nickPrompt.modal('close');
             if (document.body.clientWidth < 992) {
                 $(".button-collapse").sideNav("hide");
             }
-        });
+        };
         UI.nickPrompt.find("form input.validate").mixedLogin();
     }
 
@@ -204,10 +188,7 @@ class UI {
         $("#menu").on("click", "a.fav", function (e) {
             e.preventDefault();
             UI.addFavourite($(this).attr("data-add"));
-            UI.ipc.send("set", {
-                prop: "favourites",
-                value: UI.favourites
-            });
+            App.userData.set("favourites", App.favourites);
         });
         $("body").on("click", ".channel .title a, .user a.nick", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
@@ -232,37 +213,31 @@ class UI {
     }
 
     private static loadIpcEvents(): void {
-        UI.ipc.on("openChannel", function (e, data) {
+        App.ipc.on("openChannel", function (e, data) {
             let {"channel": channel, "nick": nick} = JSON.parse(data);
             UI.login(channel, nick);
         });
-        UI.ipc.on("favourites", function (event, favourites) {
-            favourites.forEach(function (favourite) {
-                UI.addFavourite(favourite);
-            });
-        });
-        UI.ipc.send("get", "favourites", true);
     }
 
     private static loadTabEvents(): void {
         $("#channels-tabs")
             .tabs("init")
             .on("tabOpened", function (e, channelId) {
-                if(!UI.channelUIs[channelId].channel.isOnline){
+                if (!UI.channelUIs[channelId].channel.isOnline) {
                     UI.chatInputForm.find("#textfield").attr("disabled", "");
                 }
             })
             .on("tabChanged", function (e, channelId) {
                 $(".users").css("display", "none");
-                let currentChannelUI : ChannelUI = UI.channelUIs[channelId];
+                let currentChannelUI: ChannelUI = UI.channelUIs[channelId];
                 currentChannelUI.usersUI.css("display", "");
                 currentChannelUI.unreadMessageCount = 0;
                 currentChannelUI.messageCounter.text(0);
-                UI.currentChannel = channelId;
-                if(currentChannelUI.channel.isOnline){
+                App.currentChannel = channelId;
+                if (currentChannelUI.channel.isOnline) {
                     UI.chatInputForm.find("#textfield").removeAttr("disabled");
-                    let users : string[] = [];
-                    for(let user in UI.channelUIs[channelId].channel.users){
+                    let users: string[] = [];
+                    for (let user in UI.channelUIs[channelId].channel.users) {
                         users.push(user);
                     }
                     UI.chatInputForm.find("#textfield").autocomplete("setItems", users);
@@ -284,18 +259,18 @@ class UI {
     private static login(channelName: string, nick?: string): void {
         if (nick !== undefined && nick !== null && nick !== "") {
             UI.openChannel(channelName, nick);
-        } else if (UI.nick === null || UI.nick === "" || UI.nick.split("#").length > 1 && UI.nick.split("#")[1].length == 0) {
+        } else if (App.nick === undefined || App.nick === null || App.nick === "" || App.nick.split("#").length > 1 && App.nick.split("#")[1].length == 0) {
             UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
-            UI.nickPrompt.find("input.validate").val(UI.nick).data("realNick", UI.nick).data("channel", channelName).focus();
+            UI.nickPrompt.find("input.validate").val(App.nick).data("realNick", App.nick).data("channel", channelName).focus();
         } else {
-            UI.openChannel(channelName, UI.nick);
+            UI.openChannel(channelName, App.nick);
         }
     }
 
     private static openChannel(channelName: string, nick: string): void {
         let channel = new Channel(channelName, nick);
         UI.channelUIs[channel.channelId] = new ChannelUI(channel);
-        UI.currentChannel = channel.channelId;
+        App.currentChannel = channel.channelId;
     }
 
     private static loadChannelEvents() {

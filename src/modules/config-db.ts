@@ -2,6 +2,7 @@ import sequelize = require("sequelize");
 import Sequelize = sequelize.Sequelize;
 import Model = sequelize.Model;
 import fn = sequelize.fn;
+import {ConfigObject, Property, Config} from "../app/config";
 
 
 interface DBConfig {
@@ -11,22 +12,19 @@ interface DBConfig {
     password: string;
 }
 
-export interface Property {
-    name: string;
-    value: string;
+class ConfigDBObject extends ConfigObject{
+    nickName: string;
 }
 
-class ConfigSequelize extends Config {
-    sequelize: Sequelize;
-    Property: any;
+class ConfigDB extends Config {
+    private sequelize: Sequelize;
+    private Property: any;
+    private changed : boolean;
 
     constructor(dbConfig: DBConfig) {
         super();
-        this.config = new ConfigObject();
-        this.sequelize = new sequelize(dbConfig.database, dbConfig.username, dbConfig.password, {
-            host: dbConfig.host || null,
-            storage: dbConfig.host || 'localConfig.db'
-        });
+        this.config = new ConfigDBObject();
+        this.sequelize = new sequelize(dbConfig.database, dbConfig.username, dbConfig.password, dbConfig);
         this.Property = this.sequelize.define('config', {
             name: {
                 type: sequelize.STRING,
@@ -44,19 +42,26 @@ class ConfigSequelize extends Config {
                 })
             });
         });
+        this.changed = false;
     }
 
     save(): void {
         for(let propName in this.config){
             this.Property.upsert({name: propName, value: this.config[propName]});
         }
+        this.changed = false;
     }
 
     set(name: string, value: any): void {
-        this.config[name] = value;
+        if (this.config.hasOwnProperty(name)) {
+            this.config[name] = value;
+            this.changed = true;
+        }
     }
 
     get(name: string): any {
         return this.config[name];
     }
 }
+
+module.exports = ConfigDB;

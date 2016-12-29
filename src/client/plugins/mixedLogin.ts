@@ -1,56 +1,81 @@
 (function ($) {
+    function applyComposition(el: HTMLInputElement, nick: string, key: string, selectionStart: number, selectionEnd: number) {
+        let before: string;
+        let after: string;
+        switch (key) {
+            case "Backspace":
+                before = nick.substring(0, selectionStart - 1);
+                after = nick.substring(selectionEnd);
+                return before + after;
+            case "Delete":
+                before = nick.substring(0, selectionStart);
+                if (selectionStart === selectionEnd) {
+                    selectionEnd++;
+                }
+                after = nick.substring(selectionEnd);
+                return before + after;
+        }
+    }
+
     $.fn.mixedLogin = function () {
+        let realNick: string = "";
+        let that: JQuery = this;
         if (this[0].nodeName !== "INPUT") {
             throw "mixedLogin has to be applied to a <input> element";
         }
-        this.keydown(function (e) {
+        let event = navigator.userAgent.match(/Android/i) ? "textInput" : "keydown";
+        let pressedDown = false;
+        let selectionStart: number = 0;
+        let selectionEnd: number = 0;
+        this.on(event, function (e) {
+            pressedDown = true;
             let target: HTMLInputElement = <HTMLInputElement> e.currentTarget;
-            $(this).data("keyCode", e.keyCode);
-            if ((e.keyCode !== 8 && e.keyCode != 46) || $(this).data("selectionStart") == null) {
-                $(this).data("selectionEnd", target.selectionEnd);
-                $(this).data("selectionStart", target.selectionStart);
+            let before;
+            let after;
+            let key = e.key || e.originalEvent.data;
+            switch (key) {
+                case "Backspace":
+                case "Delete":
+                    realNick = applyComposition(e.currentTarget, realNick, key, target.selectionStart, target.selectionEnd);
+                    break;
+                case "Enter":
+                    break;
+                default:
+                    if (key.length === 1) {
+                        e.preventDefault();
+                        before = realNick.substring(0, target.selectionStart);
+                        after = realNick.substring(target.selectionEnd);
+                        realNick = before + key + after;
+                        let matches = realNick.split("#");
+                        let oldSelectionStart = e.currentTarget.selectionStart;
+                        e.currentTarget.value = matches.length < 2 ? realNick : realNick.replace(/#(.+)/, `#${matches[1].replace(/./g, "*")}`);
+                        e.currentTarget.selectionStart = oldSelectionStart + 1;
+                        e.currentTarget.selectionEnd = oldSelectionStart + 1;
+                    }
+                    break;
             }
-        }).click(function (e) {
-            let target: HTMLInputElement = <HTMLInputElement> e.currentTarget;
-            $(this).data("selectionEnd", target.selectionEnd);
-            $(this).data("selectionStart", target.selectionStart);
-        }).on("select", function (e) {
-            let target: HTMLInputElement = <HTMLInputElement> e.currentTarget;
-            $(this).data("selectionEnd", target.selectionEnd);
-            $(this).data("selectionStart", target.selectionStart);
-        }).on("input", function (e) {
-            if ($(this).data("realNick") == null) {
-                $(this).data("realNick", "");
+        }).keydown(function (e) {
+            selectionStart = e.currentTarget.selectionStart;
+            selectionEnd = e.currentTarget.selectionEnd;
+        }).keyup(function (e) {
+            let key: string = null;
+            if (e.currentTarget.value.length === 0) {
+                realNick = "";
             }
-            if ($(this).data("keyCode") == 8 || $(this).data("keyCode") == 46) {
-                let oldNick = $(this).data("realNick");
-                let before = oldNick;
-                switch ($(this).data("keyCode")) {
-                    case 8://BACKSPACE
-                        before = oldNick.slice(0, $(this).data("selectionStart") - 1);
-                        break;
-                    case 46://DELETE
-                        before = oldNick.slice(0, $(this).data("selectionStart"));
-                        break;
+            else if (!pressedDown && e.currentTarget.value.length < realNick.length && navigator.userAgent.match(/Android/i)) {
+                if (selectionStart === e.currentTarget.selectionStart) {
+                    key = "Delete";
+                } else if (selectionStart > e.currentTarget.selectionStart) {
+                    key = "Backspace";
                 }
-                let after = oldNick.slice($(this).data("selectionEnd") + 1);
-                $(this).data("realNick", before + after);
-            } else {
-                let target: HTMLInputElement = <HTMLInputElement> e.currentTarget;
-                let nick = target.value;
-                let idxStart = $(this).data("selectionStart") || target.selectionStart - 1;
-                let idxEnd = $(this).data("selectionEnd") || target.selectionStart;
-                let newChar = nick[idxStart];
-                $(this).data("realNick", `${$(this).data("realNick").slice(0, idxStart)}${newChar}${$(this).data("realNick").slice(idxEnd)}`);
-                let matches = nick.match(/#(.+)/i);
-                if (matches !== null) {
-                    let password = matches[1];
-                    target.value = nick.replace(/#(.+)/, `#${password.replace(/./g, "*")}`);
-                }
+                realNick = applyComposition(e.currentTarget, realNick, key, selectionStart, selectionEnd);
             }
-            $(this).data("selectionStart", null);
-            $(this).data("selectionEnd", null);
-            $(this).data("keyCode", null);
+            pressedDown = false;
+            that.data("realNick", realNick);
+            if (e.key === "Enter") {
+                realNick = "";
+            }
         });
+        return $(this);
     }
 })(jQuery);

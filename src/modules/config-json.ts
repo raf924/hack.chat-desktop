@@ -1,3 +1,4 @@
+import {ConfigObject, Config} from "../app/config";
 const fs = require("fs");
 
 class ConfigJSONObject extends ConfigObject {
@@ -15,10 +16,13 @@ class ConfigJSON extends Config {
     }
 
     set(name: string, value: any): void {
+        if (this.config.hasOwnProperty(name)) {
+            this.config[name] = value;
+        }
     }
 
     get(name: string): any {
-        return undefined;
+        return this.config[name];
     }
 
     constructor(filePath: string) {
@@ -33,3 +37,5 @@ class ConfigJSON extends Config {
             }
     }
 }
+
+module.exports = ConfigJSON;

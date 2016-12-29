@@ -1,4 +1,5 @@
 @sideNavWidth: 300px;
+@import "imports/platform";
 
 .side-nav {
   width: @sideNavWidth !important;
@@ -11,7 +12,7 @@ body {
 }
 
 main#container {
-  margin-top: 2em;
+  margin-top: @titleBarMargin;
   top: 0;
   position: fixed;
   height: 100%;
@@ -55,7 +56,7 @@ header {
 }
 
 #sidemenu, #users {
-  top: 22px;
+  margin-top: @titleBarMargin;
 }
 
 #sidemenu {
@@ -132,7 +133,7 @@ header {
 
 ul.collection.messages {
   overflow-y: visible;
-  max-height: ~"calc(100% - 10em)";
+  max-height: ~"calc(100% - 6em)";
   position: absolute;
   width: ~"calc(99% - 300px)";
   & li {
@@ -284,6 +285,14 @@ ul.collection.messages {
   & form.inputprompt {
     padding: 0 16px;
   }
+}
+
+.modal-content .modal-title{
+  margin: 0;
+}
+
+.modal-overlay{
+  height: unset;
 }
 
 @import "imports/small-screen";
