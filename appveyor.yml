@@ -27,8 +27,6 @@ install:
 - npm install
 cache:
 - node_modules -> package.json
-- cordova/platforms -> cordova/config.xml
-- cordova/plugins -> cordova/config.xml
 xamarin:
   email: rafael.naciri.dev@gmail.com
   password:
