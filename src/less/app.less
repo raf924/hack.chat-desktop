@@ -132,10 +132,12 @@ header {
 }
 
 ul.collection.messages {
+  -webkit-margin-after: 0px;
   overflow-y: visible;
-  max-height: ~"calc(100% - 6em)";
+  max-height: ~"calc(100% - 6rem - 3vh)";
   position: absolute;
   width: ~"calc(99% - 300px)";
+  margin-top: 3vh;
   & li {
     &.collection-item.avatar {
       padding-top: 1px;
@@ -163,13 +165,14 @@ ul.collection.messages {
   position: fixed;
   width: 100%;
   bottom: 0;
-  height: 7em;
   margin-bottom: 0;
   & form#send {
     width: ~"calc(92% - 300px)";
     & #textfield {
       overflow-y: visible;
-      max-height: 4em;
+      max-height: 4rem;
+      padding: 0;
+      margin-bottom: 0;
     }
   }
 }
