@@ -1,31 +1,27 @@
 import {EventEmitter} from 'events';
 
-interface MessageData{
-    nick: string,
-    trip: string,
-    mod: boolean,
-    cmd: string,
-    nicks : string[],
-    text : string
-}
+class Channel extends EventEmitter {
+    name: string;
+    nick: string;
+    channelId: string;
+    users: Map<string, string>;
+    ws: WebSocket;
+    private online: boolean;
+    password: string;
+    service = "hack.chat";
 
-class Channel extends EventEmitter{
-    name : string;
-    nick : string;
-    channelId : string;
-    users : Map<string, string>;
-    ws : WebSocket;
-    private online : boolean;
     public get isOnline(): boolean {
         return this.online;
     }
-    constructor(name, nickName){
+
+    constructor(name, nickName, password) {
         super();
         this.users = new Map<string, string>();
         this.name = name;
         this.nick = nickName;
+        this.password = password;
         this.online = false;
-        this.channelId = nickName.split("#")[0] + (nickName.split("#").length > 1 ? "#" : "") + "@" + name;
+        this.channelId = `${nickName}@${name}@${this.service}`;
         let that = this;
         this.ws = new WebSocket("wss://hack.chat/chat-ws");
         window.setInterval(function () {
@@ -37,12 +33,12 @@ class Channel extends EventEmitter{
             that.send({
                 cmd: "join",
                 channel: that.name,
-                nick: that.nick
+                nick: `${that.nick}#${that.password}`
             });
         };
         this.ws.onmessage = function (message) {
-            let args : MessageData = JSON.parse(message.data);
-            switch (args.cmd){
+            let args: MessageData = JSON.parse(message.data);
+            switch (args.cmd) {
                 case "onlineAdd":
                     that.addUser(args.nick);
                     break;
@@ -70,35 +66,42 @@ class Channel extends EventEmitter{
             that.receiveMessage(args);
         };
     }
-    send(args){
+
+    send(args) {
         if (this.ws && this.ws.readyState == this.ws.OPEN) {
             this.ws.send(JSON.stringify(args));
         }
     }
-    sendMessage(message){
+
+    sendMessage(message) {
         this.send({
             cmd: "chat",
             text: message
         });
     }
-    close(){
+
+    close() {
         this.ws.close();
     }
-    addUser(user){
-        this.users[user] =  "";
+
+    addUser(user) {
+        this.users[user] = "";
         super.emit("addUser", user);
     }
-    removeUser(user){
+
+    removeUser(user) {
         delete this.users[user];
         super.emit("removeUser", user);
     }
-    setTripCode(user, tripCode){
+
+    setTripCode(user, tripCode) {
         this.users[user] = tripCode;
         super.emit("tripCodeSet", user, tripCode);
     }
-    receiveMessage(args){
+
+    receiveMessage(args) {
         super.emit("messageReceived", args);
     }
 }
 
-export {Channel, MessageData};
+export {Channel};

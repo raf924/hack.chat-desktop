@@ -108,9 +108,9 @@ app.on('ready', function () {
     webContents.on("new-window", function (e, url, frameName, disposition) {
         if (url.match(/(https:\/\/hack\.chat)|(file:\/\/.+\?.+)/i) != null) {
             e.preventDefault();
-            this.send("openChannel", url.split("?")[1]);
+            this.send("openChannel", JSON.stringify({channel: url.split("?")[1]}));
         } else {
-            if (!config.get().openInside) {
+            if (!localConfig.get("openInside")) {
                 e.preventDefault();
                 shell.openExternal(url);
             }

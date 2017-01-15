@@ -24,14 +24,17 @@
   ],
   "license": "MIT",
   "dependencies": {
+    "bootstrap": "^3.3.7",
+    "electron": "^1.4.14",
     "events": "^1.1.1",
-    "fs": "0.0.1-security",
     "hammer": "0.0.5",
     "jquery": "^3.1.1",
+    "material-components-web": "^0.1.1",
     "material-design-icons": "^3.0.1",
     "materialize-css": "^0.97.8",
     "mysql": "^2.12.0",
     "require-rebuild": "^1.2.8",
+    "roboto-fontface": "^0.6.0",
     "sequelize": "^3.27.0",
     "tedious": "^1.14.0",
     "titlebar": "^1.4.0"

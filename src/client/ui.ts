@@ -1,57 +1,18 @@
 ///<reference path="../../node_modules/@types/jquery/index.d.ts" />
 ///<reference path="plugins/index.d.ts"/>
-///<reference path="../../node_modules/@types/materialize-css/index.d.ts"/>
-
 //TODO: add keyboard shortcuts
 
 import {ChannelUI} from "./channelUI"
 const titlebar = require('titlebar');
 import fs = require('fs');
-import {View} from "./view";
-import {Channel} from "./channel";
 import {App} from "./app";
-
-export interface MessageIcon {
-    icon: string,
-    color: string,
-    title: boolean
-}
-
-export class Views {
-    message: View;
-    channel: View;
-    user: View;
-    users: View;
-    accessLink: View;
-
-    constructor() {
-        this.message = new View("message");
-        this.channel = new View("channel");
-        this.users = new View("users");
-        this.user = new View("user");
-        this.accessLink = new View("accessLink");
-    }
-}
-
-interface Titlebar {
-    appendTo(el: HTMLElement): Titlebar;
-    element: HTMLElement;
-    destroy(): void;
-    on(event: string, callback: Function): Titlebar;
-}
-
-export interface NotifyConfig {
-    onlineSet: boolean,
-    onlineAdd: boolean,
-    onlineRemove: boolean,
-    chat: boolean,
-    warn: boolean
-}
+import {Login} from "./login";
+import {Views} from "./views";
+import {NotifyConfig} from "./notifyConfig";
 
 //TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
 class UI {
-    static message_icons: MessageIcon;
-    private static favouritesUI: JQuery;
+    public static favouritesUI: JQuery;
     private static titleBar: Titlebar;
     private static channelUIs: Map<string, ChannelUI>;
     public static notifyConfig: NotifyConfig;
@@ -59,15 +20,21 @@ class UI {
     private static nickPrompt: JQuery;
     public static chatInputForm: JQuery;
     public static channelTabs: JQuery;
+    public static channelsContainer: JQuery;
+    public static loginMethod: Login;
 
-    public static getCurrentChannelUI(): ChannelUI {
+    public static get currentChannelUI(): ChannelUI {
         return UI.channelUIs[App.currentChannel];
     }
 
+    public static isFavourite(channelName: string): boolean {
+        return UI.favouritesUI.find(`[for$='${channelName}']`).length === 1;
+    }
+
     private static addFavourite(channelName: string) {
-        App.favourites.push(channelName);
-        let $favouriteLink = $("<a>").attr("href", "#").attr("data-open", channelName).text(channelName);
-        let $favourite = $("<li>").append($favouriteLink);
+        App.addFavourite(channelName);
+        UI.channelTabs.find(`[for$='${channelName}']`).attr("data-is-fav", "true");
+        let $favourite = $(UI.views.favourite.element).attr("data-open", channelName).text(channelName);
         UI.favouritesUI.append($favourite);
         let visibleHeight: Number = UI.favouritesUI.visibleHeight();
         if (UI.favouritesUI.css("max-height") != visibleHeight.toString() && UI.favouritesUI.height() > visibleHeight) {
@@ -76,15 +43,15 @@ class UI {
     }
 
     public static init() {
-        //TODO: See hammer.js for swipe (already imported for materialize-css)
+        //TODO: See hammer.js for swipe
 
         UI.channelUIs = new Map<string, ChannelUI>();
         //TODO: Load UI components from component/selector maps stored in JSON
-        UI.channelTabs = $("#channels-tabs");
+        UI.channelTabs = $("#menu-channels");
+        UI.channelsContainer = $("#channels");
         UI.loadViews();
         UI.nickPrompt = $("#nickPrompt");
-        UI.chatInputForm = $("form#send");
-        UI.nickPrompt.modal();
+        UI.chatInputForm = $("form#chatInputForm");
         UI.notifyConfig = {
             "onlineSet": false,
             "onlineAdd": true,
@@ -93,27 +60,26 @@ class UI {
             "warn": true
         }; //TODO: get the notify values from the App.userData
 
-        UI.favouritesUI = $("#favourites");
-        UI.favouritesUI.on("click", "li a[data-open]", function (e) {
-            UI.login($(this).attr("data-open"));
+        UI.favouritesUI = $("#menu-favourites");
+        UI.favouritesUI.on("click", "li", function (e) {
+            let [channel, service] = $(this).attr("data-open").split("@");
+            UI.login(channel, service);
         });
         App.userData.get("favourites", function (favourites) {
             favourites.forEach(function (favourite) {
                 UI.addFavourite(favourite);
             });
         });
-        if (!App.isCordova) {
-            UI.message_icons = require(`${__dirname}/../../static/data/message_icons.json`);
-        } else {
-            UI.message_icons = JSON.parse($.ajax("static/data/message_icons.json", {async: false}).responseText);
-        }
 
         if (!App.isCordova) {
             UI.loadIpcEvents();
             UI.titleBar = titlebar();
             UI.titleBar.appendTo(document.body);
             $(UI.titleBar.element).append($("<div>").text("Chatron"));
+            UI.titleBar.element.classList.add("mdc-elevation--z4");
             UI.loadTitleBarEvents();
+        } else {
+            document.body.classList.add("cordova");
         }
         UI.loadUIEvents();
         UI.loadChatEvents();
@@ -137,19 +103,20 @@ class UI {
         UI.views = new Views();
     }
 
-    private static insertAtCursor(text): void {
-        let textfield: HTMLTextAreaElement = <HTMLTextAreaElement>UI.chatInputForm.find("#textfield")[0];
-        let pos = textfield.selectionStart || 0;
-        let value = textfield.value;
-        textfield.value = [value.slice(0, pos), text, value.slice(pos)].join('');
-        textfield.selectionStart = pos + text.length;
-        textfield.focus();
+    static insertAtCursor(text): void {
+        let chatBox: HTMLTextAreaElement = <HTMLTextAreaElement>UI.chatInputForm.find("#chatBox")[0];
+        let pos = chatBox.selectionStart || 0;
+        let value = chatBox.value;
+        chatBox.value = [value.slice(0, pos), text, value.slice(pos)].join('');
+        chatBox.selectionStart = pos + text.length;
+        chatBox.focus();
     }
 
     private static loadChatEvents(): void {
+        //let that = this;
         UI.chatInputForm.submit(function (e) {
             e.preventDefault();
-        }).find("#textfield").keydown(function (e) {
+        }).find("#chatBox").keydown(function (e) {
             if (e.keyCode === 13 && !e.shiftKey) {
                 e.preventDefault();
                 UI.channelUIs[App.currentChannel].channel.sendMessage($(this).val());
@@ -157,41 +124,60 @@ class UI {
             }
             //TODO: add commands handling
             //TODO: add history
-        }).autocomplete();
+        });
+        if (!App.isCordova) {
+            UI.chatInputForm.find("#chatBox").autocomplete();
+        }
+        window.onresize = function (ev) {
+            //console.log(`I will ${UI.channelUIs[App.currentChannel].isAtBottom?"":"not"} scroll`);
+            if (UI.channelUIs[App.currentChannel].isAtBottom) {
+                UI.channelUIs[App.currentChannel].scrollToBottom();
+            }
+        };
     }
 
     private static loadLoginEvents(): void {
-        UI.nickPrompt.find("form")[0].onsubmit = function (e) {
-            e.preventDefault();
-            let $nick = $(e.target).find("input.validate");
-            let nick = $nick.data("realNick");
-            if (!App.isCordova) {
-                App.ipc.send("join", JSON.stringify({"channel": $nick.data("channel"), "nick": nick}));
-            } else {
-                UI.login($nick.data("channel"), nick);
+        //TODO: prefill userData
+        App.userData.get("loginMethod", function (loginMethod) {
+            let method = require(`${__dirname}/login/${loginMethod}`);
+            UI.loginMethod = new method[method.className](UI.nickPrompt[0]);
+            UI.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
+                if (!App.isCordova) {
+                    App.ipc.send("join", JSON.stringify({
+                        "channel": channelName,
+                        "service": service,
+                        "nick": nick,
+                        "password": password
+                    }));
+                } else {
+                    UI.login(channelName, service, nick, password);
+                }
+                if (useAlways) {
+                    App.userData.set("nickName", nick);
+                    App.userData.set("password", password);
+                    App.nick = nick;
+                    App.password = password;
+                }
+                UI.loginMethod.close();
+
+                if (document.body.clientWidth < 992) {
+                    //TODO: hide drawer if smallscreen
+                    //$(".button-collapse").sideNav("hide");
+                }
+            };
+            UI.loginMethod.oncancel = (channelName) => {
+                UI.loginMethod.close();
             }
-            $nick.val("").data("realNick", "").data("channel", "");
-            let forAll = $(e.target).find("#forAll:checked");
-            if (forAll.length > 0) {
-                App.userData.set("nickName", nick);
-                App.nick = nick;
-            }
-            UI.nickPrompt.modal('close');
-            if (document.body.clientWidth < 992) {
-                $(".button-collapse").sideNav("hide");
-            }
-        };
-        UI.nickPrompt.find("form input.validate").mixedLogin();
+        });
     }
 
     private static loadUIEvents(): void {
-        $("#menu").on("click", "a.fav", function (e) {
+        this.channelTabs.on("click", ".fav", function (e) {
             e.preventDefault();
-            UI.addFavourite($(this).attr("data-add"));
-            App.userData.set("favourites", App.favourites);
-        });
-        $("body").on("click", ".channel .title a, .user a.nick", function (e) {
-            UI.insertAtCursor(`@${$(this).text()} `);
+            let channelName = $(this).attr("data-add");
+            if (!UI.isFavourite(channelName)) {
+                UI.addFavourite(channelName);
+            }
         });
         $(".button-collapse[data-activates='sidemenu']").click(function (e) {
             $("div.drag-target").remove();
@@ -214,81 +200,82 @@ class UI {
 
     private static loadIpcEvents(): void {
         App.ipc.on("openChannel", function (e, data) {
-            let {"channel": channel, "nick": nick} = JSON.parse(data);
-            UI.login(channel, nick);
+            let {channel, service, nick, password} = JSON.parse(data);
+            UI.login(channel, service, nick, password);
         });
     }
 
     private static loadTabEvents(): void {
-        $("#channels-tabs")
+        $("#menu-channels")
             .tabs("init")
-            .on("tabOpened", function (e, channelId) {
+            .on("tabs.opened", function (e, channelId) {
                 if (!UI.channelUIs[channelId].channel.isOnline) {
-                    UI.chatInputForm.find("#textfield").attr("disabled", "");
+                    UI.chatInputForm.find("#chatBox").attr("disabled", "");
                 }
             })
-            .on("tabChanged", function (e, channelId) {
+            .on("tabs.changed", function (e, channelId) {
                 $(".users").css("display", "none");
                 let currentChannelUI: ChannelUI = UI.channelUIs[channelId];
-                currentChannelUI.usersUI.css("display", "");
-                currentChannelUI.unreadMessageCount = 0;
-                currentChannelUI.messageCounter.text(0);
-                App.currentChannel = channelId;
-                if (currentChannelUI.channel.isOnline) {
-                    UI.chatInputForm.find("#textfield").removeAttr("disabled");
-                    let users: string[] = [];
-                    for (let user in UI.channelUIs[channelId].channel.users) {
-                        users.push(user);
+                if (currentChannelUI != null) {
+                    //currentChannelUI.usersUI.css("display", "");
+                    currentChannelUI.unreadMessageCount = 0;
+                    currentChannelUI.messageCounter.text(0);
+                    App.currentChannel = channelId;
+                    if (currentChannelUI.channel.isOnline) {
+                        UI.chatInputForm.find("#chatBox").removeAttr("disabled");
+                        let users: string[] = [];
+                        for (let user in UI.channelUIs[channelId].channel.users) {
+                            users.push(user);
+                        }
+                        UI.chatInputForm.find("#chatBox").autocomplete("setItems", users);
                     }
-                    UI.chatInputForm.find("#textfield").autocomplete("setItems", users);
                 }
+                document.title = `Chatron - ${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
             })
-            .on("tabClosed", function (e, channelId) {
+            .on("tabs.closed", function (e, channelId) {
                 UI.channelUIs[channelId].close();
                 delete UI.channelUIs[channelId];
                 if ($(this).find(".tab").length == 0) {
-                    UI.chatInputForm.find("#textfield").attr("disabled", "");
+                    UI.chatInputForm.find("#chatBox").attr("disabled", "");
                 }
             });
-        $(".button-collapse").sideNav({
-            menuWidth: 300,
-            closeOnClick: false
-        });
+        //TODO: add button to open drawer on small screens
     }
 
-    private static login(channelName: string, nick?: string): void {
+    private static login(channelName: string, service: string, nick?: string, password?: string): void {
         if (nick !== undefined && nick !== null && nick !== "") {
-            UI.openChannel(channelName, nick);
-        } else if (App.nick === undefined || App.nick === null || App.nick === "" || App.nick.split("#").length > 1 && App.nick.split("#")[1].length == 0) {
-            UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
-            UI.nickPrompt.find("input.validate").val(App.nick).data("realNick", App.nick).data("channel", channelName).focus();
+            UI.openChannel(channelName, nick, password);
+        } else if (App.nick === undefined || App.nick === null || App.nick === "") {
+            //UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
+            UI.loginMethod.open(channelName, service);
+            UI.nickPrompt.find("input").focus();
         } else {
-            UI.openChannel(channelName, App.nick);
+            UI.openChannel(channelName, App.nick, App.password);
         }
     }
 
-    private static openChannel(channelName: string, nick: string): void {
-        let channel = new Channel(channelName, nick);
+    private static openChannel(channelName: string, nick: string, password: string): void {
+        let channel = App.openChannel(channelName, nick, password);
         UI.channelUIs[channel.channelId] = new ChannelUI(channel);
-        App.currentChannel = channel.channelId;
     }
 
     private static loadChannelEvents() {
-        let $addChannelForm = $(".addChannel form");
+        let $addChannelForm = $("#addChannel form");
         $addChannelForm.submit(function (e) {
             e.preventDefault();
-            UI.login($(this).find("input").val(), null);
+            let [channel, service] = $(this).find("input").val().split("@");
+            UI.login(channel, service);
             $(this).find("button").css("display", "");
-            $(this).find("input").css("display", "none").val("");
+            $(this).find("input").val("").parent().css("display", "none");
         });
         $addChannelForm.find("button").click(function (e) {
             e.preventDefault();
             $(this).css("display", "none");
-            $addChannelForm.find("input").css("display", "").focus();
+            $addChannelForm.find("input").parent().css("display", "").find("input").focus();
         });
         $addChannelForm.find("input").blur(function (e) {
             $addChannelForm.find("button").css("display", "");
-            $(this).css("display", "none");
+            $(this).parent().css("display", "none");
         });
     }
 }

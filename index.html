@@ -1,127 +1,108 @@
-<!DOCTYPE html>
-<html>
-
+<!doctype html>
+<html class="mdc-typography" lang="">
 <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Chatron</title>
-    <link href="node_modules/materialize-css/dist/css/materialize.min.css" rel="stylesheet">
-    <link href="node_modules/material-design-icons/iconfont/material-icons.css" rel="stylesheet">
-    <link href="static/css/app.css" rel="stylesheet">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-</head>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="stylesheet" href="node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
+    <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="node_modules/material-design-icons/iconfont/material-icons.css">
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/app.css">
+</head>
 <body>
-<header>
-    <div class="row">
-        <a class="button-collapse hide-on-large-only col s1" data-activates="sidemenu" href="#">
-            <i class="material-icons">menu</i>
-        </a>
-        <!--<div class="col s11">
-          <ul id="channels-tabs" class="tabs">
-            <li class="tab disabled col s1" style="visibility:hidden;">
-              <a href="#"></a>
-            </li>
-          </ul>
-        </div>-->
-    </div>
-</header>
-<ul id="sidemenu" class="side-nav fixed">
-    <div id="menu">
-        <li class="brand row">
-            <pre class="col s10">&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_ |&nbsp;|_&nbsp;___&nbsp;___|&nbsp;|_&nbsp;&nbsp;&nbsp;___|&nbsp;|_&nbsp;___|&nbsp;|_&nbsp;
-          |&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp;'_|&nbsp;|&nbsp;&nbsp;_|&nbsp;&nbsp;&nbsp;|_&nbsp;||&nbsp;&nbsp;_|&nbsp; |_|_|__/|___|_,_|.|___|_|_|__/|_|
-            </pre>
-            <a class="waves-effect waves-teal btn-flat col s1 tooltipped" data-tooltip="Settings" data-delay="50"
-               data-flip="settings">
-                <i class="material-icons">settings</i>
-            </a>
-        </li>
-        <li class="addChannel">
+<!--[if lt IE 8]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<nav id="sidemenu" class="mdc-permanent-drawer mdc-typography mdc-elevation--z16">
+    <h2 id="title">
+        Chatron
+    </h2>
+    <nav class="mdc-list-group">
+        <div id="addChannel">
             <form class="inputprompt">
-                <button class="btn waves-effect waves-light" type="button">
+                <button class="mdc-button mdc-button--primary mdc-button--raised mdc-ripple-surface mdc-ripple-upgraded"
+                        data-mdc-auto-init="MDCRipple" type="button">
                     Join Channel&nbsp;<i class="material-icons">chat</i>
                 </button>
-                <div class="input-field">
-                    <input type="text" style="display:none;" class="validate" placeholder="Channel Name">
+                <div class="mdc-textfield" style="display:none;">
+                    <input type="text" class="mdc-textfield__input" placeholder="Channel Name">
                 </div>
             </form>
-        </li>
-        <li>
-            <ul class="collapsible" data-collapsible="expandable">
-                <li>
-                    <div class="collapsible-header active">Open channels<span class="caret"></span></div>
-                    <div class="collapsible-body">
-                        <ul id="channels-tabs">
-
-                        </ul>
-                    </div>
-                </li>
-                <li>
-                    <div class="collapsible-header">Favourite Channels<span class="caret"></span></div>
-                    <div class="collapsible-body">
-                        <ul id="favourites">
-                        </ul>
-                    </div>
-                </li>
-            </ul>
-        </li>
-    </div>
-    <!-- TODO: put settings in a separate file -->
-    <div id="settings">
-        <li class="brand row">
-            <h4 class="col s10">Settings</h4>
-            <a class="waves-effect waves-teal btn-flat col s1 tooltipped" data-delay="50" data-tooltip="Menu"
-               data-flip="settings">
-                <i class="material-icons">list</i></a>
-        </li>
-        <li class="section">
-            Window
-            <form>
-                <p class="range-field">
-                    <label for="width">Width:</label>
-                    <input type="range" id="width" value="0" min="800" max="1900">
-                </p>
-                <p class="range-field">
-                    <label for="height">Height:</label>
-                    <input type="range" id="height" value="0" min="600" max="1080">
-                </p>
-            </form>
-            <!-- TODO: add notification settings -->
-        </li>
-    </div>
-</ul>
-<ul id="users" class="side-nav">
-</ul>
-<main id="container" class="container">
+        </div>
+        <br>
+        <hr class="mdc-list-divider">
+        <div id="menu-channels-header" class="mdc-list-group__subheader menu-header collapsed" data-toggle="collapse"
+             data-target="#menu-channels">Open
+            Channels
+            <span class="caret"></span>
+        </div>
+        <ul id="menu-channels" class="mdc-list collapse">
+        </ul>
+        <hr class="mdc-list-divider">
+        <div id="menu-favourites-header" class="mdc-list-group__subheader menu-header collapsed" data-toggle="collapse"
+             data-target="#menu-favourites">Favourite Channels
+            <span class="caret"></span>
+        </div>
+        <ul id="menu-favourites" class="mdc-list collapse">
+        </ul>
+    </nav>
+</nav>
+<main>
     <div id="channels">
     </div>
-    <div id="input_container" class="row">
-        <a href="#!" data-activates="users" class="button-collapse col s1 m1 btn"><i class="material-icons medium">recent_actors</i></a>
-        <form id="send" class="col s9 m8">
-            <div class="input-field">
-                <textarea type="text" id="textfield" class="materialize-textarea" disabled></textarea>
-                <label for="textfield">Type your message here</label>
-            </div>
+    <div id="chatBox-wrapper" class="mdc-textfield mdc-textfield--multiline mdc-textfield--fullwidth mdc-elevation--z3"
+         data-mdc-auto-init="MDCTextfield">
+        <form id="chatInputForm">
+            <textarea id="chatBox" class="mdc-textfield__input" placeholder="Type your message here"
+                      aria-label="Type your message here" rows="1"></textarea>
         </form>
     </div>
 </main>
-<div id="nickPrompt" class="modal">
-    <div class="modal-content">
-        <p class="modal-title">Enter a nickname</p>
-        <form>
-            <div class="input-field">
-                <input type="hidden" value="">
-                <input type="text" class="validate" placeholder="nick[#password] (ex: bob#isadick)">
+<aside id="nickPrompt" class="dialog">
+    <form>
+        <section class="dialog-header">
+            <h2 class="dialog-header__title">
+                Login
+            </h2>
+        </section>
+        <section class="dialog-body">
+            <div class="mdc-textfield--fullwidth">
+                <input type="text" id="nickInput" class="mdc-textfield__input"
+                       placeholder="nick[#password] (ex: bob#isadick)" pattern="[^#]+(#[^#]*)?">
             </div>
-            <input type="checkbox" id="forAll">
-            <label for="forAll">Use this nick for all channels</label>
-            <button class="btn" type="submit">Join channel</button>
-        </form>
-    </div>
-</div>
+            <div class="mdc-form-field">
+                <div class="mdc-checkbox">
+                    <input type="checkbox" id="useAlways" class="mdc-checkbox__native-control">
+                    <div class="mdc-checkbox__background">
+                        <svg version="1.1" class="mdc-checkbox__checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" xml:space="preserve">
+                            <path class="mdc-checkbox__checkmark__path" fill="none" stroke="white" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
+                        </svg>
+                        <div class="mdc-checkbox__mixedmark"></div>
+                    </div>
+                </div>
+                <label for="useAlways">Remember</label>
+            </div>
+        </section>
+        <section class="dialog-footer">
+            <button type="reset" class="dialog-footer__btn cancel">Cancel</button>
+            <button type="submit" class="dialog-footer__btn confirm">Login</button>
+        </section>
+    </form>
+</aside>
+<script src="node_modules/material-components-web/dist/material-components-web.min.js"></script>
+<script>mdc.autoInit();</script>
+<!--<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="static/js/bootstrap.min.js"></script>-->
 <script src="bundle.js"></script>
 <script src="client.js"></script>
-<script src="node_modules/materialize-css/dist/js/materialize.js"></script>
 <script src="cordova.js"></script>
 </body>
-
 </html>

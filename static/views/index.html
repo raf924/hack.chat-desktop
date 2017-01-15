@@ -1,0 +1,62 @@
+<!doctype html>
+<html class="mdc-typography" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="stylesheet" href="node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
+    <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.min.css">
+    <link rel="stylesheet" href="node_modules/material-design-icons/iconfont/material-icons.css">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<!--[if lt IE 8]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
+    your browser</a> to improve your experience.</p>
+<![endif]-->
+
+<nav class="mdc-permanent-drawer mdc-typography sidemenu mdc-elevation--z24">
+    <h2 id="title">
+        Chatron
+    </h2>
+    <nav class="mdc-list-group">
+        <div id="menu-channels-header" class="mdc-list-group__subheader menu-header collapsed" data-toggle="collapse"
+             data-target="#menu-channels">Open
+            Channels
+            <span class="caret"></span>
+        </div>
+        <ul id="menu-channels" class="mdc-list collapse">
+        </ul>
+        <hr class="mdc-list-divider">
+        <div id="menu-favourites-header" class="mdc-list-group__subheader menu-header collapsed" data-toggle="collapse"
+             data-target="#menu-favourites">Favourite Channels
+            <span class="caret"></span>
+        </div>
+        <ul id="menu-favourites" class="mdc-list collapse">
+        </ul>
+    </nav>
+</nav>
+<main>
+    <div id="channels">
+    </div>
+    <div id="chatBox-wrapper" class="mdc-textfield mdc-textfield--multiline mdc-textfield--fullwidth mdc-elevation--z10"
+         data-mdc-auto-init="MDCTextfield">
+        <textarea id="chatBox" class="mdc-textfield__input" placeholder="Type your message here"
+                  aria-label="Type your message here" rows="1"></textarea>
+    </div>
+</main>
+
+<script src="node_modules/material-components-web/dist/material-components-web.min.js"></script>
+<script>mdc.autoInit();</script>
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="bundle.js"></script>
+<script src="client.js"></script>
+<script src="cordova.js"></script>
+</body>
+</html>

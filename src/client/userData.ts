@@ -1,4 +1,10 @@
-export abstract class UserData{
-    public abstract get(prop: string, successCallBack: Function, errorCallBack?: Function) : void;
-    public abstract set(prop: string, value: any, successCallBack?: Function, errorCallBack?: Function) : void;
+export abstract class UserData {
+    public abstract get(prop: string, successCallBack: (value) => void, errorCallBack?: (error: Error) => void): void;
+
+    public abstract set(prop: string, value: any, successCallBack?: (value) => void, errorCallBack?: (error: Error) => void): void;
+
+    static defaultData = {
+        "loginMethod": "mixedLogin",
+        "favourites": ["programming@hack.chat"]
+    };
 }

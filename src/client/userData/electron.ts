@@ -1,11 +1,10 @@
 import {UserData} from "../userData";
-import {NativeStorage} from "./cordova";
 class UserDataElectron extends UserData {
-    get(prop: string, successCallBack: Function, errorCallBack: Function): void {
+    get(prop: string, successCallBack: (value) => any, errorCallBack?: (error: Error) => any): void {
         if (localStorage.hasOwnProperty(prop)) {
-            successCallBack(localStorage[prop]);
+            successCallBack(JSON.parse(localStorage.getItem(prop)));
         } else {
-            if (errorCallBack) {
+            if (typeof errorCallBack === "function") {
                 let error = new Error();
                 error.message = `${prop} doesn't exist`;
                 error.name = "NotFound";
@@ -14,19 +13,10 @@ class UserDataElectron extends UserData {
         }
     }
 
-    set(prop: string, value: any, successCallBack: Function, errorCallBack: Function): void {
-        if (localStorage.hasOwnProperty(prop)) {
-            localStorage[prop] = value;
-            if (successCallBack) {
-                successCallBack(localStorage[prop]);
-            }
-        } else {
-            let error = new Error();
-            error.message = `${prop} doesn't exist`;
-            error.name = "NotFound";
-            if (errorCallBack) {
-                errorCallBack(error);
-            }
+    set(prop: string, value: any, successCallBack?: (value) => void, errorCallBack?: (error: Error) => void): void {
+        localStorage.setItem(prop, JSON.stringify(value));
+        if (typeof successCallBack === "function") {
+            successCallBack(JSON.parse(localStorage.getItem(prop)));
         }
     }
 }

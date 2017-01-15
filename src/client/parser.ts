@@ -1,6 +1,6 @@
 abstract class Parser{
     abstract getRegex() : RegExp
-    abstract parse(text : string): string
+    abstract parse(text : string): ParsedMessage
 }
 
 export {Parser}

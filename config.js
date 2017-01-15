@@ -13,7 +13,7 @@ let config = {
 if (!fs.existsSync("./data.json")) {
   save();
 } else {
-  var buffer = fs.readFileSync("./data.json", "utf-8");
+  let buffer = fs.readFileSync("./data.json", "utf-8");
   config = JSON.parse(buffer.toString());
 }
 
@@ -21,9 +21,9 @@ function save() {
   fs.writeFileSync("./data.json", JSON.stringify(config));
 }
 
-var getConfig = function() {
+let getConfig = function() {
   return config;
-}
+};
 
 exports.get = getConfig;
 exports.save = save;
