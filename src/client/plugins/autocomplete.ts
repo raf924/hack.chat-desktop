@@ -10,54 +10,55 @@
             }
             this.data("autocomplete", true);
             this.data("items", []);
+            let originalString = "";
+            let startPos = 0;
+            let endPos = 0;
+            let nextIndex = 0;
+            let possibleItems = [];
             this.keyup(function (e) {
-                if (e.keyCode !== 9 && e.target.value !== that.data("originalString")) {
+                if (e.keyCode !== 9 && e.target.value !== originalString) {
                     let beforeWordReg = /(^|\s|@)[\w]*$/ig;
                     let match: RegExpExecArray;
                     let wordBeginning: number;// = that.data("startPos");
                     let items: string[] = that.data("items");
-                    that.data("possibleItems", items);
-                    if (e.target.value.length > 0) {
+                    possibleItems = items;
+                    if (e.target.value.substr(0, e.target.selectionEnd) > 0) {
                         while ((match = beforeWordReg.exec(e.target.value.substr(0, e.target.selectionEnd))) !== null) {
                             wordBeginning = match.index;
                         }
                         match = /[\w]+/i.exec(e.target.value.substr(wordBeginning, e.target.value.length - wordBeginning));
-                        if(match !== null){
+                        if (match !== null) {
                             wordBeginning += match.index;
-                            that.data("endPos", wordBeginning + match[0].length);
+                            endPos = wordBeginning + match[0].length;
                         } else {
-                            that.data("endPos", ++wordBeginning);
+                            endPos = ++wordBeginning;
                         }
                     } else {
                         wordBeginning = 0;
-                        that.data("endPos", 0);
+                        endPos = 0;
                     }
-                    that.data("startPos", wordBeginning);
-                    if(match !== undefined && match !== null){
-                        let possibleItems = items.filter(function (item) {
+                    startPos = wordBeginning;
+                    if (match !== undefined && match !== null) {
+                        possibleItems = items.filter(function (item) {
                             return match.length > 0 && item.startsWith(match[0]);
                         });
-                        that.data("possibleItems", possibleItems);
                     }
-                    that.data("nextIndex", 0);
-                    that.data("originalString", e.target.value);
+                    nextIndex = 0;
+                    originalString = e.target.value;
                 }
             }).keydown(function (e) {
                 if (e.keyCode === 9) {
                     e.preventDefault();
-                    let items = that.data("possibleItems") || that.data("items");
-                    if(items.length>0){
-                        let startPos = that.data("startPos") || 0;
-                        let endPos = that.data("endPos") || 0;
-                        let currentIndex = that.data("nextIndex") || 0;
-                        let originalString = that.data("originalString") || "";
+                    let items = possibleItems || that.data("items");
+                    if (items.length > 0) {
+                        let currentIndex = nextIndex;
                         let strBefore = originalString.substr(0, startPos);
                         let strAfter = originalString.substr(endPos + 1);
                         e.target.value = strBefore + items[currentIndex] + " " + strAfter;
                         if (currentIndex === items.length - 1) {
                             currentIndex = -1;
                         }
-                        that.data("nextIndex", currentIndex + 1);
+                        nextIndex = currentIndex + 1;
                     }
                 }
             });

@@ -3,43 +3,49 @@
         if (this.length == 0) return this;
         let that = this;
         let tabSelector = ".tab";
-        let activateTab = function (index, newTab? : boolean) {
-            var $tabs = that.find(`${tabSelector} a[data-tab]`);
-            $tabs.each(function (i) {
-                let $div = $(`[id='${$(this).attr("data-tab")}']`);
-                $div.css("display", i == index ? "" : "none");
-                $(this)[i == index ? "addClass" : "removeClass"]("active");
-            });
-            if(newTab){
-                $(that).trigger("tabOpened", $(`${tabSelector} a[data-tab].active`, that).attr("data-tab"));
+        let activateTab = function (index: number | string, newTab?: boolean) {
+            let $tabs = that.find(`${tabSelector} [data-tab]`);
+            if (typeof index === "number") {
+                $tabs.each(function (i) {
+                    let $div = $(`[id='${$(this).attr("data-tab")}']`);
+                    $(this)[i == index ? "addClass" : "removeClass"]("active");
+                    $div[i == index ? "addClass" : "removeClass"]("active");
+
+                });
+            } else if (typeof index === "string") {
+                $tabs.removeClass("active");
+                $(`[id='${index}']`).addClass("active");
             }
-            $(that).trigger("tabChanged", $(`${tabSelector} a[data-tab].active`, that).attr("data-tab"));
+            if (newTab) {
+                $(that).trigger("tabs.opened", $(`${tabSelector} [data-tab].active`, that).attr("data-tab"));
+            }
+            $(that).trigger("tabs.changed", $(`${tabSelector} [data-tab].active`, that).attr("data-tab"));
 
         };
+        this.on("click", "[data-close]", function () {
+            $(that).trigger("tabs.closed", $(this).attr("data-close"));
+            $(`[id='${$(this).attr("data-close")}']`).remove();
+            $(this).parent().remove();
+        }).on("click", "[data-tab]", function () {
+            activateTab($(this).index(`${tabSelector} [data-tab]`));
+        });
         let observer = new MutationObserver(function (mutationRecord) {
             mutationRecord.forEach(function (mutation) {
                 switch (mutation.type) {
                     case "attributes":
-                        activateTab($(mutation.target).index(`${tabSelector} a[data-tab]`));
+                        activateTab($(mutation.target).index(`${tabSelector} [data-tab]`));
                         break;
                     case "childList":
                         if (mutation.addedNodes.length > 0) {
-                            let $tabs = $(mutation.addedNodes).find("a[data-tab]");
-                            let $closeTab = $(mutation.addedNodes).find("a[data-close]");
-                            $closeTab.click(function (e) {
-                                $(that).trigger("tabClosed", $(this).attr("data-close"));
-                            });
-                            $tabs.click(function (e) {
-                                activateTab($(this).index(`${tabSelector} a[data-tab]`));
-                            });
-                            activateTab($tabs.index(`${tabSelector} a[data-tab]`), true);
+                            let $tabs = $(mutation.addedNodes).find("[data-tab]");
+                            activateTab($tabs.index(`${tabSelector} [data-tab]`), true);
                         }
                         break;
                 }
             });
         });
         observer.observe(this[0], {
-            attributes: true,
+            attributes: false,
             subtree: false,
             childList: true,
             characterData: false
