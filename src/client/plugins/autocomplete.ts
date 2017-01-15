@@ -22,7 +22,7 @@
                     let wordBeginning: number;// = that.data("startPos");
                     let items: string[] = that.data("items");
                     possibleItems = items;
-                    if (e.target.value.substr(0, e.target.selectionEnd) > 0) {
+                    if (e.target.value.substr(0, e.target.selectionEnd).length > 0) {
                         while ((match = beforeWordReg.exec(e.target.value.substr(0, e.target.selectionEnd))) !== null) {
                             wordBeginning = match.index;
                         }
