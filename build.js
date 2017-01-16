@@ -111,6 +111,6 @@ ncp(`${__dirname}/node_modules/material-design-icons/iconfont`, `${__dirname}/co
 
 });
 
-ncp(`${__dirname}/node_modules/roboto-fontface/css/roboto`, function (err) {
+ncp(`${__dirname}/node_modules/roboto-fontface/css/roboto`, `${__dirname}/cordova/www/node_modules/roboto-fontface/css/roboto`, function (err) {
 
 });

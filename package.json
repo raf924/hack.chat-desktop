@@ -41,6 +41,7 @@
   },
   "devDependencies": {
     "@types/electron": "^1.4.27",
+    "@types/hammerjs": "^2.0.34",
     "@types/jquery": "^2.0.33",
     "@types/materialize-css": "^0.97.32",
     "@types/node": "^6.0.48",

@@ -66,10 +66,10 @@
                 activateTab(0);
                 break;
             case "activate":
-                if (data != null && typeof data == "number") {
+                if (data != null && typeof data === "number" || typeof data === "string") {
                     activateTab(data);
                 } else {
-                    console.warn("argument must be a number");
+                    console.warn("argument must be a number or a string");
                 }
                 break;
             default:

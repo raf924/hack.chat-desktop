@@ -9,6 +9,8 @@ import {App} from "./app";
 import {Login} from "./login";
 import {Views} from "./views";
 import {NotifyConfig} from "./notifyConfig";
+import Hammer = require("hammerjs");
+
 
 //TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
 class UI {
@@ -179,22 +181,14 @@ class UI {
                 UI.addFavourite(channelName);
             }
         });
-        $(".button-collapse[data-activates='sidemenu']").click(function (e) {
-            $("div.drag-target").remove();
-            $("body").on("click", "#sidenav-overlay:last-of-type", function (e) {
-                $("#menu, #settings").removeClass("flipped");
-            });
+        $("#sidemenu-collapse, #sidemenu-overlay").click(function (e) {
+            $("#sidemenu").toggleClass("open");
+            $("#sidemenu-overlay").toggleClass("hidden");
         });
-        $("a[data-flip='settings']").click(function (e) {
-            let $flippables = $("#menu, #settings");
-            if ($flippables.hasClass("flipped")) {
-                $flippables.removeClass("flipped");
-            } else {
-                $flippables.addClass("flipped");
-            }
-        });
-        $("a[data-activates='users']").click(function () {
-            $("div.drag-target").remove();
+        let hammerTime = new Hammer(document.body);
+        hammerTime.on("swipe", function (ev) {
+            $("#sidemenu-overlay").toggleClass("hidden");
+            $("#sidemenu").toggleClass("open");
         });
     }
 
@@ -206,7 +200,8 @@ class UI {
     }
 
     private static loadTabEvents(): void {
-        $("#menu-channels")
+        $("#menu-channels"
+        )
             .tabs("init")
             .on("tabs.opened", function (e, channelId) {
                 if (!UI.channelUIs[channelId].channel.isOnline) {
@@ -239,13 +234,15 @@ class UI {
                     UI.chatInputForm.find("#chatBox").attr("disabled", "");
                 }
             });
-        //TODO: add button to open drawer on small screens
+//TODO: add button to open drawer on small screens
     }
 
-    private static login(channelName: string, service: string, nick?: string, password?: string): void {
-        if (nick !== undefined && nick !== null && nick !== "") {
+    private static login(channelName: string, service: string, nick ?: string, password ?: string): void {
+        if (nick !== undefined && nick !== null && nick !== ""
+        ) {
             UI.openChannel(channelName, nick, password);
-        } else if (App.nick === undefined || App.nick === null || App.nick === "") {
+        }
+        else if (App.nick === undefined || App.nick === null || App.nick === "") {
             //UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
             UI.loginMethod.open(channelName, service);
             UI.nickPrompt.find("input").focus();

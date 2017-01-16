@@ -10,7 +10,7 @@ declare const global;
 //Necessary for Materialize
 global.$ = global.jQuery = window.$ = window.jQuery = require('jquery');
 require("../../static/js/bootstrap.min");
-window.Hammer = require('hammerjs');
+global.Hammer = window.Hammer = require('hammerjs');
 
 import {UI} from "./ui";
 import fs = require('fs');

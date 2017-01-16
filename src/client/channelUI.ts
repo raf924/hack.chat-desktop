@@ -11,7 +11,7 @@ export class ChannelUI extends ChannelEventListener {
     public ui: JQuery;
     public messageCounter: JQuery;
     public unreadMessageCount: number;
-    public isAtBottom: boolean;
+    public isAtBottom: boolean = true;
 
     public getChannel(): Channel {
         return this.channel;
@@ -46,17 +46,13 @@ export class ChannelUI extends ChannelEventListener {
         }
         let oldHeight = 0;
         this.messagesUI.scroll(function (e) {
-            let scrollTop = that.messagesUI.scrollTop();
-            let scrollHeight = that.messagesUI[0].scrollHeight;
-            if (oldHeight === scrollHeight) {
-                that.isAtBottom = scrollTop + that.messagesUI.visibleHeight() >= scrollHeight;
-            }
+            that.isAtBottom = oldHeight <= this.scrollHeight;
         });
         this.messagesUI.on("wheel", function (e) {
-            oldHeight = that.messagesUI[0].scrollHeight;
+            oldHeight = this.scrollHeight;
         });
         this.messagesUI.on("click", ".message .text-wrapper", function () {
-            $(this).parent().find(".timestamp").toggle(200);
+            $(this).parent().find(".timestamp").toggleClass("hidden");
         });
         this.messagesUI.on("click", ".channel .title a, .user a.nick", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
@@ -73,6 +69,7 @@ export class ChannelUI extends ChannelEventListener {
             args.text = "";
             $message.addClass("cmd");
             $message.find(".text").parent().css("display", "none");
+            $message.find(".timestamp").removeClass("hidden");
         }
         $message.find(".nick").text(args.nick);
         $message.find(".text").html(args.text);
@@ -81,12 +78,9 @@ export class ChannelUI extends ChannelEventListener {
         if (args.mod) {
             $message.find(".mod").removeClass("hide");
         }
+        let isAtBottom = this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop <= this.messagesUI[0].clientHeight + 1;
         this.messagesUI.append($message);
-
-        let scrollTop = this.messagesUI.scrollTop();
-        let scrollHeight = this.messagesUI[0].scrollHeight;
-        let messageHeight = $message.outerHeight();
-        if (this.isAtBottom || (scrollTop + this.messagesUI.visibleHeight() >= scrollHeight - messageHeight)) {
+        if (this.isAtBottom || isAtBottom) {
             this.scrollToBottom();
         }
     }

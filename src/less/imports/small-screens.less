@@ -1,6 +1,14 @@
 @media only screen and (max-width: 992px) {
   #sidemenu {
-    display: none;
+    width: 0;
+    transition: width 500ms;
+    &.open {
+      width: @drawerWidth;
+    }
+  }
+
+  #sidemenu-collapse {
+    padding: ~"calc((3rem - 24px) / 2)";
   }
 
   main {
@@ -10,5 +18,9 @@
 
   #chatBox-wrapper {
     width: 98%;
+  }
+
+  #app-bar {
+    display: inline;
   }
 }
