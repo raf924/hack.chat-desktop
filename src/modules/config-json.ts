@@ -1,5 +1,6 @@
 import {ConfigObject, Config} from "../app/config";
 const fs = require("fs");
+const path = require("path");
 
 class ConfigJSONObject extends ConfigObject {
     windowWidth?: number;
@@ -28,10 +29,12 @@ class ConfigJSON extends Config {
     constructor(filePath: string) {
         super();
         this.config = new ConfigJSONObject();
+        filePath = path.resolve(filePath);
         if (filePath !== undefined && filePath !== null)
+            this.filePath = filePath;
             if (fs.existsSync(filePath)) {
                 this.config = JSON.parse(fs.readFileSync(filePath, "utf-8").toString());
-                this.filePath = filePath;
+
             } else {
                 this.save();
             }

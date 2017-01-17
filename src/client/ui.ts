@@ -131,8 +131,7 @@ class UI {
             UI.chatInputForm.find("#chatBox").autocomplete();
         }
         window.onresize = function (ev) {
-            //console.log(`I will ${UI.channelUIs[App.currentChannel].isAtBottom?"":"not"} scroll`);
-            if (UI.channelUIs[App.currentChannel].isAtBottom) {
+            if (App.currentChannel != null && UI.channelUIs[App.currentChannel].isAtBottom) {
                 UI.channelUIs[App.currentChannel].scrollToBottom();
             }
         };
@@ -173,6 +172,11 @@ class UI {
         });
     }
 
+    private static toggleDrawer() {
+        $("#sidemenu").toggleClass("open");
+        $("#sidemenu-overlay").toggleClass("hidden");
+    }
+
     private static loadUIEvents(): void {
         this.channelTabs.on("click", ".fav", function (e) {
             e.preventDefault();
@@ -182,13 +186,14 @@ class UI {
             }
         });
         $("#sidemenu-collapse, #sidemenu-overlay").click(function (e) {
-            $("#sidemenu").toggleClass("open");
-            $("#sidemenu-overlay").toggleClass("hidden");
+            UI.toggleDrawer();
         });
         let hammerTime = new Hammer(document.body);
         hammerTime.on("swipe", function (ev) {
-            $("#sidemenu-overlay").toggleClass("hidden");
-            $("#sidemenu").toggleClass("open");
+            UI.toggleDrawer();
+        });
+        $("#sidemenu").on("click", "ul li", function () {
+            UI.toggleDrawer();
         });
     }
 

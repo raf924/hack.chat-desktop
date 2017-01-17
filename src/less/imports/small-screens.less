@@ -14,6 +14,12 @@
   main {
     left: 0;
     width: 100%;
+    margin-top: @appBarHeight;
+  }
+
+  .messages {
+    max-height: calc(100% ~"-" 3.5rem ~"-" @appBarHeight);
+    bottom: 5.5rem + @appBarHeight;
   }
 
   #chatBox-wrapper {

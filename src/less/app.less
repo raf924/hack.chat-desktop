@@ -47,9 +47,11 @@ html {
   font-size: 1rem;
 }
 
-#app-bar{
+@appBarHeight: 3rem;
+
+#app-bar {
   width: 100%;
-  height: 3rem;
+  height: @appBarHeight;
   display: none;
   z-index: 4;
   position: absolute;
@@ -65,10 +67,9 @@ html {
   padding: 0;
   position: fixed;
   width: calc(98% ~"-" @drawerWidth);
-}
-
-#chatBox {
-  padding: 1%;
+  #chatBox {
+    padding: 2%;
+  }
 }
 
 #title {
@@ -113,7 +114,7 @@ html {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .ch-close{
+  .ch-close {
     position: absolute;
     right: 0;
   }
@@ -127,7 +128,7 @@ html {
   width: @messageWidth;
   float: left;
   &.cmd {
-    .timestamp{
+    .timestamp {
       display: block !important;
       line-height: 0;
     }
@@ -166,7 +167,7 @@ html {
   .timestamp {
     float: left;
     font-size: 0.6rem;
-    &.hidden{
+    &.hidden {
       visibility: hidden;
     }
   }
@@ -191,7 +192,7 @@ html {
       cursor: pointer;
     }
   }
-  .mod.hidden{
+  .mod.hidden {
     display: none;
   }
 }
@@ -373,7 +374,7 @@ main {
   height: 100%;
   position: fixed;
   width: 100%;
-  &.hidden{
+  &.hidden {
     display: none;
   }
 }

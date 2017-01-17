@@ -46,7 +46,7 @@ export class ChannelUI extends ChannelEventListener {
         }
         let oldHeight = 0;
         this.messagesUI.scroll(function (e) {
-            that.isAtBottom = oldHeight <= this.scrollHeight;
+            that.isAtBottom = Math.floor(this.scrollHeight - this.scrollTop) <= this.clientHeight + 1;
         });
         this.messagesUI.on("wheel", function (e) {
             oldHeight = this.scrollHeight;
@@ -78,10 +78,12 @@ export class ChannelUI extends ChannelEventListener {
         if (args.mod) {
             $message.find(".mod").removeClass("hide");
         }
-        let isAtBottom = this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop <= this.messagesUI[0].clientHeight + 1;
+        let wasAtBottom = Math.floor(this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop) <= this.messagesUI[0].clientHeight + 1;
         this.messagesUI.append($message);
-        if (this.isAtBottom || isAtBottom) {
+        if (wasAtBottom) {
             this.scrollToBottom();
+        } else {
+            this.isAtBottom = false;
         }
     }
 

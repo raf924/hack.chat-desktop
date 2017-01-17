@@ -75,8 +75,8 @@ ipc.on("fullscreen", function (event) {
 app.on('ready', function () {
     // Create the browser window.
     mainWindow = new BrowserWindow({
-        width: localConfig.get("width"),
-        height: localConfig.get("height"),
+        width: localConfig.get("windowWidth"),
+        height: localConfig.get("windowHeight"),
         frame: false,
         icon: "./static/img/icon128.png",
         minWidth: 400,
@@ -95,6 +95,11 @@ app.on('ready', function () {
         if (item === "dev") {
             mainWindow.webContents.openDevTools({mode: "undocked"});
         }
+    });
+
+    mainWindow.on('resize', function () {
+       localConfig.set("windowHeight", mainWindow.height);
+       localConfig.set("windowWidth", mainWindow.width);
     });
 
     // Emitted when the window is closed.
