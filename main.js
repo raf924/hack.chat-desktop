@@ -8,7 +8,7 @@ const ipc = electron.ipcMain;
 require('require-rebuild')();
 const ConfigJSON = require("./lib/modules/config-json");
 
-const localConfig = new ConfigJSON(`${__dirname}/data.json`);
+const localConfig = new ConfigJSON(`${process.cwd()}/data.json`);
 const fs = require('fs');
 
 //TODO: Add remote config
@@ -98,8 +98,8 @@ app.on('ready', function () {
     });
 
     mainWindow.on('resize', function () {
-       localConfig.set("windowHeight", mainWindow.height);
-       localConfig.set("windowWidth", mainWindow.width);
+        localConfig.set("windowHeight", mainWindow.height);
+        localConfig.set("windowWidth", mainWindow.width);
     });
 
     // Emitted when the window is closed.
