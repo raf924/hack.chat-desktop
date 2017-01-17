@@ -44,7 +44,7 @@ test: off
 artifacts:
 - path: app.win32.zip
   name: Win32
-- path: cordova\platforms\android\bin\chatron-release-unsigned.apk
+- path: cordova\platforms\android\build\outputs\apk\android-release-unsigned.apk
   name: Android
 deploy:
 - provider: BinTray
