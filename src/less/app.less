@@ -158,7 +158,8 @@ html {
       font-family: Roboto, sans-serif;
       margin: 0;
       white-space: normal;
-      word-break: break-all;
+      word-wrap: break-word;
+      word-break: break-word;
       a {
         word-break: break-all;
       }
@@ -188,12 +189,15 @@ html {
     .trip {
       font-size: 0.8em;
     }
-    .nick {
+    .nick[data-nick] {
       cursor: pointer;
     }
   }
-  .mod.hidden {
-    display: none;
+  .mod {
+    font-style: 1.3em;
+    &.hidden {
+      display: none;
+    }
   }
 }
 

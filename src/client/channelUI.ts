@@ -54,7 +54,7 @@ export class ChannelUI extends ChannelEventListener {
         this.messagesUI.on("click", ".message .text-wrapper", function () {
             $(this).parent().find(".timestamp").toggleClass("hidden");
         });
-        this.messagesUI.on("click", ".channel .title a, .user a.nick", function (e) {
+        this.messagesUI.on("click", ".messages .nick[data-nick], .user a.nick", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
         });
     }
@@ -70,13 +70,15 @@ export class ChannelUI extends ChannelEventListener {
             $message.addClass("cmd");
             $message.find(".text").parent().css("display", "none");
             $message.find(".timestamp").removeClass("hidden");
+        } else {
+            $message.find(".nick")[0].dataset["nick"] = args.nick;
         }
         $message.find(".nick").text(args.nick);
         $message.find(".text").html(args.text);
         $message.find(".trip").text(args.trip);
         $message.find(".timestamp").text(new Date(args.time).toLocaleString());
         if (args.mod) {
-            $message.find(".mod").removeClass("hide");
+            $message.find(".mod").removeClass("hidden");
         }
         let wasAtBottom = Math.floor(this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop) <= this.messagesUI[0].clientHeight + 1;
         this.messagesUI.append($message);
