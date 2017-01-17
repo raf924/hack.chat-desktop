@@ -1,7 +1,7 @@
-import {Login} from "../login";
+import {LoginMethod} from "../loginMethod";
 
 export const className = "MixedLoginPopup";
-export class MixedLoginPopup extends Login {
+export class MixedLoginPopup extends LoginMethod {
     overlay: HTMLDivElement;
     root: HTMLElement;
     input: HTMLInputElement;

@@ -6,7 +6,7 @@ import {ChannelUI} from "./channelUI"
 const titlebar = require('titlebar');
 import fs = require('fs');
 import {App} from "./app";
-import {Login} from "./login";
+import {LoginMethod} from "./loginMethod";
 import {Views} from "./views";
 import {NotifyConfig} from "./notifyConfig";
 import Hammer = require("hammerjs");
@@ -23,7 +23,7 @@ class UI {
     public static chatInputForm: JQuery;
     public static channelTabs: JQuery;
     public static channelsContainer: JQuery;
-    public static loginMethod: Login;
+    public static loginMethod: LoginMethod;
 
     public static get currentChannelUI(): ChannelUI {
         return UI.channelUIs[App.currentChannel];
@@ -140,7 +140,12 @@ class UI {
     private static loadLoginEvents(): void {
         //TODO: prefill userData
         App.userData.get("loginMethod", function (loginMethod) {
-            let method = require(`${__dirname}/login/${loginMethod}`);
+            let method;
+            if (App.isCordova) {
+                method = require(`./loadLogin`)[loginMethod];
+            } else {
+                method = require(`${__dirname}/login/${loginMethod}`);
+            }
             UI.loginMethod = new method[method.className](UI.nickPrompt[0]);
             UI.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
                 if (!App.isCordova) {

@@ -1,3 +1,4 @@
 declare interface Window {
-    cordova: any;
+    cordova?: any;
+    NativeStorage?: any;
 }

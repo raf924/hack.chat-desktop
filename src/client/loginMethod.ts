@@ -1,5 +1,4 @@
-import CallbackObject = Pickadate.CallbackObject;
-export abstract class Login {
+export abstract class LoginMethod {
     open(channel, service) {
         this.channel = channel;
         this.service = service;

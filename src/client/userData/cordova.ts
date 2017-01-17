@@ -1,19 +1,24 @@
 import {UserData} from "../userData";
-export declare const NativeStorage;
-class UserDataCordova extends UserData{
+class UserDataCordova extends UserData {
     get(prop: string, successCallBack: Function, errorCallBack: Function): void {
-        NativeStorage.getItem(prop, function (obj) {
+        window.NativeStorage.getItem(prop, function (obj) {
             successCallBack(obj);
         }, function (error) {
-            errorCallBack(error);
+            if (typeof errorCallBack === "function") {
+                errorCallBack(error);
+            }
         });
     }
 
     set(prop: string, value: any, successCallBack: Function, errorCallBack: Function): void {
-        NativeStorage.setItem(prop, value, function (obj) {
-            successCallBack(obj);
+        window.NativeStorage.setItem(prop, value, function (obj) {
+            if (typeof successCallBack === "function") {
+                successCallBack(obj);
+            }
         }, function (error) {
-            errorCallBack(error);
+            if (typeof errorCallBack === "function") {
+                errorCallBack(error);
+            }
         });
     }
 }

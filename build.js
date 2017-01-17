@@ -34,7 +34,12 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
     files.forEach(function (file) {
         fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `require("./parsers/${file}");\n`);
     });
-
+    fs.writeFileSync(`${__dirname}/lib/client/loadLogin.js`, "");
+    files = fs.readdirSync(`${__dirname}/lib/client/login`);
+    files.forEach(function (file) {
+        //TODO: find something better to name modules
+        fs.appendFileSync(`${__dirname}/lib/client/loadLogin.js`, `module.exports.${file.split(".js")[0]} = require("./login/${file}");\n`);
+    });
     let wS = fs.createWriteStream(`${__dirname}/cordova/www/bundle.js`);
     let b = browserify({standalone: "App"});
     b.add(`${__dirname}/client.js`);
@@ -97,6 +102,10 @@ try {
     fs.mkdirSync(`${__dirname}/cordova/www/node_modules/roboto-fontface/css`);
 } catch (e) {
 }
+try {
+    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/roboto-fontface/fonts`);
+} catch (e) {
+}
 
 ncp(`${__dirname}/node_modules/material-components-web/dist`, `${__dirname}/cordova/www/node_modules/material-components-web/dist`, function (err) {
 
@@ -112,5 +121,8 @@ ncp(`${__dirname}/node_modules/material-design-icons/iconfont`, `${__dirname}/co
 });
 
 ncp(`${__dirname}/node_modules/roboto-fontface/css/roboto`, `${__dirname}/cordova/www/node_modules/roboto-fontface/css/roboto`, function (err) {
+
+});
+ncp(`${__dirname}/node_modules/roboto-fontface/fonts/Roboto`, `${__dirname}/cordova/www/node_modules/roboto-fontface/fonts/Roboto`, function (err) {
 
 });

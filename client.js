@@ -1,1 +1,4 @@
-require('./lib/client/index');
+document.addEventListener("deviceready", function () {
+    require('./lib/client/index');
+});
+
