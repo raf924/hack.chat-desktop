@@ -12,7 +12,7 @@ clone_folder: "C:\\projects\\hack.chat-desktop"
 init:
 - cd \
 - appveyor DownloadFile http://dl.google.com/android/android-sdk_r24.4.1-windows.zip
-- appveyor DownloadFile http://www-eu.apache.org/dist//ant/binaries/apache-ant-1.9.7-bin.zip
+- appveyor DownloadFile http://apache.crihan.fr/dist//ant/binaries/apache-ant-1.10.0-bin.zip
 - 7z x android-sdk_r24.4.1-windows.zip > nul
 - 7z x apache-ant-1.9.7-bin.zip > nul
 - cd C:\projects\hack.chat-desktop
