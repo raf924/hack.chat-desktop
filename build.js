@@ -47,17 +47,6 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
             process.exit();
         }
     });
-    //let wS = fs.createWriteStream(`${__dirname}/cordova/www/bundle.js`);
-    /*let b = browserify({standalone: "App"});
-    b.add(`${__dirname}/client.js`);
-    b.bundle().pipe(wS);*/
-
-    /*ncp(`${__dirname}/lib`, `${__dirname}/cordova/www/lib`, function (err) {
-        if (err) {
-            return console.error(err);
-        }
-        console.log("Lib files distributed to cordova");
-    });*/
 });
 
 const less = require('less');
@@ -115,10 +104,6 @@ try {
 }
 
 ncp(`${__dirname}/node_modules/material-components-web/dist`, `${__dirname}/cordova/www/node_modules/material-components-web/dist`, function (err) {
-
-});
-
-ncp(`${__dirname}/node_modules/jquery/dist`, `${__dirname}/cordova/www/node_modules/jquery/dist`, function (err) {
 
 });
 
