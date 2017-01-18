@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require("path");
 const ncp = require("ncp");
 const browserify = require('browserify');
+const webpack = require('webpack');
 
 const execFile = require('child_process').execFile;
 let tscPath = `${__dirname}/node_modules/.bin/tsc`;
@@ -40,17 +41,23 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         //TODO: find something better to name modules
         fs.appendFileSync(`${__dirname}/lib/client/loadLogin.js`, `module.exports.${file.split(".js")[0]} = require("./login/${file}");\n`);
     });
-    let wS = fs.createWriteStream(`${__dirname}/cordova/www/bundle.js`);
-    let b = browserify({standalone: "App"});
+    webpack(require('./webpack.config'), function (err, stats) {
+        if(err){
+            console.error(err);
+            process.exit();
+        }
+    });
+    //let wS = fs.createWriteStream(`${__dirname}/cordova/www/bundle.js`);
+    /*let b = browserify({standalone: "App"});
     b.add(`${__dirname}/client.js`);
-    b.bundle().pipe(wS);
+    b.bundle().pipe(wS);*/
 
-    ncp(`${__dirname}/lib`, `${__dirname}/cordova/www/lib`, function (err) {
+    /*ncp(`${__dirname}/lib`, `${__dirname}/cordova/www/lib`, function (err) {
         if (err) {
             return console.error(err);
         }
         console.log("Lib files distributed to cordova");
-    });
+    });*/
 });
 
 const less = require('less');
