@@ -89,6 +89,9 @@ app.on('ready', function () {
     // and load the index.html of the app.
     mainWindow.loadURL(`file://${__dirname}/index.html`);
     webContents = mainWindow.webContents;
+    webContents.on("did-finish-load", function () {
+       webContents.executeJavaScript("document.dispatchEvent(new Event('deviceready'));");
+    });
     mainWindow.flashFrame(true);
     // Open the devtools.
     process.argv.forEach(function (item) {
