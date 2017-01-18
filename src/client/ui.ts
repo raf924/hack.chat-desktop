@@ -140,12 +140,7 @@ class UI {
     private static loadLoginEvents(): void {
         //TODO: prefill userData
         App.userData.get("loginMethod", function (loginMethod) {
-            let method;
-            if (App.isCordova) {
-                method = require(`./loadLogin`)[loginMethod];
-            } else {
-                method = require(`${__dirname}/login/${loginMethod}`);
-            }
+            let method = require(`${__dirname}/login/${loginMethod}`);
             UI.loginMethod = new method[method.className](UI.nickPrompt[0]);
             UI.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
                 if (!App.isCordova) {
@@ -177,9 +172,9 @@ class UI {
         });
     }
 
-    private static toggleDrawer() {
-        $("#sidemenu").toggleClass("open");
-        $("#sidemenu-overlay").toggleClass("hidden");
+    private static toggleDrawer(state?: boolean) {
+        $("#sidemenu").toggleClass("open", state);
+        $("#sidemenu-overlay").toggleClass("hidden", state==null?state:!state);
     }
 
     private static loadUIEvents(): void {
@@ -190,15 +185,20 @@ class UI {
                 UI.addFavourite(channelName);
             }
         });
-        $("#sidemenu-collapse, #sidemenu-overlay").click(function (e) {
+        $("#sidemenu-collapse").click(function (eventObject) {
             UI.toggleDrawer();
         });
-        let hammerTime = new Hammer(document.body);
-        hammerTime.on("swipe", function (ev) {
-            UI.toggleDrawer();
+        $("#sidemenu-overlay").click(function (e) {
+            UI.toggleDrawer(false);
         });
+        if(App.isCordova){
+            let hammerTime = new Hammer(document.body);
+            hammerTime.on("swiperight", function (ev) {
+                UI.toggleDrawer(true);
+            });
+        }
         $("#sidemenu").on("click", "ul li", function () {
-            UI.toggleDrawer();
+            UI.toggleDrawer(false);
         });
     }
 
@@ -255,6 +255,7 @@ class UI {
         else if (App.nick === undefined || App.nick === null || App.nick === "") {
             //UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
             UI.loginMethod.open(channelName, service);
+            UI.toggleDrawer(false);
             UI.nickPrompt.find("input").focus();
         } else {
             UI.openChannel(channelName, App.nick, App.password);

@@ -1,9 +1,9 @@
 @media only screen and (max-width: 992px) {
   #sidemenu {
-    width: 0;
-    transition: width 500ms;
+    left: -@drawerWidth;
+    transition: left 500ms;
     &.open {
-      width: @drawerWidth;
+      left: 0;
     }
   }
 
@@ -18,8 +18,7 @@
   }
 
   .messages {
-    max-height: calc(100% ~"-" 3.5rem ~"-" @appBarHeight);
-    bottom: 5.5rem + @appBarHeight;
+    bottom: 4rem + @appBarHeight;
   }
 
   #chatBox-wrapper {

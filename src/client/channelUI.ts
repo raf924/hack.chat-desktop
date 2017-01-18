@@ -51,9 +51,15 @@ export class ChannelUI extends ChannelEventListener {
         this.messagesUI.on("wheel", function (e) {
             oldHeight = this.scrollHeight;
         });
-        this.messagesUI.on("click", ".message .text-wrapper", function () {
-            $(this).parent().find(".timestamp").toggleClass("hidden");
-        });
+        let hammerTime = new Hammer(this.messagesUI[0]);
+        hammerTime.on("tap", (function (e) {
+            if ($(e.target).parent(".title").length === 0 && !$(e.target).is(".messages, .cmd *, .title")) {
+                $(e.target).parentsUntil(".message").find(".timestamp").toggleClass("hidden");
+                if (this.isAtBottom) {
+                    this.scrollToBottom();
+                }
+            }
+        }).bind(this));
         this.messagesUI.on("click", ".messages .nick[data-nick], .user a.nick", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
         });

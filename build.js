@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require("path");
 const ncp = require("ncp");
-const browserify = require('browserify');
 const webpack = require('webpack');
 
 const execFile = require('child_process').execFile;
@@ -42,10 +41,11 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         fs.appendFileSync(`${__dirname}/lib/client/loadLogin.js`, `module.exports.${file.split(".js")[0]} = require("./login/${file}");\n`);
     });
     webpack(require(`${__dirname}/webpack.config`), function (err, stats) {
-        if(err){
+        if (err) {
             console.error(err);
             process.exit();
         }
+        console.log("Program bundled for cordova");
     });
 });
 
@@ -80,10 +80,6 @@ try {
 }
 try {
     fs.mkdirSync(`${__dirname}/cordova/www/node_modules/material-components-web/`);
-} catch (e) {
-}
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/jquery/`);
 } catch (e) {
 }
 try {

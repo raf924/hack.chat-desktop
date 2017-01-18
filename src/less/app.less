@@ -68,7 +68,7 @@ html {
   position: fixed;
   width: calc(98% ~"-" @drawerWidth);
   #chatBox {
-    padding: 2%;
+    padding: 0.8rem;
   }
 }
 
@@ -206,6 +206,9 @@ body {
   margin-top: calc(@titlebarButtonSize ~"+" 12px);
   &.cordova {
     margin-top: 0;
+    .messages {
+      margin-bottom: 0;
+    }
   }
   * {
     -moz-user-select: none;
@@ -296,14 +299,15 @@ main {
 .messages {
   overflow-y: scroll;
   position: absolute;
-  bottom: 5.5rem;
+  bottom: 4rem;
+  margin-bottom: calc(@titlebarButtonSize ~"+" 12px);
   top: 0;
   max-height: calc(100% ~"-" 3.5rem);
   padding: 0;
-  padding-right: 2%;
-  width: @width2;
+  padding-right: 1%;
+  width: 98.6%;
   &::-webkit-scrollbar {
-    width: 0.3em;
+    width: 0.4%;
     &-thumb {
       background-color: rgba(0, 0, 0, 0.46);
       border-radius: 1em;

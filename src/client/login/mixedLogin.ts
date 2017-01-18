@@ -102,7 +102,7 @@ export class MixedLoginPopup extends LoginMethod {
         let target: HTMLInputElement = <HTMLInputElement> event.currentTarget;
         let before;
         let after;
-        let key = event.key || event.originalEvent.data;
+        let key = event.key || event.data;
         switch (key) {
             case "Backspace":
             case "Delete":
