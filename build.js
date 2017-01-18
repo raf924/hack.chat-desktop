@@ -41,7 +41,7 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         //TODO: find something better to name modules
         fs.appendFileSync(`${__dirname}/lib/client/loadLogin.js`, `module.exports.${file.split(".js")[0]} = require("./login/${file}");\n`);
     });
-    webpack(require('./webpack.config'), function (err, stats) {
+    webpack(require(`${__dirname}/webpack.config`), function (err, stats) {
         if(err){
             console.error(err);
             process.exit();
