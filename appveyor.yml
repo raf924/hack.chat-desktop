@@ -12,9 +12,7 @@ clone_folder: "C:\\projects\\hack.chat-desktop"
 init:
 - cd \
 - appveyor DownloadFile http://dl.google.com/android/android-sdk_r24.4.1-windows.zip
-- appveyor DownloadFile http://apache.crihan.fr/dist//ant/binaries/apache-ant-1.10.0-bin.zip
 - 7z x android-sdk_r24.4.1-windows.zip > nul
-- 7z x apache-ant-1.10.0-bin.zip > nul
 - cd C:\projects\hack.chat-desktop
 install:
 - ps: Install-Product node $env:NODE_VERSION
@@ -39,11 +37,9 @@ build_script:
 - cmd: set PATH=C:\apache-ant-1.10.0\bin;%PATH%
 - cmd: set PATH=C:\android-sdk-windows\build-tools\25.0.0;%PATH%
 - cmd: set PATH=%JAVA_HOME%\bin;%PATH%
-- cmd: cd cordova && ..\node_modules\.bin\cordova.cmd prepare && ..\node_modules\.bin\cordova.cmd build android -- -ant
+- cmd: cd cordova && ..\node_modules\.bin\cordova.cmd prepare && ..\node_modules\.bin\cordova.cmd build android
 test: off
 artifacts:
-- path: app.win32.zip
-  name: Win32
 - path: cordova\platforms\android\build\outputs\apk\android-debug.apk
   name: Android
 deploy:

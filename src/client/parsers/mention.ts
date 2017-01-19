@@ -1,7 +1,7 @@
 import {Parser} from "../parser"
 import {UI} from "../ui";
 
-interface MentionMessage extends ParsedMessage{
+interface MentionMessage extends ParsedMessage {
     mention: boolean,
     originalText: string
 }
@@ -32,7 +32,7 @@ class MentionParser implements Parser {
                 message = newMessage.replace(userReg, `$1${html}$3`);
             }
         }
-        return {text: message, mention: mention, originalText: message};
+        return {text: message, mention: mention, originalText: newMessage};
     }
 }
 

@@ -165,6 +165,7 @@ export class ChannelUI extends ChannelEventListener {
                 } else {
                     notificationText = args.text;
                 }
+                notificationText = `${new Date(args.time).getHours()}:${new Date(args.time).getMinutes()})}\nFrom ${args.nick}:\n ${notificationText}`;
                 break;
         }
         if (this.channel.channelId !== App.currentChannel && UI.notifyConfig[args.cmd]) {
@@ -172,13 +173,23 @@ export class ChannelUI extends ChannelEventListener {
             this.messageCounter.text(this.unreadMessageCount);
             //TODO: add notifications
         }
-        if (!document.hasFocus() && args.mention) {
-            let notification = new Notification(`Chatron - ${this.channel.name}@${this.channel.service}`, {
-                body: `From ${args.nick}:\n ${notificationText}`
-            });
-            notification.onclick = (function () {
+        if ((!document.hasFocus() || window.cordova.plugins.backgroundMode.isActive()) && args.mention) {
+            let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
+            let notificationClicked = (function () {
                 UI.channelTabs.tabs("activate", this.channel.channelId);
             }).bind(this);
+            if (App.isCordova) {
+                window.cordova.plugins.notification.local.schedule({
+                    title: notificationTitle,
+                    text: notificationText,
+                });
+                window.cordova.plugins.notification.local.on("click", notificationClicked);
+            } else {
+                let notification = new Notification(notificationTitle, {
+                    body: notificationText
+                });
+                notification.onclick = notificationClicked;
+            }
         }
         this.appendMessage(args);
     }

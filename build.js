@@ -31,8 +31,9 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
     });
     fs.writeFileSync(`${__dirname}/lib/client/loadParsers.js`, "");
     files = fs.readdirSync(`${__dirname}/lib/client/parsers`);
+    fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `module.exports = [];\n`);
     files.forEach(function (file) {
-        fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `require("./parsers/${file}");\n`);
+        fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `module.exports.push("${file}");\n`);
     });
     fs.writeFileSync(`${__dirname}/lib/client/loadLogin.js`, "");
     files = fs.readdirSync(`${__dirname}/lib/client/login`);

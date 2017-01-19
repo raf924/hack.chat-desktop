@@ -53,24 +53,20 @@ export class App {
     }
 
     private static loadParsers(): void {
-        if (fs.hasOwnProperty("readdir")) {
-            fs.readdir(`${__dirname}/parsers`, function (err, files) {
-                if (err === null) {
-                    files.forEach(function (file) {
-                        try {
-                            let parser = require(`${__dirname}/parsers/${file}`);
-                            App.parsers.push(new parser());
-                        } catch (e) {
-                            console.warn(`./parsers/${file} doesn't contain a Parser`);
-                        }
-                    });
-                } else {
-                    console.error("Cannot load parsers: lib/client/parsers access error.");
-                }
-            });
+        let parsers = [];
+        if (!App.isCordova) {
+            parsers = fs.readdirSync(`${__dirname}/parsers`);
         } else {
-            require('./loadParsers');
+            parsers = require('./loadParsers');
         }
+        parsers.forEach(function (file) {
+            try {
+                let parser = require(`${__dirname}/parsers/${file}`);
+                App.parsers.push(new parser());
+            } catch (e) {
+                console.warn(`./parsers/${file} doesn't contain a Parser`);
+            }
+        });
     }
 
     static addFavourite(favourite: string) {
