@@ -39,7 +39,7 @@ build_script:
 - cmd: set PATH=C:\apache-ant-1.10.0\bin;%PATH%
 - cmd: set PATH=C:\android-sdk-windows\build-tools\25.0.0;%PATH%
 - cmd: set PATH=%JAVA_HOME%\bin;%PATH%
-- cmd: cd cordova && ..\node_modules\.bin\cordova.cmd prepare && ..\node_modules\.bin\cordova.cmd build android --release -- -ant
+- cmd: cd cordova && ..\node_modules\.bin\cordova.cmd prepare && ..\node_modules\.bin\cordova.cmd build android -- -ant
 test: off
 artifacts:
 - path: app.win32.zip
