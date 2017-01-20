@@ -173,7 +173,7 @@ export class ChannelUI extends ChannelEventListener {
             this.messageCounter.text(this.unreadMessageCount);
             //TODO: add notifications
         }
-        if ((!document.hasFocus() || window.cordova.plugins.backgroundMode.isActive()) && args.mention) {
+        if ((!document.hasFocus() || App.isCordova && window.cordova.plugins.backgroundMode.isActive()) && args.mention) {
             let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
             let notificationClicked = (function () {
                 UI.channelTabs.tabs("activate", this.channel.channelId);
