@@ -22,11 +22,11 @@ export class ChannelUI extends ChannelEventListener {
         this.channel = channel;
         this.createAccessLink();
         this.unreadMessageCount = 0;
-        $(".users").css("display", "none");
         this.usersUI = $(UI.views.users.element).attr("for", this.channel.channelId).appendTo('#users');
         this.ui = $(UI.views.channel.element).attr("id", this.channel.channelId).appendTo("#channels");
         this.messagesUI = this.ui;
         this.bindEvents();
+        this.appendMessage({cmd: "info", text: "Waiting for connection..."});
     }
 
     public close() {
@@ -60,7 +60,7 @@ export class ChannelUI extends ChannelEventListener {
                 }
             }
         }).bind(this));
-        this.messagesUI.on("click", ".messages .nick[data-nick], .user a.nick", function (e) {
+        this.messagesUI.on("click", ".message .nick[data-nick], .user a.nick", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
         });
     }
@@ -70,19 +70,27 @@ export class ChannelUI extends ChannelEventListener {
         if (args.nick === this.channel.nick) {
             $message.addClass("from-user");
         }
+        switch (args.cmd){
+            case "chat":
+                $message.find(".nick")[0].dataset["nick"] = args.nick;
+                break;
+            case "onlineSet":
+                this.messagesUI.find(".message").remove();
+                break;
+        }
         if (args.cmd !== "chat") {
             args.nick = args.text;
             args.text = "";
             $message.addClass("cmd");
             $message.find(".text").parent().css("display", "none");
             $message.find(".timestamp").removeClass("hidden");
-        } else {
-            $message.find(".nick")[0].dataset["nick"] = args.nick;
         }
-        $message.find(".nick").text(args.nick);
+        $message.find(".nick").html(args.nick);
         $message.find(".text").html(args.text);
         $message.find(".trip").text(args.trip);
-        $message.find(".timestamp").text(new Date(args.time).toLocaleString());
+        if (args.time) {
+            $message.find(".timestamp").text(new Date(args.time).toLocaleString());
+        }
         if (args.mod) {
             $message.find(".mod").removeClass("hidden");
         }
