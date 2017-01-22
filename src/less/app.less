@@ -125,15 +125,22 @@ html {
 .message {
   margin-bottom: 0.1rem;
   margin-right: calc(100% - @messageWidth);
-  width: @messageWidth;
+  max-width: @messageWidth;
+  clear: both;
   float: left;
   & > .title {
     display: none;
+  }
+  & + .from-last-sender{
+    margin-top: 0;
   }
   &.from-last-sender {
     .title {
       display: none !important;
     }
+  }
+  & + .message {
+    margin-top: 0.5rem;
   }
   &.cmd {
     & > .title {
@@ -145,6 +152,9 @@ html {
     .timestamp {
       display: block !important;
       line-height: 0;
+    }
+    & + .cmd {
+      margin-top: 0;
     }
   }
   &.from-user {
