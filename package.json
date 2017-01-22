@@ -25,14 +25,15 @@
   "license": "MIT",
   "dependencies": {
     "cordova": "^6.4.0",
-    "electron": "^1.4.14",
-    "events": "^1.1.1",
+    "electron": "^1.4.15",
+    "electron-builder": "^11.4.4",
+    "electron-packager": "^8.5.0",
     "hammerjs": "^2.0.8",
     "jquery": "^3.1.1",
-    "material-components-web": "^0.1.1",
+    "material-components-web": "^0.2.0",
     "material-design-icons": "^3.0.1",
     "require-rebuild": "^1.2.8",
-    "roboto-fontface": "^0.6.0",
+    "roboto-fontface": "^0.7.0",
     "titlebar": "^1.4.0"
   },
   "devDependencies": {
