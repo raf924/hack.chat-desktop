@@ -28,13 +28,16 @@ class Channel extends EventEmitter {
             that.send({
                 cmd: 'ping'
             });
-        }, 50000);
+        }, 30000);
         this.ws.onopen = function () {
             that.send({
                 cmd: "join",
                 channel: that.name,
                 nick: `${that.nick}#${that.password}`
             });
+        };
+        this.ws.onclose = function (ev) {
+            that.disconnect(ev.code, ev.reason);
         };
         this.ws.onmessage = function (message) {
             let args: MessageData = JSON.parse(message.data);
@@ -101,6 +104,10 @@ class Channel extends EventEmitter {
 
     receiveMessage(args) {
         super.emit("messageReceived", args);
+    }
+
+    disconnect(code: number, reason: string) {
+        super.emit("disconnected", {code, reason});
     }
 }
 

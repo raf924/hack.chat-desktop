@@ -10,7 +10,8 @@ import {LoginMethod} from "./loginMethod";
 import {Views} from "./views";
 import {NotifyConfig} from "./notifyConfig";
 import Hammer = require("hammerjs");
-
+const mdc = require('material-components-web/dist/material-components-web.min.js');
+const MDCSnackbar: any = mdc.snackbar.MDCSnackbar;
 
 //TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
 class UI {
@@ -24,6 +25,8 @@ class UI {
     public static channelTabs: JQuery;
     public static channelsContainer: JQuery;
     public static loginMethod: LoginMethod;
+    private static snackBar: any;
+    public static readonly DEFAULT_ALERT_TIMEOUT = 2750;
 
     public static get currentChannelUI(): ChannelUI {
         return UI.channelUIs[App.currentChannel];
@@ -45,9 +48,8 @@ class UI {
     }
 
     public static init() {
-        //TODO: See hammer.js for swipe
-
         UI.channelUIs = new Map<string, ChannelUI>();
+        UI.snackBar = new mdc.snackbar.MDCSnackbar($("#alert")[0]);
         //TODO: Load UI components from component/selector maps stored in JSON
         UI.channelTabs = $("#menu-channels");
         UI.channelsContainer = $("#channels");
@@ -88,7 +90,7 @@ class UI {
         UI.loadLoginEvents();
         UI.loadTabEvents();
         UI.loadChannelEvents();
-
+        UI.snackBar = new MDCSnackbar($("#alert")[0]);
     }
 
     private static loadTitleBarEvents(): void {
@@ -174,7 +176,7 @@ class UI {
 
     private static toggleDrawer(state?: boolean) {
         $("#sidemenu").toggleClass("open", state);
-        $("#sidemenu-overlay").toggleClass("hidden", state==null?state:!state);
+        $("#sidemenu-overlay").toggleClass("hidden", state == null ? state : !state);
     }
 
     private static loadUIEvents(): void {
@@ -191,7 +193,7 @@ class UI {
         $("#sidemenu-overlay").click(function (e) {
             UI.toggleDrawer(false);
         });
-        if(App.isCordova){
+        if (App.isCordova) {
             let hammerTime = new Hammer(document.body);
             hammerTime.on("swiperight", function (ev) {
                 UI.toggleDrawer(true);
@@ -215,7 +217,7 @@ class UI {
             .tabs("init")
             .on("tabs.opened", function (e, channelId) {
                 if (!UI.channelUIs[channelId].channel.isOnline) {
-                    UI.chatInputForm.find("#chatBox").attr("disabled", "");
+                    //UI.chatInputForm.find("#chatBox").attr("disabled", "");
                 }
             })
             .on("tabs.changed", function (e, channelId) {
@@ -227,7 +229,7 @@ class UI {
                     currentChannelUI.messageCounter.text(0);
                     App.currentChannel = channelId;
                     if (currentChannelUI.channel.isOnline) {
-                        UI.chatInputForm.find("#chatBox").removeAttr("disabled");
+                        UI.chatInputForm.parent().removeAttr("hidden");
                         let users: string[] = [];
                         for (let user in UI.channelUIs[channelId].channel.users) {
                             users.push(user);
@@ -238,13 +240,17 @@ class UI {
                 document.title = `Chatron - ${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
             })
             .on("tabs.closed", function (e, channelId) {
-                UI.channelUIs[channelId].close();
-                delete UI.channelUIs[channelId];
-                if ($(this).find(".tab").length == 0) {
-                    UI.chatInputForm.find("#chatBox").attr("disabled", "");
-                }
+                UI.closeChannelUI(channelId);
             });
 //TODO: add button to open drawer on small screens
+    }
+
+    public static closeChannelUI(channelId){
+        UI.channelUIs[channelId].close();
+        delete UI.channelUIs[channelId];
+        if(UI.channelTabs.find(".tab").length === 0){
+            UI.chatInputForm.parent().attr("hidden", "true");
+        }
     }
 
     private static login(channelName: string, service: string, nick ?: string, password ?: string): void {
@@ -284,6 +290,15 @@ class UI {
         $addChannelForm.find("input").blur(function (e) {
             $addChannelForm.find("button").css("display", "");
             $(this).parent().css("display", "none");
+        });
+    }
+
+    public static alert(text: string, timeout?: number, actionText?: string, actionHandler?: () => {}): void {
+        UI.snackBar.show({
+            message: text,
+            actionText: actionText,
+            actionHandler: actionHandler,
+            timeout: timeout || UI.DEFAULT_ALERT_TIMEOUT
         });
     }
 }

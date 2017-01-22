@@ -1,5 +1,5 @@
 export abstract class ChannelEventListener {
-    protected static events = ["addUser", "removeUser", "tripCodeSet", "messageReceived"];
+    protected static events = ["addUser", "removeUser", "tripCodeSet", "messageReceived", "disconnected"];
 
     abstract addUser(user: string): void
 
@@ -8,4 +8,6 @@ export abstract class ChannelEventListener {
     abstract tripCodeSet(user: string, trip: string): void
 
     abstract messageReceived(args: MessageData): void
+
+    abstract disconnected(code: number, reason: string): void
 }

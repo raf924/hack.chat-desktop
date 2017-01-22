@@ -25,25 +25,45 @@ export class ChannelUI extends ChannelEventListener {
         this.usersUI = $(UI.views.users.element).attr("for", this.channel.channelId).appendTo('#users');
         this.ui = $(UI.views.channel.element).attr("id", this.channel.channelId).appendTo("#channels");
         this.messagesUI = this.ui;
-        this.bindEvents();
+        this.bindChannelEvents();
+        this.bindUIEvents();
         this.appendMessage({cmd: "info", text: "Waiting for connection..."});
+    }
+
+    public disconnected(event): void {
+        if (event.code !== 1000) {
+            let reconnetTimeout = window.setTimeout((function () {
+                this.channel = new Channel(this.channel.name, this.channel.nick, this.channel.password);
+                this.bindChannelEvents();
+            }).bind(this), UI.DEFAULT_ALERT_TIMEOUT);
+            UI.alert(`${this.channel.name}@${this.channel.service} was disconnected\nReason: ${event.reason}\nRetrying`, UI.DEFAULT_ALERT_TIMEOUT, "Cancel", (function () {
+                window.clearTimeout(reconnetTimeout);
+                UI.closeChannelUI(this.channel.channelId);
+            }).bind(this));
+        } else {
+            UI.closeChannelUI(this.channel.channelId);
+        }
     }
 
     public close() {
         //TODO: ask for confirmation (if config allows it)
         this.channel.close();
+        this.accessLink.remove();
         this.usersUI.remove();
         this.messagesUI.remove();
         this.ui.remove();
     }
 
-    private bindEvents() {
-        let that = this;
+    private bindChannelEvents() {
         for (let event of ChannelEventListener.events) {
-            this.channel.on(event, function () {
-                that[event].apply(that, arguments);
-            });
+            this.channel.on(event, (function () {
+                this[event].apply(this, arguments);
+            }).bind(this));
         }
+    }
+
+    private bindUIEvents() {
+        let that = this;
         let oldHeight = 0;
         this.messagesUI.scroll(function (e) {
             that.isAtBottom = Math.floor(this.scrollHeight - this.scrollTop) <= this.clientHeight + 1;
@@ -53,7 +73,7 @@ export class ChannelUI extends ChannelEventListener {
         });
         let hammerTime = new Hammer(this.messagesUI[0]);
         hammerTime.on("tap", (function (e) {
-            if ($(e.target).parent(".title").length === 0 && !$(e.target).is(".messages, .cmd *, .title")) {
+            if ($(e.target).parent(".title").length === 0 && !$(e.target).is(".messages, .cmd *, .title, a")) {
                 $(e.target).parentsUntil(".message").find(".timestamp").toggleClass("hidden");
                 if (this.isAtBottom) {
                     this.scrollToBottom();
@@ -70,7 +90,7 @@ export class ChannelUI extends ChannelEventListener {
         if (args.nick === this.channel.nick) {
             $message.addClass("from-user");
         }
-        switch (args.cmd){
+        switch (args.cmd) {
             case "chat":
                 $message.find(".nick")[0].dataset["nick"] = args.nick;
                 break;
@@ -108,19 +128,6 @@ export class ChannelUI extends ChannelEventListener {
         this.messagesUI.scrollTop(this.messagesUI[0].scrollHeight);
     }
 
-    /*public loadUsers() {
-     this.usersUI.css("display", "");
-     this.usersUI.remove(".user");
-     let users = this.channel.users;
-     for (let user in users) {
-     let $user = $(UI.views.user.element);
-     $user.find(".nick").text(user);
-     $user.find(".trip").text(users[user]);
-     $user.attr("user", user);
-     this.usersUI.append($user);
-     }
-     }*/
-
     addUser(user) {
         let $user = $(UI.views.user.element);
         $user.attr("user", user)
@@ -149,7 +156,7 @@ export class ChannelUI extends ChannelEventListener {
         switch (args.cmd) {
             case "onlineSet":
                 args.text = `Users online : ${args.nicks.join(", ")}`;
-                UI.chatInputForm.find("#chatBox").removeAttr("disabled");
+                UI.chatInputForm.parent().removeAttr("hidden");
                 break;
             case "onlineRemove":
                 args.text = `${args.nick} has left`;
@@ -176,30 +183,33 @@ export class ChannelUI extends ChannelEventListener {
                 notificationText = `${new Date(args.time).getHours()}:${new Date(args.time).getMinutes()})}\nFrom ${args.nick}:\n ${notificationText}`;
                 break;
         }
-        if (this.channel.channelId !== App.currentChannel && UI.notifyConfig[args.cmd]) {
+        this.appendMessage(args);
+        let isCurrentChannel = this.channel.channelId !== App.currentChannel;
+        let shouldNotify = UI.notifyConfig[args.cmd];
+        let isAppActive = !(!document.hasFocus() || App.isCordova && window.cordova.plugins.backgroundMode.isActive());
+        let isUserMentionned = args.mention;
+        if (!isCurrentChannel || !isAppActive) {
             this.unreadMessageCount++;
             this.messageCounter.text(this.unreadMessageCount);
-            //TODO: add notifications
-        }
-        if ((!document.hasFocus() || App.isCordova && window.cordova.plugins.backgroundMode.isActive()) && args.mention) {
-            let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
-            let notificationClicked = (function () {
-                UI.channelTabs.tabs("activate", this.channel.channelId);
-            }).bind(this);
-            if (App.isCordova) {
-                window.cordova.plugins.notification.local.schedule({
-                    title: notificationTitle,
-                    text: notificationText,
-                });
-                window.cordova.plugins.notification.local.on("click", notificationClicked);
-            } else {
-                let notification = new Notification(notificationTitle, {
-                    body: notificationText
-                });
-                notification.onclick = notificationClicked;
+            if (shouldNotify && isUserMentionned) {
+                let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
+                let notificationClicked = (function () {
+                    UI.channelTabs.tabs("activate", this.channel.channelId);
+                }).bind(this);
+                if (App.isCordova) {
+                    window.cordova.plugins.notification.local.schedule({
+                        title: notificationTitle,
+                        text: notificationText,
+                    });
+                    window.cordova.plugins.notification.local.on("click", notificationClicked);
+                } else {
+                    let notification = new Notification(notificationTitle, {
+                        body: notificationText
+                    });
+                    notification.onclick = notificationClicked;
+                }
             }
         }
-        this.appendMessage(args);
     }
 
     private createAccessLink() {
