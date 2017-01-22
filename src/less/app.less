@@ -127,7 +127,21 @@ html {
   margin-right: calc(100% - @messageWidth);
   width: @messageWidth;
   float: left;
+  & > .title {
+    display: none;
+  }
+  &.from-last-sender {
+    .title {
+      display: none !important;
+    }
+  }
   &.cmd {
+    & > .title {
+      display: inherit !important;
+    }
+    .text-wrapper {
+      display: none;
+    }
     .timestamp {
       display: block !important;
       line-height: 0;
@@ -137,6 +151,7 @@ html {
     float: right;
     margin-left: calc(100% - @messageWidth);
     margin-right: 0;
+    text-align: right;
     .title {
       float: right;
     }
@@ -160,6 +175,7 @@ html {
       white-space: normal;
       word-wrap: break-word;
       word-break: break-word;
+      clear: both;
       a {
         word-break: break-all;
       }

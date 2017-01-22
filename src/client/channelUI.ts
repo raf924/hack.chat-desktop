@@ -73,8 +73,8 @@ export class ChannelUI extends ChannelEventListener {
         });
         let hammerTime = new Hammer(this.messagesUI[0]);
         hammerTime.on("tap", (function (e) {
-            if ($(e.target).parent(".title").length === 0 && !$(e.target).is(".messages, .cmd *, .title, a")) {
-                $(e.target).parentsUntil(".message").find(".timestamp").toggleClass("hidden");
+            if (!$(e.target).is(".messages, .cmd *, .nick")) {
+                $(e.target).parents(".message").find(".timestamp").toggleClass("hidden");
                 if (this.isAtBottom) {
                     this.scrollToBottom();
                 }
@@ -92,7 +92,10 @@ export class ChannelUI extends ChannelEventListener {
         }
         switch (args.cmd) {
             case "chat":
-                $message.find(".nick")[0].dataset["nick"] = args.nick;
+                if (args.nick === this.channel.lastSender) {
+                    $message.addClass("from-last-sender");
+                }
+                $message.find(".nick").attr("data-nick", args.nick);
                 break;
             case "onlineSet":
                 this.messagesUI.find(".message").remove();
@@ -180,11 +183,11 @@ export class ChannelUI extends ChannelEventListener {
                 } else {
                     notificationText = args.text;
                 }
-                notificationText = `${new Date(args.time).getHours()}:${new Date(args.time).getMinutes()})}\nFrom ${args.nick}:\n ${notificationText}`;
+                notificationText = `\nFrom ${args.nick}:\n ${notificationText}`;
                 break;
         }
         this.appendMessage(args);
-        let isCurrentChannel = this.channel.channelId !== App.currentChannel;
+        let isCurrentChannel = this.channel.channelId === App.currentChannel;
         let shouldNotify = UI.notifyConfig[args.cmd];
         let isAppActive = !(!document.hasFocus() || App.isCordova && window.cordova.plugins.backgroundMode.isActive());
         let isUserMentionned = args.mention;

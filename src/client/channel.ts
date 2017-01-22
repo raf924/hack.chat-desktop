@@ -9,6 +9,8 @@ class Channel extends EventEmitter {
     private online: boolean;
     password: string;
     service = "hack.chat";
+    lastSender: string = null;
+    private currentSender: string;
 
     public get isOnline(): boolean {
         return this.online;
@@ -46,6 +48,8 @@ class Channel extends EventEmitter {
                     that.addUser(args.nick);
                     break;
                 case "chat":
+                    that.lastSender = that.lastSender === null?"":that.currentSender;
+                    that.currentSender = args.nick;
                     that.setTripCode(args.nick, args.trip);
                     break;
                 case "onlineRemove":
