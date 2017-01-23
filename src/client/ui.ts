@@ -48,6 +48,7 @@ class UI {
     }
 
     public static init() {
+        mdc.autoInit();
         UI.channelUIs = new Map<string, ChannelUI>();
         UI.snackBar = new mdc.snackbar.MDCSnackbar($("#alert")[0]);
         //TODO: Load UI components from component/selector maps stored in JSON

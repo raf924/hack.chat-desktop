@@ -43,12 +43,15 @@ class Channel extends EventEmitter {
         };
         this.ws.onmessage = function (message) {
             let args: MessageData = JSON.parse(message.data);
+            if (args.cmd !== "chat") {
+                that.currentSender = "";
+            }
             switch (args.cmd) {
                 case "onlineAdd":
                     that.addUser(args.nick);
                     break;
                 case "chat":
-                    that.lastSender = that.lastSender === null?"":that.currentSender;
+                    that.lastSender = that.lastSender === null ? "" : that.currentSender;
                     that.currentSender = args.nick;
                     that.setTripCode(args.nick, args.trip);
                     break;
