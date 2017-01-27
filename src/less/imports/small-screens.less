@@ -1,14 +1,18 @@
 @media only screen and (max-width: 992px) {
   #sidemenu {
-    left: -@drawerWidth;
-    transition: left 500ms;
+    left: -100%;
+    right: 100%;
+    transition: left 500ms, right 500ms;
+    will-change: left, right;
+    width: unset;
     &.open {
       left: 0;
+      right: 56px;
     }
   }
 
   #sidemenu-collapse {
-    padding: ~"calc((3rem - 24px) / 2)";
+    padding: ~"calc(( "@appBarHeight ~" - 24px) / 2)";
   }
 
   main {

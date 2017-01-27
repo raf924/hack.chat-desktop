@@ -213,8 +213,7 @@ class UI {
     }
 
     private static loadTabEvents(): void {
-        $("#menu-channels"
-        )
+        $("#menu-channels")
             .tabs("init")
             .on("tabs.opened", function (e, channelId) {
                 if (!UI.channelUIs[channelId].channel.isOnline) {
@@ -222,10 +221,8 @@ class UI {
                 }
             })
             .on("tabs.changed", function (e, channelId) {
-                $(".users").css("display", "none");
                 let currentChannelUI: ChannelUI = UI.channelUIs[channelId];
                 if (currentChannelUI != null) {
-                    //currentChannelUI.usersUI.css("display", "");
                     currentChannelUI.unreadMessageCount = 0;
                     currentChannelUI.messageCounter.text(0);
                     App.currentChannel = channelId;
@@ -238,12 +235,11 @@ class UI {
                         UI.chatInputForm.find("#chatBox").autocomplete("setItems", users);
                     }
                 }
-                document.title = `Chatron - ${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
+                document.title = `Chatron - ${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
             })
             .on("tabs.closed", function (e, channelId) {
                 UI.closeChannelUI(channelId);
             });
-//TODO: add button to open drawer on small screens
     }
 
     public static closeChannelUI(channelId){
