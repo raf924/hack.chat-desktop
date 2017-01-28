@@ -10,6 +10,7 @@ import {LoginMethod} from "./loginMethod";
 import {Views} from "./views";
 import {NotifyConfig} from "./notifyConfig";
 import Hammer = require("hammerjs");
+import {Tool} from "./tool";
 const mdc = require('material-components-web/dist/material-components-web.min.js');
 const MDCSnackbar: any = mdc.snackbar.MDCSnackbar;
 
@@ -25,6 +26,7 @@ class UI {
     public static channelTabs: JQuery;
     public static channelsContainer: JQuery;
     public static loginMethod: LoginMethod;
+    public static toolBar: JQuery;
     private static snackBar: any;
     public static readonly DEFAULT_ALERT_TIMEOUT = 2750;
 
@@ -48,12 +50,12 @@ class UI {
     }
 
     public static init() {
-        mdc.autoInit();
         UI.channelUIs = new Map<string, ChannelUI>();
         UI.snackBar = new mdc.snackbar.MDCSnackbar($("#alert")[0]);
         //TODO: Load UI components from component/selector maps stored in JSON
         UI.channelTabs = $("#menu-channels");
         UI.channelsContainer = $("#channels");
+        UI.toolBar = $("#app-bar");
         UI.loadViews();
         UI.nickPrompt = $("#nickPrompt");
         UI.chatInputForm = $("form#chatInputForm");
@@ -61,8 +63,9 @@ class UI {
             "onlineSet": false,
             "onlineAdd": true,
             "onlineRemove": true,
-            "chat": true,
-            "warn": true
+            "chat": false,
+            "warn": true,
+            "info": true
         }; //TODO: get the notify values from the App.userData
 
         UI.favouritesUI = $("#menu-favourites");
@@ -91,7 +94,9 @@ class UI {
         UI.loadLoginEvents();
         UI.loadTabEvents();
         UI.loadChannelEvents();
+        UI.loadTools();
         UI.snackBar = new MDCSnackbar($("#alert")[0]);
+        mdc.autoInit();
     }
 
     private static loadTitleBarEvents(): void {
@@ -100,6 +105,23 @@ class UI {
                 App.ipc.send(event, function () {
 
                 });
+            });
+        }
+    }
+
+    private static loadTools(): void {
+        let tools : Tool[];
+        if(!App.isCordova){
+            let toolPath = `${__dirname}/tools`;
+            let files = fs.readdirSync(toolPath);
+            files.forEach(function (file) {
+                try{
+                    let toolClass = require(`${toolPath}/${file}`);
+                    let tool : Tool = new toolClass();
+                    tool.install();
+                } catch (e){
+                    console.error(`Couldn't load tool '${file}'`);
+                }
             });
         }
     }
@@ -242,10 +264,10 @@ class UI {
             });
     }
 
-    public static closeChannelUI(channelId){
+    public static closeChannelUI(channelId) {
         UI.channelUIs[channelId].close();
         delete UI.channelUIs[channelId];
-        if(UI.channelTabs.find(".tab").length === 0){
+        if (UI.channelTabs.find(".tab").length === 0) {
             UI.chatInputForm.parent().attr("hidden", "true");
         }
     }

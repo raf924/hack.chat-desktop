@@ -3,5 +3,6 @@ export interface NotifyConfig {
     onlineAdd: boolean,
     onlineRemove: boolean,
     chat: boolean,
-    warn: boolean
+    warn: boolean,
+    info: boolean
 }

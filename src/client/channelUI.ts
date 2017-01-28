@@ -194,7 +194,7 @@ export class ChannelUI extends ChannelEventListener {
         if (!isCurrentChannel || !isAppActive) {
             this.unreadMessageCount++;
             this.messageCounter.text(this.unreadMessageCount);
-            if (shouldNotify && isUserMentionned) {
+            if (shouldNotify || isUserMentionned) {
                 let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
                 let notificationClicked = (function () {
                     UI.channelTabs.tabs("activate", this.channel.channelId);
@@ -212,6 +212,9 @@ export class ChannelUI extends ChannelEventListener {
                     notification.onclick = notificationClicked;
                 }
             }
+        } else {
+            this.unreadMessageCount = 0;
+            this.messageCounter.text(this.unreadMessageCount);
         }
     }
 

@@ -1,4 +1,13 @@
-@media only screen and (max-width: 992px) {
+@media only screen and (max-width: 640px) {
+
+  .dialog {
+    min-width: 280px;
+    .dialog-body {
+      font-size: 14px;
+      line-height: 24px;
+    }
+  }
+
   #sidemenu {
     left: -100%;
     right: 100%;
@@ -12,7 +21,7 @@
   }
 
   #sidemenu-collapse {
-    padding: ~"calc(( "@appBarHeight ~" - 24px) / 2)";
+    padding: ~"calc(( " @appBarHeight ~" - 24px) / 2)";
   }
 
   main {
@@ -22,7 +31,7 @@
   }
 
   .messages {
-    bottom: 4rem + @appBarHeight;
+    bottom: calc(4rem ~"+" @appBarHeight);
   }
 
   #chatBox-wrapper {
