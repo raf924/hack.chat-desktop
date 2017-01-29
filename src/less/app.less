@@ -10,6 +10,9 @@
 @titleBarButtonIconPadding: 25%;
 @titleBarButtonIconSize: calc(@titlebarButtonSize ~"-" @titleBarButtonIconPadding);
 
+@avatarSize: 40px;
+@iconSize: 24px;
+
 :root {
   --mdc-theme-background: #c2c2c2;
   --mdc-theme-primary: #26a69a;
@@ -131,7 +134,7 @@ html {
   & > .title {
     display: none;
   }
-  & + .from-last-sender{
+  & + .from-last-sender {
     margin-top: 0 !important;
   }
   &.from-last-sender {
@@ -412,6 +415,17 @@ main {
   width: 100%;
   &.hidden {
     display: none;
+  }
+}
+
+.tool {
+  & > .material-icons {
+    padding: calc(~"("@appBarHeight~"-"@iconSize~")" / 2);
+    font-size: @iconSize;
+    cursor: pointer;
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
   }
 }
 

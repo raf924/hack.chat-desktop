@@ -68,6 +68,30 @@ less.render(lessFile, {
     });
 });
 
+let copyToolStyle = function (tool) {
+    ncp(`${__dirname}/src/client/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/tools/${tool}/${tool}.css`, function (err) {
+
+    });
+};
+
+let tools = fs.readdirSync(`${__dirname}/src/client/tools`);
+tools.forEach(function (tool) {
+    ncp(`${__dirname}/src/client/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/tools/${tool}/${tool}.html`, function (err) {
+        
+    });
+    let toolLess = fs.readFileSync(`${__dirname}/src/client/tools/${tool}/${tool}.less`).toString();
+    if(toolLess == null){
+        copyToolStyle(tool);
+    } else {
+        less.render(toolLess, function (error, output) {
+            if(error){
+                return console.error(error);
+            }
+            fs.writeFileSync(`${__dirname}/lib/client/tools/${tool}/${tool}.css`, output.css);
+        });
+    }
+});
+
 ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (err) {
     if (err) {
         return console.error(err);

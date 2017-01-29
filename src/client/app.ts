@@ -14,6 +14,8 @@ export class App {
     public static isCordova: boolean;
     public static isAndroid: boolean;
     static password: string;
+    static proxy: any;
+    private static listeners: any;
 
     public static init(): void {
         App.isCordova = !!window.cordova;
@@ -42,6 +44,25 @@ export class App {
             App.password = password;
         });
         App.loadParsers();
+        App.loadProxy();
+    }
+
+    static loadProxy() {
+        App.listeners = {};
+        let proxy = new Proxy(App, {
+            set: function (obj, prop, value) {
+                if (App.listeners[prop]) {
+                    App.listeners[prop].forEach(function(listener){
+                        listener(value);
+                    });
+                }
+                return true;
+            }
+        });
+        App.proxy = proxy;
+        App.proxy.addListener = function (prop, handler: (value) => {}) {
+            App.proxy.listeners[prop].push(handler);
+        }
     }
 
     static parseText(text: string): ParsedMessage {
