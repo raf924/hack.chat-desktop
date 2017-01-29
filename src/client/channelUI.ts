@@ -186,6 +186,9 @@ export class ChannelUI extends ChannelEventListener {
                 notificationText = `\nFrom ${args.nick}:\n ${notificationText}`;
                 break;
         }
+        if(args.cmd !== "chat"){
+            notificationText = args.text;
+        }
         this.appendMessage(args);
         let isCurrentChannel = this.channel.channelId === App.currentChannel;
         let shouldNotify = UI.notifyConfig[args.cmd];
