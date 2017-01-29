@@ -41,6 +41,29 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         //TODO: find something better to name modules
         fs.appendFileSync(`${__dirname}/lib/client/loadLogin.js`, `module.exports.${file.split(".js")[0]} = require("./login/${file}");\n`);
     });
+    let copyToolStyle = function (tool) {
+        ncp(`${__dirname}/src/client/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/tools/${tool}/${tool}.css`, function (err) {
+
+        });
+    };
+
+    let tools = fs.readdirSync(`${__dirname}/src/client/tools`);
+    tools.forEach(function (tool) {
+        ncp(`${__dirname}/src/client/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/tools/${tool}/${tool}.html`, function (err) {
+
+        });
+        let toolLess = fs.readFileSync(`${__dirname}/src/client/tools/${tool}/${tool}.less`).toString();
+        if (toolLess == null) {
+            copyToolStyle(tool);
+        } else {
+            less.render(toolLess, function (error, output) {
+                if (error) {
+                    return console.error(error);
+                }
+                fs.writeFileSync(`${__dirname}/lib/client/tools/${tool}/${tool}.css`, output.css);
+            });
+        }
+    });
     webpack(require(`${__dirname}/webpack.config`), function (err, stats) {
         if (err) {
             console.error(err);
@@ -66,30 +89,6 @@ less.render(lessFile, {
             return console.error(err);
         }
     });
-});
-
-let copyToolStyle = function (tool) {
-    ncp(`${__dirname}/src/client/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/tools/${tool}/${tool}.css`, function (err) {
-
-    });
-};
-
-let tools = fs.readdirSync(`${__dirname}/src/client/tools`);
-tools.forEach(function (tool) {
-    ncp(`${__dirname}/src/client/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/tools/${tool}/${tool}.html`, function (err) {
-        
-    });
-    let toolLess = fs.readFileSync(`${__dirname}/src/client/tools/${tool}/${tool}.less`).toString();
-    if(toolLess == null){
-        copyToolStyle(tool);
-    } else {
-        less.render(toolLess, function (error, output) {
-            if(error){
-                return console.error(error);
-            }
-            fs.writeFileSync(`${__dirname}/lib/client/tools/${tool}/${tool}.css`, output.css);
-        });
-    }
 });
 
 ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (err) {
