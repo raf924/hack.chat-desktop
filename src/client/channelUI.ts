@@ -32,12 +32,12 @@ export class ChannelUI extends ChannelEventListener {
 
     public disconnected(event): void {
         if (event.code !== 1000) {
-            let reconnetTimeout = window.setTimeout((function () {
+            let reconnectTimeout = window.setTimeout((function () {
                 this.channel = new Channel(this.channel.name, this.channel.nick, this.channel.password);
                 this.bindChannelEvents();
             }).bind(this), UI.DEFAULT_ALERT_TIMEOUT);
             UI.alert(`${this.channel.name}@${this.channel.service} was disconnected\nReason: ${event.reason}\nRetrying`, UI.DEFAULT_ALERT_TIMEOUT, "Cancel", (function () {
-                window.clearTimeout(reconnetTimeout);
+                window.clearTimeout(reconnectTimeout);
                 UI.closeChannelUI(this.channel.channelId);
             }).bind(this));
         } else {
@@ -73,14 +73,14 @@ export class ChannelUI extends ChannelEventListener {
         });
         let hammerTime = new Hammer(this.messagesUI[0]);
         hammerTime.on("tap", (function (e) {
-            if (!$(e.target).is(".messages, .cmd *, .nick")) {
+            if (!$(e.target).is(".messages, .cmd *, .nick, .message .text a")) {
                 $(e.target).parents(".message").find(".timestamp").toggleClass("hidden");
                 if (this.isAtBottom) {
                     this.scrollToBottom();
                 }
             }
         }).bind(this));
-        this.messagesUI.on("click", ".message .nick[data-nick], .user a.nick", function (e) {
+        this.messagesUI.on("click", ".message .nick[data-nick]", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
         });
     }
