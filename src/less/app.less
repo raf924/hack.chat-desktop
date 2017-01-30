@@ -353,12 +353,13 @@ main {
   flex-direction: column;
   font-family: Roboto, sans-serif;
   left: 50%;
-  min-width: 640px;
+  min-width: calc(@drawerWidth * 2);
   position: fixed;
   right: auto;
   top: 50%;
   transform: translate(-50%, -50%);
   z-index: 1;
+  margin-left: calc(@drawerWidth / 2);
   will-change: display;
   &.open {
     display: inline-flex;

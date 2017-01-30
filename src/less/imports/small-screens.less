@@ -1,7 +1,8 @@
-@media only screen and (max-width: 640px) {
+@media only screen and (max-width: (@drawerWidth * 3)) {
 
   .dialog {
     min-width: 280px;
+    margin-left: 0;
     .dialog-body {
       font-size: 14px;
       line-height: 24px;
@@ -21,7 +22,7 @@
   }
 
   #sidemenu-collapse {
-    margin: calc( ~"(" @appBarHeight ~"-" @iconSize ~")" / 2);
+    margin: calc(~"("@appBarHeight~"-"@iconSize~")" / 2);
     font-size: @iconSize;
     cursor: pointer;
   }
