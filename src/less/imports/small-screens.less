@@ -21,16 +21,9 @@
     }
   }
 
-  #sidemenu-collapse {
-    margin: calc(~"("@appBarHeight~"-"@iconSize~")" / 2);
-    font-size: @iconSize;
-    cursor: pointer;
-  }
-
   main {
     left: 0;
     width: 100%;
-    margin-top: @appBarHeight;
   }
 
   .messages {
@@ -42,6 +35,13 @@
   }
 
   #app-bar {
-    display: inline;
+    left: 0;
+    width: 100%;
+    #sidemenu-collapse {
+      margin: calc(~"("@appBarHeight~"-"@iconSize~")" / 2);
+      font-size: @iconSize;
+      cursor: pointer;
+      display: unset;
+    }
   }
 }

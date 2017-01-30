@@ -53,12 +53,15 @@ html {
 @appBarHeight: 56px;
 
 #app-bar {
-  width: 100%;
   height: @appBarHeight;
-  display: none;
   z-index: 4;
   position: absolute;
   background-color: white;
+  left: @drawerWidth;
+  width: calc(100% ~"-" @drawerWidth);
+  #sidemenu-collapse {
+    display: none;
+  }
 }
 
 #chatBox-wrapper {
@@ -268,6 +271,7 @@ main {
   position: fixed;
   width: calc(100% ~"-" @drawerWidth);
   height: 100%;
+  margin-top: @appBarHeight;
 }
 
 #sidemenu {
