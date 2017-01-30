@@ -23,8 +23,8 @@ export class UserList extends Tool {
         this.menu = <HTMLElement>this.root.querySelector(".mdc-simple-menu");
         this.userList = <HTMLUListElement>this.menu.querySelector(".mdc-list");
         let closeMenu = (function (e) {
-            if (!e.target.classList.contains("user") && e.target.id !== "userListOpen") {
-                this.menu.classList.remove("mdc-simple-men--open");
+            if (!e.target.parentElement.classList.contains("user") && e.target.id !== "userListOpen") {
+                this.menu.classList.remove("mdc-simple-menu--open");
                 this.userList.innerHTML = "";
                 document.removeEventListener("click", closeMenu);
             }
