@@ -5,6 +5,8 @@
   "engines": {
     "node": ">=6.5.0"
   },
+  "author": "raf924",
+  "description": "A cross-platform client",
   "scripts": {
     "start": "node start.js",
     "dev": "node_modules\\.bin\\electron.cmd . dev",
@@ -22,12 +24,11 @@
     "desktop",
     "electron"
   ],
+  "build": {
+    "appId": "tk.rafaelnaciri.chatron"
+  },
   "license": "MIT",
   "dependencies": {
-    "cordova": "^6.4.0",
-    "electron": "^1.4.15",
-    "electron-builder": "^11.4.4",
-    "electron-packager": "^8.5.0",
     "hammerjs": "^2.0.8",
     "jquery": "^3.1.1",
     "material-components-web": "^0.2.0",
@@ -45,9 +46,9 @@
     "@types/sequelize": "^4.0.39",
     "adm-zip": "^0.4.7",
     "cordova": "^6.4.0",
-    "electron": "^1.4.12",
-    "electron-builder": "^8.6.0",
-    "electron-packager": "^8.3.0",
+    "electron": "^1.4.15",
+    "electron-builder": "^12.0.3",
+    "electron-packager": "^8.5.0",
     "install": "^0.8.2",
     "less": "^2.7.1",
     "ncp": "^2.0.0",
