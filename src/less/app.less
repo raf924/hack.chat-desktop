@@ -333,7 +333,7 @@ main {
 .messages {
   overflow-y: scroll;
   position: absolute;
-  bottom: 4rem;
+  bottom: calc(4rem ~"+" @appBarHeight);
   margin-bottom: calc(@titlebarButtonSize ~"+" 12px);
   top: 0;
   max-height: calc(100% ~"-" 3.5rem);
