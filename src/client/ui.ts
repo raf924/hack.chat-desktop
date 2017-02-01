@@ -111,18 +111,22 @@ class UI {
 
     private static loadTools(): void {
         let tools : Tool[];
+        let files = [];
+        let toolPath = `${__dirname}/tools`;
         if(!App.isCordova){
-            let toolPath = `${__dirname}/tools`;
-            let files = fs.readdirSync(toolPath);
-            files.forEach(function (file) {
-                try{
-                    let toolClass = require(`${toolPath}/${file}/${file}`);
-                    let tool : Tool = new toolClass[toolClass.toolName]();
-                } catch (e){
-                    console.error(`Couldn't load tool '${file}'`);
-                }
-            });
+            files = fs.readdirSync(toolPath);
+
+        } else {
+            files = require("./loadTools")
         }
+        files.forEach(function (file) {
+            try{
+                let toolClass = require(`./tools/${file}/${file}`);
+                let tool : Tool = new toolClass[toolClass.toolName]();
+            } catch (e){
+                console.error(`Couldn't load tool '${file}'`);
+            }
+        });
     }
 
     private static loadViews(): void {

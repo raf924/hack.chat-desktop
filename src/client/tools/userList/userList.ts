@@ -9,15 +9,17 @@ export class UserList extends Tool {
     constructor() {
         super();
         let html = "";
+        let link = document.createElement("link");
         if (!App.isCordova) {
             html = require("fs").readFileSync(`${__filename.replace(/\.js$/i, ".html")}`).toString();
-            let link = document.createElement("link");
             link.href = `${__filename.replace(/\.js$/i, ".css")}`;
-            link.rel = "stylesheet";
-            document.head.appendChild(link);
+
         } else {
-            //TODO: use webpack html-loader
+            html = require(`html-loader!${__filename.replace(/\.js$/i, ".html")}`);
+            link.href = require(`file-loader?name=[name].[ext]&publicPath=tools/&outputPath=tools/!${__filename.replace(/\.js$/i, ".css")}`);
         }
+        link.rel = "stylesheet";
+        document.head.appendChild(link);
         UI.toolBar.find("#toolbar").append(html);
         this.root = UI.toolBar.find(`#toolbar #userList`)[0];
         this.menu = <HTMLElement>this.root.querySelector(".mdc-simple-menu");

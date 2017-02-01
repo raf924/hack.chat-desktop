@@ -24,23 +24,23 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         console.error(`Failed to compile typescript files :\n ${error} \n ${stdout} \n ${stderr}`);
         return;
     }
-    fs.writeFileSync(`${__dirname}/lib/client/loadPlugins.js`, "");
+    fs.writeFileSync(`${__dirname}/lib/client/loadPlugins.js`, "module.exports = [];\n");
     let files = fs.readdirSync(`${__dirname}/lib/client/plugins`);
     files.forEach(function (file) {
-        fs.appendFileSync(`${__dirname}/lib/client/loadPlugins.js`, `require("./plugins/${file}");\n`);
+        fs.appendFileSync(`${__dirname}/lib/client/loadPlugins.js`, `module.exports.push("${file}");\n`);
     });
-    fs.writeFileSync(`${__dirname}/lib/client/loadParsers.js`, "");
+    fs.writeFileSync(`${__dirname}/lib/client/loadParsers.js`, "module.exports = [];\n");
     files = fs.readdirSync(`${__dirname}/lib/client/parsers`);
-    fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `module.exports = [];\n`);
     files.forEach(function (file) {
         fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `module.exports.push("${file}");\n`);
     });
-    fs.writeFileSync(`${__dirname}/lib/client/loadLogin.js`, "");
-    files = fs.readdirSync(`${__dirname}/lib/client/login`);
+
+    fs.writeFileSync(`${__dirname}/lib/client/loadTools.js`, "module.exports = [];\n");
+    files = fs.readdirSync(`${__dirname}/lib/client/tools`);
     files.forEach(function (file) {
-        //TODO: find something better to name modules
-        fs.appendFileSync(`${__dirname}/lib/client/loadLogin.js`, `module.exports.${file.split(".js")[0]} = require("./login/${file}");\n`);
+        fs.appendFileSync(`${__dirname}/lib/client/loadTools.js`, `module.exports.push("${file}");\n`);
     });
+
     let copyToolStyle = function (tool) {
         ncp(`${__dirname}/src/client/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/tools/${tool}/${tool}.css`, function (err) {
 
@@ -71,7 +71,8 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         }
         console.log("Program bundled for cordova");
     });
-});
+})
+;
 
 const less = require('less');
 let lessFile = fs.readFileSync(`${lessFilesPath}/app.less`).toString();

@@ -12,8 +12,8 @@ module.exports = {
     externals:{
         titlebar: "null"
     },
-    node:{
-        fs:"empty",
+    node: {
+        fs: "empty",
         titlebar: "empty"
     }
 };
