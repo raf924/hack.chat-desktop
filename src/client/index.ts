@@ -18,15 +18,14 @@ import {App} from "./app";
 $(document).ready(function () {
     App.init();
     if (!App.isCordova) {
-        fs.readdir(`${__dirname}/plugins`, function (err, files) {
+        fs.readdir(`${__dirname}/modules/plugins`, function (err, files) {
             files.forEach(function (file) {
-                require(`./plugins/${file}`);
+                require(`${__dirname}/modules/plugins/${file}`);
             });
             UI.init();
-
         });
     } else {
-        require('./loadPlugins');
+        require('dir-loader!./loadModules');
         UI.init();
     }
 });

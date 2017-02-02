@@ -79,7 +79,7 @@ export class App {
             parsers = fs.readdirSync(`${__dirname}/modules/parsers`);
             parsers.forEach(function (file) {
                 try {
-                    let parser = require(`${__dirname}/module/parsers/${file}`);
+                    let parser = require(`${__dirname}/modules/parsers/${file}`);
                     App.parsers.push(new parser());
                 } catch (e) {
                     console.warn(`./modules/parsers/${file} doesn't contain a Parser`);

@@ -117,7 +117,7 @@ class UI {
             files = fs.readdirSync(toolPath);
             files.forEach(function (file) {
                 try{
-                    let toolModule = require(`./modules/tools/${file}/${file}`);
+                    let toolModule = require(`${__dirname}/modules/tools/${file}/${file}`);
                     let tool : Tool = new toolModule[toolModule.toolName]();
                 } catch (e){
                     console.error(`Couldn't load tool '${file}'`);
