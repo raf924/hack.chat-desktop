@@ -19,7 +19,7 @@ export class App {
     private static listeners: any;
 
     public static set currentChannel(channelId) {
-        App.proxy.currentChannel_ = channelId;
+        App.proxy.currentChannel_ = App.currentChannel_ = channelId;
     }
 
     public static init(): void {

@@ -31,7 +31,7 @@ class UI {
     public static readonly DEFAULT_ALERT_TIMEOUT = 2750;
 
     public static get currentChannelUI(): ChannelUI {
-        return UI.channelUIs[App.currentChannel];
+        return UI.channelUIs[App.currentChannel_];
     }
 
     public static isFavourite(channelName: string): boolean {
@@ -110,23 +110,23 @@ class UI {
     }
 
     private static loadTools(): void {
-        let tools : Tool[];
+        let tools: Tool[];
         let files = [];
         let toolPath = `${__dirname}/modules/tools`;
-        if(!App.isCordova){
+        if (!App.isCordova) {
             files = fs.readdirSync(toolPath);
             files.forEach(function (file) {
-                try{
+                try {
                     let toolModule = require(`${__dirname}/modules/tools/${file}/${file}`);
-                    let tool : Tool = new toolModule[toolModule.toolName]();
-                } catch (e){
+                    let tool: Tool = new toolModule[toolModule.toolName]();
+                } catch (e) {
                     console.error(`Couldn't load tool '${file}'`);
                 }
             });
 
         } else {
             files = require("dir-loader!./loadModules").tools;
-            for(let tool in files){
+            for (let tool in files) {
                 let toolModule = files[tool][`${tool}.js`].src;
                 new toolModule[toolModule.toolName]();
             }
@@ -154,7 +154,7 @@ class UI {
         }).find("#chatBox").keydown(function (e) {
             if (e.keyCode === 13 && !e.shiftKey) {
                 e.preventDefault();
-                UI.channelUIs[App.currentChannel].channel.sendMessage($(this).val());
+                UI.currentChannelUI.channel.sendMessage($(this).val());
                 $(this).val("");
             }
             //TODO: add commands handling
@@ -164,8 +164,8 @@ class UI {
             UI.chatInputForm.find("#chatBox").autocomplete();
         }
         window.onresize = function (ev) {
-            if (App.currentChannel != null && UI.channelUIs[App.currentChannel].isAtBottom) {
-                UI.channelUIs[App.currentChannel].scrollToBottom();
+            if (App.currentChannel_ != null && UI.currentChannelUI.isAtBottom) {
+                UI.currentChannelUI.scrollToBottom();
             }
         };
     }
@@ -277,6 +277,9 @@ class UI {
         delete UI.channelUIs[channelId];
         if (UI.channelTabs.find(".tab").length === 0) {
             UI.chatInputForm.parent().attr("hidden", "true");
+        }
+        if (channelId === App.currentChannel_) {
+            App.currentChannel = null;
         }
     }
 

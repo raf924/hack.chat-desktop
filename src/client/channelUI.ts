@@ -137,7 +137,7 @@ export class ChannelUI extends ChannelEventListener {
             .find(".nick")
             .text(user);
         this.usersUI.append($user);
-        if (App.currentChannel === this.channel.channelId) {
+        if (App.currentChannel_ === this.channel.channelId) {
             UI.chatInputForm.find("#chatBox").autocomplete("addItem", user);
         }
     }
@@ -148,7 +148,7 @@ export class ChannelUI extends ChannelEventListener {
 
     removeUser(user) {
         this.usersUI.find(`.user[user='${user}']`).remove();
-        if (App.currentChannel === this.channel.channelId) {
+        if (App.currentChannel_ === this.channel.channelId) {
             UI.chatInputForm.find("#chatBox").autocomplete("removeItem", user);
         }
 
@@ -190,7 +190,7 @@ export class ChannelUI extends ChannelEventListener {
             notificationText = args.text;
         }
         this.appendMessage(args);
-        let isCurrentChannel = this.channel.channelId === App.currentChannel;
+        let isCurrentChannel = this.channel.channelId === App.currentChannel_;
         let shouldNotify = UI.notifyConfig[args.cmd];
         let isAppActive = !(!document.hasFocus() || App.isCordova && window.cordova.plugins.backgroundMode.isActive());
         let isUserMentionned = args.mention;

@@ -34,7 +34,7 @@ export class UserList extends Tool {
         }).bind(this);
         (<HTMLElement>this.root.querySelector("#userListOpen")).addEventListener("click", (function () {
             this.userList.innerHTML = "";
-            if (App.currentChannel) {
+            if (App.currentChannel_) {
                 if (!this.menu.classList.contains("mdc-simple-menu--open")) {
                     this.menu.classList.add("mdc-simple-menu--open");
                 }

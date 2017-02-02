@@ -1,12 +1,19 @@
 #userList {
   .mdc-simple-menu {
-    top: -28px;
-    left: 0;
+    top: 0;
+    right: 0;
     z-index: 10010;
   }
   .mdc-list {
-    overflow-y: scroll;
+    overflow-y: visible;
     max-height: 50vh;
+    &::-webkit-scrollbar {
+      width: 1vw;
+      &-thumb {
+        background-color: rgba(0, 0, 0, 0.46);
+        border-radius: 1em;
+      }
+    }
   }
   .user {
     cursor: pointer;
