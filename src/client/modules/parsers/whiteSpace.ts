@@ -1,4 +1,4 @@
-import {Parser} from "../parser";
+import {Parser} from "../../parser";
 
 const toHTML = {
     '\n': "<br>",

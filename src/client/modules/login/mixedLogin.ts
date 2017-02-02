@@ -1,4 +1,4 @@
-import {LoginMethod} from "../loginMethod";
+import {LoginMethod} from "../../loginMethod";
 
 export const className = "MixedLoginPopup";
 export class MixedLoginPopup extends LoginMethod {

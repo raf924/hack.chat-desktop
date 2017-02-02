@@ -1,5 +1,5 @@
 ///<reference path="../../node_modules/@types/jquery/index.d.ts" />
-///<reference path="plugins/index.d.ts"/>
+///<reference path="modules/plugins/index.d.ts"/>
 //TODO: add keyboard shortcuts
 
 import {ChannelUI} from "./channelUI"
@@ -112,21 +112,26 @@ class UI {
     private static loadTools(): void {
         let tools : Tool[];
         let files = [];
-        let toolPath = `${__dirname}/tools`;
+        let toolPath = `${__dirname}/modules/tools`;
         if(!App.isCordova){
             files = fs.readdirSync(toolPath);
+            files.forEach(function (file) {
+                try{
+                    let toolModule = require(`./modules/tools/${file}/${file}`);
+                    let tool : Tool = new toolModule[toolModule.toolName]();
+                } catch (e){
+                    console.error(`Couldn't load tool '${file}'`);
+                }
+            });
 
         } else {
-            files = require("./loadTools")
-        }
-        files.forEach(function (file) {
-            try{
-                let toolClass = require(`./tools/${file}/${file}`);
-                let tool : Tool = new toolClass[toolClass.toolName]();
-            } catch (e){
-                console.error(`Couldn't load tool '${file}'`);
+            files = require("dir-loader!./loadModules").tools;
+            for(let tool in files){
+                let toolModule = files[tool][`${tool}.js`].src;
+                new toolModule[toolModule.toolName]();
             }
-        });
+        }
+
     }
 
     private static loadViews(): void {
@@ -168,7 +173,7 @@ class UI {
     private static loadLoginEvents(): void {
         //TODO: prefill userData
         App.userData.get("loginMethod", function (loginMethod) {
-            let method = require(`${__dirname}/login/${loginMethod}`);
+            let method = require(`${__dirname}/modules/login/${loginMethod}`);
             UI.loginMethod = new method[method.className](UI.nickPrompt[0]);
             UI.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
                 if (!App.isCordova) {

@@ -1,6 +1,6 @@
-import {Tool, ToolType} from "../../tool";
-import {UI} from "../../ui";
-import {App} from "../../app";
+import {Tool, ToolType} from "../../../tool";
+import {UI} from "../../../ui";
+import {App} from "../../../app";
 export class UserList extends Tool {
     root: HTMLElement;
     menu: HTMLElement;

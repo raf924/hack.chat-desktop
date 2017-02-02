@@ -1,5 +1,5 @@
 
-import {Parser} from "../parser";
+import {Parser} from "../../parser";
 class LinkParser extends Parser{
     getRegex(): RegExp {
         return /(\s|^)((http(|s):\/\/)|\?)[^\s]+/gi;

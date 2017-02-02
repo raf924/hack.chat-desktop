@@ -52,7 +52,7 @@ export class App {
         let proxy = new Proxy(App, {
             set: function (obj, prop, value) {
                 if (App.listeners[prop]) {
-                    App.listeners[prop].forEach(function(listener){
+                    App.listeners[prop].forEach(function (listener) {
                         listener(value);
                     });
                 }
@@ -76,18 +76,21 @@ export class App {
     private static loadParsers(): void {
         let parsers = [];
         if (!App.isCordova) {
-            parsers = fs.readdirSync(`${__dirname}/parsers`);
+            parsers = fs.readdirSync(`${__dirname}/modules/parsers`);
+            parsers.forEach(function (file) {
+                try {
+                    let parser = require(`${__dirname}/module/parsers/${file}`);
+                    App.parsers.push(new parser());
+                } catch (e) {
+                    console.warn(`./modules/parsers/${file} doesn't contain a Parser`);
+                }
+            });
         } else {
-            parsers = require('./loadParsers');
-        }
-        parsers.forEach(function (file) {
-            try {
-                let parser = require(`${__dirname}/parsers/${file}`);
-                App.parsers.push(new parser());
-            } catch (e) {
-                console.warn(`./parsers/${file} doesn't contain a Parser`);
+            parsers = require('dir-loader!./loadModules').parsers;
+            for (let parser in parsers) {
+                App.parsers.push(new parsers[parser].src());
             }
-        });
+        }
     }
 
     static addFavourite(favourite: string) {

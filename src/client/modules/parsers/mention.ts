@@ -1,5 +1,5 @@
-import {Parser} from "../parser"
-import {UI} from "../ui";
+import {Parser} from "../../parser"
+import {UI} from "../../ui";
 
 interface MentionMessage extends ParsedMessage {
     mention: boolean,

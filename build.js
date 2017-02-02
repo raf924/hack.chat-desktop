@@ -24,7 +24,7 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
         console.error(`Failed to compile typescript files :\n ${error} \n ${stdout} \n ${stderr}`);
         return;
     }
-    fs.writeFileSync(`${__dirname}/lib/client/loadPlugins.js`, "module.exports = [];\n");
+    /*fs.writeFileSync(`${__dirname}/lib/client/loadPlugins.js`, "module.exports = [];\n");
     let files = fs.readdirSync(`${__dirname}/lib/client/plugins`);
     files.forEach(function (file) {
         fs.appendFileSync(`${__dirname}/lib/client/loadPlugins.js`, `module.exports.push("${file}");\n`);
@@ -40,19 +40,19 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
     files.forEach(function (file) {
         fs.appendFileSync(`${__dirname}/lib/client/loadTools.js`, `module.exports.push("${file}");\n`);
     });
-
+    */
     let copyToolStyle = function (tool) {
-        ncp(`${__dirname}/src/client/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/tools/${tool}/${tool}.css`, function (err) {
+        ncp(`${__dirname}/src/client/modules/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.css`, function (err) {
 
         });
     };
 
-    let tools = fs.readdirSync(`${__dirname}/src/client/tools`);
+    let tools = fs.readdirSync(`${__dirname}/src/client/modules/tools`);
     tools.forEach(function (tool) {
-        ncp(`${__dirname}/src/client/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/tools/${tool}/${tool}.html`, function (err) {
+        ncp(`${__dirname}/src/client/modules/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.html`, function (err) {
 
         });
-        let toolLess = fs.readFileSync(`${__dirname}/src/client/tools/${tool}/${tool}.less`).toString();
+        let toolLess = fs.readFileSync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.less`).toString();
         if (toolLess == null) {
             copyToolStyle(tool);
         } else {
@@ -60,7 +60,7 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
                 if (error) {
                     return console.error(error);
                 }
-                fs.writeFileSync(`${__dirname}/lib/client/tools/${tool}/${tool}.css`, output.css);
+                fs.writeFileSync(`${__dirname}/lib/client/modules/tools/${tool}/${tool}.css`, output.css);
             });
         }
     });
