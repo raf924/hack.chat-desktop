@@ -22,6 +22,7 @@ export class UserList extends Tool {
         document.head.appendChild(link);
         UI.toolBar.find("#toolbar").append(html);
         this.root = UI.toolBar.find(`#toolbar #userList`)[0];
+        this.root.style.display = "none";
         this.menu = <HTMLElement>this.root.querySelector(".mdc-simple-menu");
         this.userList = <HTMLUListElement>this.menu.querySelector(".mdc-list");
         let closeMenu = (function (e) {
@@ -32,11 +33,11 @@ export class UserList extends Tool {
             }
         }).bind(this);
         (<HTMLElement>this.root.querySelector("#userListOpen")).addEventListener("click", (function () {
-            if (!this.menu.classList.contains("mdc-simple-menu--open")) {
-                this.menu.classList.add("mdc-simple-menu--open");
-            }
             this.userList.innerHTML = "";
             if (App.currentChannel) {
+                if (!this.menu.classList.contains("mdc-simple-menu--open")) {
+                    this.menu.classList.add("mdc-simple-menu--open");
+                }
                 let users = UI.currentChannelUI.channel.users;
                 this.userList.innerHTML = "";
                 for (let user in users) {
@@ -55,6 +56,13 @@ export class UserList extends Tool {
         this.userList.addEventListener("click", (function (e) {
             if ((e.target.classList.contains("user") || e.target.parentElement.classList.contains("user"))) {
                 UI.insertAtCursor(`@${e.target.dataset["nick"] || e.target.parentElement.dataset["nick"]} `);
+            }
+        }).bind(this));
+        App.addListener("currentChannel_", (function (currentChannel) {
+            if(currentChannel === null){
+                this.root.style.display = "none";
+            } else {
+                this.root.style.display = "";
             }
         }).bind(this));
     }

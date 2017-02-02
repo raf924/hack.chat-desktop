@@ -6,18 +6,24 @@ const platformUserDataClass = require('./loadUserData');
 
 export class App {
     public static favourites: string[];
+    public static currentChannel_: string;
     public static nick: string;
-    public static currentChannel: string;
+    public static password: string;
     public static parsers: Parser[];
     public static userData: UserData;
     public static ipc: Electron.IpcRenderer; //TODO: replace by abstract communication class
     public static isCordova: boolean;
     public static isAndroid: boolean;
-    static password: string;
+
     static proxy: any;
     private static listeners: any;
 
+    public static set currentChannel(channelId) {
+        App.proxy.currentChannel_ = channelId;
+    }
+
     public static init(): void {
+        App.loadProxy();
         App.isCordova = !!window.cordova;
         if (!window.cordova) {
             App.ipc = require('electron').ipcRenderer;
@@ -44,12 +50,11 @@ export class App {
             App.password = password;
         });
         App.loadParsers();
-        App.loadProxy();
     }
 
     static loadProxy() {
         App.listeners = {};
-        let proxy = new Proxy(App, {
+        App.proxy = new Proxy(App, {
             set: function (obj, prop, value) {
                 if (App.listeners[prop]) {
                     App.listeners[prop].forEach(function (listener) {
@@ -59,10 +64,13 @@ export class App {
                 return true;
             }
         });
-        App.proxy = proxy;
-        App.proxy.addListener = function (prop, handler: (value) => {}) {
-            App.proxy.listeners[prop].push(handler);
+    }
+
+    static addListener(prop: string, handler: (value) => {}) {
+        if (!App.listeners[prop]) {
+            App.listeners[prop] = [];
         }
+        App.listeners[prop].push(handler);
     }
 
     static parseText(text: string): ParsedMessage {
