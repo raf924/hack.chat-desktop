@@ -14,9 +14,9 @@ class WhiteSpaceParser extends Parser {
     parse(text: string): ParsedMessage {
         let newText = text;
         for(let char in toHTML){
-            newText = newText.replace(char, toHTML[char]);
+            newText = newText.replace(new RegExp(`${char}(?!(<[^>/]*>|[^><]*>))`, 'gi'), toHTML[char]);
         }
-        newText = newText.replace(/\s/gi, "&nbsp;");
+        newText = newText.replace(/\s(?!(<[^>/]*>|[^><]*>))/gi, "&nbsp;");
         return {text: newText};
     }
 
