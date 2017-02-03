@@ -2,6 +2,7 @@ import {Parser} from "./parser";
 import  fs = require('fs');
 import {UserData} from "./userData";
 import {Channel} from "./channel";
+import webpack = require("webpack");
 const platformUserDataClass = require('./loadUserData');
 
 export class App {
@@ -94,10 +95,12 @@ export class App {
                 }
             });
         } else {
-            parsers = require('dir-loader!./loadModules').parsers;
-            for (let parser in parsers) {
-                App.parsers.push(new parsers[parser].src());
+            let r = require.context(`./modules/parsers`, false, /\.js$/);
+            parsers = r.keys();
+            for (let parser of parsers) {
+                App.parsers.push(new r(parser)());
             }
+
         }
     }
 

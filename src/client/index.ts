@@ -25,7 +25,8 @@ $(document).ready(function () {
             UI.init();
         });
     } else {
-        require('dir-loader!./loadModules');
+        let r = require.context(`${__dirname}/modules/plugins`, false, /\.js$/);
+        r.keys().forEach(r);
         UI.init();
     }
 });

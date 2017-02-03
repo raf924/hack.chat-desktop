@@ -125,9 +125,10 @@ class UI {
             });
 
         } else {
-            files = require("dir-loader!./loadModules").tools;
+            let r = require.context("./modules/tools", true, /\.js$/);
+            files = r.keys();
             for (let tool in files) {
-                let toolModule = files[tool][`${tool}.js`].src;
+                let toolModule = r(tool);
                 new toolModule[toolModule.toolName]();
             }
         }
