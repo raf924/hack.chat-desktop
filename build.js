@@ -18,61 +18,51 @@ try {
 
 }
 
+let copySync = function (src, dest) {
+    fs.writeFileSync(dest, fs.readFileSync(src));
+};
+
+let tryPacking = function (arr, idx) {
+    if (arr.length === idx + 1) {
+        webpack(require(`${__dirname}/webpack.config`), function (err, stats) {
+            if (err) {
+                console.error(err);
+                process.exit();
+            }
+            console.log("Program bundled for cordova");
+        });
+    }
+};
+
 execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
     console.log("TS files compiled");
     if (error) {
         console.error(`Failed to compile typescript files :\n ${error} \n ${stdout} \n ${stderr}`);
         return;
     }
-    /*fs.writeFileSync(`${__dirname}/lib/client/loadPlugins.js`, "module.exports = [];\n");
-    let files = fs.readdirSync(`${__dirname}/lib/client/plugins`);
-    files.forEach(function (file) {
-        fs.appendFileSync(`${__dirname}/lib/client/loadPlugins.js`, `module.exports.push("${file}");\n`);
-    });
-    fs.writeFileSync(`${__dirname}/lib/client/loadParsers.js`, "module.exports = [];\n");
-    files = fs.readdirSync(`${__dirname}/lib/client/parsers`);
-    files.forEach(function (file) {
-        fs.appendFileSync(`${__dirname}/lib/client/loadParsers.js`, `module.exports.push("${file}");\n`);
-    });
 
-    fs.writeFileSync(`${__dirname}/lib/client/loadTools.js`, "module.exports = [];\n");
-    files = fs.readdirSync(`${__dirname}/lib/client/tools`);
-    files.forEach(function (file) {
-        fs.appendFileSync(`${__dirname}/lib/client/loadTools.js`, `module.exports.push("${file}");\n`);
-    });
-    */
     let copyToolStyle = function (tool) {
-        ncp(`${__dirname}/src/client/modules/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.css`, function (err) {
-
-        });
+        copySync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.css`);
     };
 
     let tools = fs.readdirSync(`${__dirname}/src/client/modules/tools`);
-    tools.forEach(function (tool) {
-        ncp(`${__dirname}/src/client/modules/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.html`, function (err) {
-
-        });
-        let toolLess = fs.readFileSync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.less`).toString();
+    tools.forEach(function (tool, idx) {
+        copySync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.html`);
+        let toolLess = fs.readFileSync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.less`);
         if (toolLess == null) {
             copyToolStyle(tool);
+            tryPacking(tools, idx);
         } else {
-            less.render(toolLess, function (error, output) {
+            less.render(toolLess.toString(), function (error, output) {
                 if (error) {
                     return console.error(error);
                 }
                 fs.writeFileSync(`${__dirname}/lib/client/modules/tools/${tool}/${tool}.css`, output.css);
+                tryPacking(tools, idx);
             });
         }
     });
-    webpack(require(`${__dirname}/webpack.config`), function (err, stats) {
-        if (err) {
-            console.error(err);
-            process.exit();
-        }
-        console.log("Program bundled for cordova");
-    });
-})
-;
+});
 
 const less = require('less');
 let lessFile = fs.readFileSync(`${lessFilesPath}/app.less`).toString();
