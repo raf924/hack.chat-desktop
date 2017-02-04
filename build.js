@@ -75,11 +75,11 @@ less.render(lessFile, {
         return console.error(error);
     }
     fs.writeFileSync(`${cssFilesPath}/app.css`, output.css);
-    ncp(`${__dirname}/static`, `${__dirname}/cordova/www/static`, function (err) {
-        if (err) {
-            return console.error(err);
-        }
-    });
+    try {
+        fs.mkdirSync(`${__dirname}/cordova/www/static`);
+    } catch (e) {
+
+    }
 });
 
 ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (err) {

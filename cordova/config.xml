@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="tk.rafaelnaciri.chatron" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Chatron</name>
+<widget id="tk.rafaelnaciri.chatrondev" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Chatron-dev</name>
     <description>
         A cross platform client for communication services
     </description>
@@ -29,4 +29,5 @@
     <plugin name="cordova-plugin-nativestorage" spec="~2.0.2" />
     <plugin name="cordova-plugin-background-mode" spec="~0.6.5" />
     <plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" />
+    <app-icon src="../icon128.png" width="128" height="128"/>
 </widget>

@@ -8,7 +8,7 @@ class View {
             if (!App.isCordova) {
                 this.element = fs.readFileSync(`${__dirname}/../../static/views/${name}.html`).toString();
             } else {
-                this.element = $.ajax(`static/views/${name}.html`, {async: false}).responseText;
+                this.element = require(`html-loader!../../static/views/${name}.html`);
             }
         } catch (e){
             this.element = `<div class="${name}"></div>`;
