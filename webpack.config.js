@@ -1,6 +1,8 @@
 let webpack = require('webpack');
 module.exports = {
-    entry: './client.js',
+    entry: {
+        main: './client.js'
+    },
     output: {
         path: './cordova/www',
         filename: 'bundle.js'
@@ -9,7 +11,7 @@ module.exports = {
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.UglifyJsPlugin()
     ],
-    externals:{
+    externals: {
         titlebar: "null"
     },
     node: {

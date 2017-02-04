@@ -127,7 +127,7 @@ class UI {
         } else {
             let r = require.context("./modules/tools", true, /\.js$/);
             files = r.keys();
-            for (let tool in files) {
+            for (let tool of files) {
                 let toolModule = r(tool);
                 new toolModule[toolModule.toolName]();
             }

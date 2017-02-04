@@ -12,7 +12,8 @@
     "dev": "node_modules\\.bin\\electron.cmd . dev",
     "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
     "package": "node build.js && node package.js",
-    "build": "node build.js"
+    "build": "node build.js",
+    "run:android": "cd cordova && ..\\node_modules\\.bin\\cordova.cmd run android"
   },
   "repository": {
     "type": "git",

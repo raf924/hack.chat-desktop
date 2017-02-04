@@ -98,7 +98,8 @@ export class App {
             let r = require.context(`./modules/parsers`, false, /\.js$/);
             parsers = r.keys();
             for (let parser of parsers) {
-                App.parsers.push(new r(parser)());
+                let parserClass = r(parser);
+                App.parsers.push(new parserClass());
             }
 
         }
