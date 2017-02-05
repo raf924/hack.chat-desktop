@@ -10,7 +10,7 @@ packager({
     name: "Chatron",
     platform: args[2] || process.platform,
     overwrite: true,
-    version: `${info.version}`,
+    electronVersion: `${info.version}`,
     arch: args[3] || process.arch,
     out: "dist",
     asar: true,

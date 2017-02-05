@@ -1,5 +1,5 @@
 {
-  "name": "hack.chat-desktop",
+  "name": "Chatron",
   "version": "0.1.0",
   "main": "main.js",
   "engines": {
@@ -41,6 +41,7 @@
   "devDependencies": {
     "@types/cordova": "0.0.34",
     "@types/electron": "^1.4.31",
+    "@types/electron-builder": "^2.0.29",
     "@types/hammerjs": "^2.0.34",
     "@types/jquery": "^2.0.40",
     "@types/node": "^6.0.62",
