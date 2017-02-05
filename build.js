@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require("path");
-const ncp = require("ncp");
 const webpack = require('webpack');
 
 const execFile = require('child_process').execFile;
@@ -80,52 +79,4 @@ less.render(lessFile, {
     } catch (e) {
 
     }
-});
-
-ncp(`${__dirname}/index.html`, `${__dirname}/cordova/www/index.html`, function (err) {
-    if (err) {
-        return console.error(err);
-    }
-    console.log("index.html loaded for cordova");
-});
-
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/`);
-} catch (e) {
-}
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/material-components-web/`);
-} catch (e) {
-}
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/material-design-icons`);
-} catch (e) {
-}
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/roboto-fontface`);
-} catch (e) {
-}
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/roboto-fontface/css`);
-} catch (e) {
-}
-try {
-    fs.mkdirSync(`${__dirname}/cordova/www/node_modules/roboto-fontface/fonts`);
-} catch (e) {
-}
-
-ncp(`${__dirname}/node_modules/material-components-web/dist`, `${__dirname}/cordova/www/node_modules/material-components-web/dist`, function (err) {
-
-});
-
-
-ncp(`${__dirname}/node_modules/material-design-icons/iconfont`, `${__dirname}/cordova/www/node_modules/material-design-icons/iconfont`, function (err) {
-
-});
-
-ncp(`${__dirname}/node_modules/roboto-fontface/css/roboto`, `${__dirname}/cordova/www/node_modules/roboto-fontface/css/roboto`, function (err) {
-
-});
-ncp(`${__dirname}/node_modules/roboto-fontface/fonts/Roboto`, `${__dirname}/cordova/www/node_modules/roboto-fontface/fonts/Roboto`, function (err) {
-
 });

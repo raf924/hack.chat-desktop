@@ -12,13 +12,19 @@ module.exports = {
     module: {
         rules: [{
             test: /\.css$/,
-            exclude: /(node_modules|tools|cordova)/,
+            exclude: /(tools|cordova)/,
             use: ExtractTextPlugin.extract({
                 loader: 'css-loader',
                 options: {
                     sourceMap: true
                 }
             })
+        }, {
+            test: /\.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/,
+            loader: 'file-loader?name=[name].[ext]&publicPath=../fonts/&outputPath=static/fonts/',
+        },{
+            test: /index\.html$/,
+            loader: 'file-loader?name=[name].[ext]'
         }]
     },
     plugins: [
