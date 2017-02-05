@@ -14,7 +14,7 @@ packager({
     arch: args[3] || process.arch,
     out: "dist",
     asar: true,
-    ignore: ["build.js", "start.js", "package.js$", "src", "tsconfig.json", ".idea", ".gitattributes", ".gitignore", "data.json"],
+    ignore: ["build.js", "start.js", "package.js$", "src", "tsconfig.json", ".idea", ".gitattributes", ".gitignore", "data.json", "cordova", "build", "dist"],
     icon: "icon.ico",
     win32metadata: {
         CompanyName: "raf924",
