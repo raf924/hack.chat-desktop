@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="tk.rafaelnaciri.chatrondev" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Chatron-dev</name>
+<widget id="tk.rafaelnaciri.chatron" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>Chatron</name>
     <description>
         A cross platform client for communication services
     </description>
