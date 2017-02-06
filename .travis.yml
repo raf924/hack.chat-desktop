@@ -8,6 +8,10 @@ matrix:
         - ANDROID_HOME=/android_sdk
         - CORDOVA=true
       sudo: required
+      addons:
+        apt:
+          packages:
+            - oracle-java8-installer
 install:
   - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then export ANDROID_HOME=/android_sdk && chmod +x installAndroid.sh && sudo ./installAndroid.sh; fi
   - if [[ "$CORDOVA" = "true" ]]; then npm install; fi
@@ -15,7 +19,7 @@ install:
 script:
   - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then travis_wait 30 npm run package; fi
   - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" != "true" ]]; then npm run package; fi
-  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then npm run build:cordova android; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then jdk_switcher use oraclejdk8 && npm run build:cordova android; fi
 before_deploy:
   - if [[ "$CORDOVA" != "true" ]]; then zip -r app.$TRAVIS_OS_NAME.zip dist/; fi
 deploy:
