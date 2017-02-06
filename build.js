@@ -1,6 +1,11 @@
 const fs = require('fs');
 const path = require("path");
-const webpack = require('webpack');
+let webpack = null;
+try {
+    webpack = require('webpack');
+} catch (e) {
+
+}
 
 const execFile = require('child_process').execFile;
 let tscPath = `${__dirname}/node_modules/.bin/tsc`;
@@ -22,7 +27,7 @@ let copySync = function (src, dest) {
 };
 
 let tryPacking = function (arr, idx) {
-    if (arr.length === idx + 1) {
+    if (arr.length === idx + 1 && webpack !== null) {
         webpack(require(`${__dirname}/webpack.config`), function (err, stats) {
             if (err) {
                 console.error(err);
