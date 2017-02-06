@@ -6,6 +6,7 @@ matrix:
       env:
         - ANDROID_HOME=/android_sdk
         - CORDOVA=true
+        - JAVA_HOME=/usr/lib/jvm/java-8-oracle
       sudo: required
       addons:
         apt:
