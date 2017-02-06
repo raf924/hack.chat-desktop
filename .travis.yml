@@ -9,14 +9,8 @@ matrix:
       env: ANDROID_HOME=/android_sdk
       sudo: required
 install:
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then wget https://dl.google.com/android/repository/tools_r25.2.3-linux.zip; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then mkdir /android_sdk && unzip tools_r25.2.3-linux.zip -d /android_sdk; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t tools; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t platform-tools; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t build-tools-25.0.0; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t android-23; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t extra-google-m2repository; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t extra-android-m2repository; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then ./installAndroid.sh; fi
+  - npm install
 script:
   - npm run build
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 npm run package; fi
