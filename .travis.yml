@@ -10,7 +10,7 @@ matrix:
         - CORDOVA=true
       sudo: required
 install:
-  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then ./installAndroid.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then chmod +x installAndroid.sh && ./installAndroid.sh; fi
   - if [[ "$CORDOVA" = "true" ]]; then npm install; fi
   - if [[ "$CORDOVA" != "true" ]]; then npm install --no-optional; fi
 script:
@@ -20,6 +20,8 @@ script:
 before_deploy:
   - if [[ "$CORDOVA" != "true" ]]; then zip -r app.$TRAVIS_OS_NAME.zip dist/; fi
 deploy:
+  on:
+    all_branches: true
   provider: bintray
   file: bintray.json
   user: raf924
