@@ -13,6 +13,7 @@
     "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
     "package": "node build.js && node package.js",
     "build": "node build.js",
+    "install:electron": "npm install electron && npm install electron-builder && npm install electron-packager && npm install titlebar",
     "build:cordova": "node build.js && cd cordova && ../node_modules/.bin/cordova prepare && node copyIcon.js && ../node_modules/.bin/cordova build",
     "run:android": "node build.js && cd cordova && node copyIcon.js && ..\\node_modules\\.bin\\cordova.cmd run android"
   },
@@ -36,8 +37,7 @@
     "material-components-web": "^0.2.0",
     "material-design-icons": "^3.0.1",
     "require-rebuild": "^1.2.8",
-    "roboto-fontface": "^0.7.0",
-    "titlebar": "^1.4.0"
+    "roboto-fontface": "^0.7.0"
   },
   "optionalDependencies": {
     "cordova": "^6.5.0",
@@ -55,9 +55,6 @@
     "@types/jquery": "^2.0.40",
     "@types/node": "^6.0.62",
     "@types/webpack": "^2.2.4",
-    "electron": "^1.4.15",
-    "electron-builder": "^12.0.3",
-    "electron-packager": "^8.5.0",
     "less": "^2.7.2",
     "typescript": "^2.1.5",
     "xml2js": "^0.4.17"
