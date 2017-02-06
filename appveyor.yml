@@ -2,27 +2,14 @@ version: 1.0.{build}-{branch}
 branches:
  only:
  - master
- - cordova
 platform: x64
 environment:
-  ANDROID_HOME: "C:\\android-sdk-windows"
-  JAVA_HOME: "C:\\Program Files\\Java\\jdk1.8.0"
   NODE_VERSION: 6.9
 clone_folder: "C:\\projects\\hack.chat-desktop"
-init:
-- cd \
-- appveyor DownloadFile http://dl.google.com/android/android-sdk_r24.4.1-windows.zip
-- 7z x android-sdk_r24.4.1-windows.zip > nul
-- cd C:\projects\hack.chat-desktop
 install:
 - ps: Install-Product node $env:NODE_VERSION
-- echo y | "%ANDROID_HOME%\tools\android.bat" update sdk -u -a -t tools
-- echo y | "%ANDROID_HOME%\tools\android.bat" update sdk -u -a -t platform-tools
-- echo y | "%ANDROID_HOME%\tools\android.bat" update sdk -u -a -t build-tools-25.0.0
-- echo y | "%ANDROID_HOME%\tools\android.bat" update sdk -u -a -t android-23
-- echo y | "%ANDROID_HOME%\tools\android.bat" update sdk -u -a -t extra-google-m2repository
-- echo y | "%ANDROID_HOME%\tools\android.bat" update sdk -u -a -t extra-android-m2repository
-- npm install
+- npm install --no-optional
+- npm run install:electron
 cache:
 - node_modules -> package.json
 xamarin:
@@ -30,18 +17,10 @@ xamarin:
   password:
     secure: Tf4GAv15ctSjj0Y0ZWzlcw==
 build_script:
-- cmd: node build.js
 - cmd: npm run package win32 x64
 - cmd: 7z a app.win32.zip %APPVEYOR_BUILD_FOLDER%\dist
 - cmd: appveyor PushArtifact app.win32.zip
-- cmd: set PATH=C:\apache-ant-1.10.0\bin;%PATH%
-- cmd: set PATH=C:\android-sdk-windows\build-tools\25.0.0;%PATH%
-- cmd: set PATH=%JAVA_HOME%\bin;%PATH%
-- cmd: cd cordova && ..\node_modules\.bin\cordova.cmd prepare && ..\node_modules\.bin\cordova.cmd build android
 test: off
-artifacts:
-- path: cordova\platforms\android\build\outputs\apk\android-debug.apk
-  name: Android
 deploy:
 - provider: BinTray
   username: raf924

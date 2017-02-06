@@ -1,13 +1,32 @@
-os:
-  - osx
-  - linux
 language: node_js
 node_js: '6'
+matrix:
+  include:
+    - os: osx
+    - os: linux
+      env:
+        - ANDROID_HOME=/android_sdk
+        - CORDOVA=true
+        - JAVA_HOME=/usr/lib/jvm/java-8-oracle
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - oracle-java8-installer
+            - oracle-java8-set-default
+install:
+  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then export ANDROID_HOME=/android_sdk && chmod +x installAndroid.sh && ./installAndroid.sh; fi
+  - if [[ "$CORDOVA" = "true" ]]; then npm install; fi
+  - if [[ "$CORDOVA" != "true" ]]; then npm install --no-optional && npm run install:electron; fi
 script:
-  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 npm run package; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package; fi
-before_deploy: zip -r app.$TRAVIS_OS_NAME.zip dist/
+  - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then travis_wait 30 npm run package; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" != "true" ]]; then npm run package; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then npm run build:cordova android; fi
+before_deploy:
+  - if [[ "$CORDOVA" != "true" ]]; then zip -r app.$TRAVIS_OS_NAME.zip dist/; fi
 deploy:
+  on:
+    all_branches: true
   provider: bintray
   file: bintray.json
   user: raf924
