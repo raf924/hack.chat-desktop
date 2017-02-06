@@ -14,8 +14,6 @@ const fs = require('fs');
 //TODO: Add remote config
 //TODO: Add tray icon
 
-let myNick = localConfig.get("nickName");
-
 Menu.setApplicationMenu(null);
 // Report crashes to our server.
 //electron.crashReporter.start({companyName: 'raf924', submitURL: 'http://127.0.0.1'});
