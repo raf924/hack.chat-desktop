@@ -14,7 +14,7 @@ matrix:
             - oracle-java8-installer
             - oracle-java8-set-default
 install:
-  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then export ANDROID_HOME=/android_sdk && chmod +x installAndroid.sh && sudo ./installAndroid.sh; fi
+  - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then export ANDROID_HOME=/android_sdk && chmod +x installAndroid.sh && sudo ./installAndroid.sh && sudo chmod a+w .android; fi
   - if [[ "$CORDOVA" = "true" ]]; then npm install; fi
   - if [[ "$CORDOVA" != "true" ]]; then npm install --no-optional && npm run install:electron; fi
 script:
