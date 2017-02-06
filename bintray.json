@@ -21,6 +21,13 @@
       "matrixParams": {
         "override": 1
       }
+    },
+    {
+      "includePattern": "cordova/platforms/android/build/outputs/apk/android-debug.apk",
+      "uploadPattern": "chatron.apk",
+      "matrixParams": {
+        "override": 1
+      }
     }
   ],
   "publish": true

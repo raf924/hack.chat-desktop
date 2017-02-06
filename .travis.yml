@@ -1,12 +1,29 @@
-os:
-  - osx
-  - linux
 language: node_js
 node_js: '6'
+matrix:
+  include:
+    - os: osx
+    - os: linux
+    - os: linux
+      env: CORDOVA=true
+      env: ANDROID_HOME=/android_sdk
+      sudo: required
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then wget https://dl.google.com/android/repository/tools_r25.2.3-linux.zip; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then mkdir /android_sdk && unzip tools_r25.2.3-linux.zip -d /android_sdk; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t tools; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t platform-tools; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t build-tools-25.0.0; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t android-23; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t extra-google-m2repository; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then echo y | "$ANDROID_HOME/tools/android" update sdk -u -a -t extra-android-m2repository; fi
 script:
+  - npm run build
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then travis_wait 30 npm run package; fi
-  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then npm run package; fi
-before_deploy: zip -r app.$TRAVIS_OS_NAME.zip dist/
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" != "true" ]]; then npm run package; fi
+  - if [[ "$TRAVIS_OS_NAME" == "linux" && "$CORDOVA" == "true" ]]; then npm run build:cordova android; fi
+before_deploy:
+  - if [[ "$CORDOVA" != "true" ]]; then zip -r app.$TRAVIS_OS_NAME.zip dist/; fi
 deploy:
   provider: bintray
   file: bintray.json
