@@ -13,7 +13,7 @@
     "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
     "package": "node build.js && node package.js",
     "build": "node build.js",
-    "build:cordova": "cd cordova && node copyIcon.js && ../node_modules/.bin/cordova build",
+    "build:cordova": "node build.js && cd cordova && ../node_modules/.bin/cordova prepare && node copyIcon.js && ../node_modules/.bin/cordova build",
     "run:android": "node build.js && cd cordova && node copyIcon.js && ..\\node_modules\\.bin\\cordova.cmd run android"
   },
   "repository": {
