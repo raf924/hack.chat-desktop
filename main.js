@@ -5,7 +5,6 @@ const Menu = electron.Menu;
 const shell = electron.shell;
 const ipc = electron.ipcMain;
 
-require('require-rebuild')();
 const ConfigJSON = require("./lib/modules/config-json");
 
 const localConfig = new ConfigJSON(`${process.cwd()}/data.json`);
