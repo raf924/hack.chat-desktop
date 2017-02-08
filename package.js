@@ -5,6 +5,8 @@ let packageFile = fs.readFileSync('./node_modules/electron/package.json', 'utf-8
 let info = JSON.parse(packageFile);
 let args = process.argv;
 
+//TODO: find better way to ignore files
+
 packager({
     dir: ".",
     name: "Chatron",
@@ -14,7 +16,7 @@ packager({
     arch: args[3] || process.arch,
     out: "dist",
     asar: true,
-    ignore: ["build.js", "start.js", "package.js$", "src", "tsconfig.json", ".idea", ".gitattributes", ".gitignore", "data.json", "cordova", "build"],
+    ignore: ["webpack.config.js", ".yml", "bintray.json", "start.js", "package.js$", "dist.js", `tsconfig.json`, `data.json`, `src`,  ".idea", ".gitattributes", ".gitignore", "cordova", "build", /material-design-icons\/(?!iconfont)/],
     icon: "icon.ico",
     win32metadata: {
         CompanyName: "raf924",

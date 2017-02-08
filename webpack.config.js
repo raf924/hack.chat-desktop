@@ -3,7 +3,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 module.exports = {
     entry: {
         main: `${__dirname}/client.js`,
-        static: `${__dirname}/static.js`
+        static: `${__dirname}/cordova/static.js`
     },
     output: {
         path: `${__dirname}/cordova/www`,
