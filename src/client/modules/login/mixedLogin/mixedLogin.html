@@ -1,0 +1,13 @@
+<paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
+    <h2>Login</h2>
+    <form is="iron-form" method="get" action="/">
+        <paper-input label="Username" placeholder="nick[#password] (ex: bob#isadick)" preventInvalidInput="true"
+                     allowedPattern="[^#]+(#[^#]*)?" id="nickInput" required>
+        </paper-input>
+        <paper-checkbox id="useAlways">Remember</paper-checkbox>
+        <div class="buttons">
+            <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
+            <paper-button class="confirm" dialog-confirm autofocus>Login</paper-button>
+        </div>
+    </form>
+</paper-dialog>

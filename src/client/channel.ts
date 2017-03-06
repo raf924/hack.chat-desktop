@@ -1,20 +1,13 @@
 import {EventEmitter} from 'events';
 
-class Channel extends EventEmitter {
+abstract class Channel extends EventEmitter {
     name: string;
     nick: string;
-    channelId: string;
     users: Map<string, string>;
-    ws: WebSocket;
-    private online: boolean;
     password: string;
-    service = "hack.chat";
+    service;
     lastSender: string = null;
-    private currentSender: string;
-
-    public get isOnline(): boolean {
-        return this.online;
-    }
+    currentSender: string;
 
     constructor(name, nickName, password) {
         super();
@@ -22,77 +15,27 @@ class Channel extends EventEmitter {
         this.name = name;
         this.nick = nickName;
         this.password = password;
-        this.online = false;
-        this.channelId = `${nickName}@${name}@${this.service}`;
-        let that = this;
-        this.ws = new WebSocket("wss://hack.chat/chat-ws");
-        window.setInterval(function () {
-            that.send({
-                cmd: 'ping'
-            });
-        }, 30000);
-        this.ws.onopen = function () {
-            that.send({
-                cmd: "join",
-                channel: that.name,
-                nick: `${that.nick}#${that.password}`
-            });
-        };
-        this.ws.onclose = function (ev) {
-            that.disconnect(ev.code, ev.reason);
-        };
-        this.ws.onmessage = function (message) {
-            let args: MessageData = JSON.parse(message.data);
-            if (args.cmd !== "chat") {
-                that.currentSender = "";
-            }
-            switch (args.cmd) {
-                case "onlineAdd":
-                    that.addUser(args.nick);
-                    break;
-                case "chat":
-                    that.lastSender = that.lastSender === null ? "" : that.currentSender;
-                    that.currentSender = args.nick;
-                    that.setTripCode(args.nick, args.trip);
-                    break;
-                case "onlineRemove":
-                    that.removeUser(args.nick);
-                    break;
-                case "onlineSet":
-                    that.online = true;
-                    for (let nick of args.nicks) {
-                        if (!that.users[nick]) {
-                            that.users[nick] = "";
-                            that.addUser(nick);
-                        }
-                    }
-                    break;
-                case "warn":
-                case "info":
-                    break;
-                default:
-                    throw "Unknown command";
-            }
-            that.receiveMessage(args);
-        };
     }
 
-    send(args) {
-        if (this.ws && this.ws.readyState == this.ws.OPEN) {
-            this.ws.send(JSON.stringify(args));
-        }
+    public get channelId() : string {
+        return `${this.nick}@${this.name}@${this.service}`;
     }
 
-    sendMessage(message) {
-        this.send({
-            cmd: "chat",
-            text: message
-        });
-    }
+    abstract get isOnline(): boolean;
 
-    close() {
-        this.ws.close();
-    }
+    abstract send(args);
+
+    abstract sendMessage(message);
+
+    abstract close();
+
+    abstract onConnectionOpen(data: any);
+
+    abstract onConnectionClose(data: any);
+
+    abstract onDataReceived(data: any);
+
+    abstract connect();
 
     addUser(user) {
         this.users[user] = "";

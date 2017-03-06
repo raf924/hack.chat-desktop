@@ -4,7 +4,8 @@ declare interface MessageData{
     mod?: boolean,
     cmd: string,
     nicks? : string[],
-    text: string,
+    text?: string,
     time?: number,
-    mention?: boolean
+    mention?: boolean,
+    channel?: string
 }

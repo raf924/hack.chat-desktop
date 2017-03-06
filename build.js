@@ -15,7 +15,6 @@ if (process.platform == "win32") {
     tscPath += ".cmd";
 }
 
-
 try {
     fs.mkdirSync(`${__dirname}/cordova/www`);
 } catch (e) {
@@ -48,7 +47,10 @@ execFile(path.resolve(tscPath), [], (error, stdout, stderr) => {
     let copyToolStyle = function (tool) {
         copySync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.css`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.css`);
     };
-
+    let logins = fs.readdirSync(`${__dirname}/src/client/modules/login`);
+    logins.forEach(function (login) {
+        copySync(`${__dirname}/src/client/modules/login/${login}/${login}.html`, `${__dirname}/lib/client/modules/login/${login}/${login}.html`);
+    });
     let tools = fs.readdirSync(`${__dirname}/src/client/modules/tools`);
     tools.forEach(function (tool, idx) {
         copySync(`${__dirname}/src/client/modules/tools/${tool}/${tool}.html`, `${__dirname}/lib/client/modules/tools/${tool}/${tool}.html`);

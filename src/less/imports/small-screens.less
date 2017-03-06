@@ -1,45 +1,5 @@
-@media only screen and (max-width: (@drawerWidth * 3)) {
-
-  .dialog {
-    min-width: 280px;
-    margin-left: 0;
-    .dialog-body {
-      font-size: 14px;
-      line-height: 24px;
-    }
-  }
-
-  #sidemenu {
-    left: ~"calc(-100% + 56px)";
-    /* right: 100%; */
-    transition: left 500ms;
-    will-change: left, transform;
-    width: ~"calc(100% - 56px)";
-    transform: translateZ(0);
-    -webkit-backface-visibility: hidden;
-    -webkit-perspective: 1000px;
-    &.open {
-      left: 0;
-    }
-  }
-
-  main {
-    left: 0;
-    width: 100%;
-  }
-
+@media only screen and (max-width: (768px)) {
   #chatBox-wrapper {
-    width: 98%;
-  }
-
-  #app-bar {
-    left: 0;
     width: 100%;
-    #sidemenu-collapse {
-      margin: calc(~"("@appBarHeight~"-"@iconSize~")" / 2);
-      font-size: @iconSize;
-      cursor: pointer;
-      display: unset;
-    }
   }
 }

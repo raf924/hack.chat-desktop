@@ -1,24 +1,13 @@
 #userList {
-  .mdc-simple-menu {
-    top: 0;
-    right: 0;
-    z-index: 10010;
+  paper-menu-button{
+    --paper-menu-button-dropdown: ~"{
+      max-width: 100%;
+    }";
   }
-  .mdc-list {
-    overflow-y: visible;
-    max-height: 50vh;
-    &::-webkit-scrollbar {
-      width: 1vw;
-      &-thumb {
-        background-color: rgba(0, 0, 0, 0.46);
-        border-radius: 1em;
-      }
-    }
-  }
-  .user {
-    cursor: pointer;
-    &:hover {
-      background: rgba(0, 0, 0, 0.05);
-    }
+  paper-item {
+    --paper-item: ~"{
+      white-space: nowrap;
+      width: 100%;
+    }";
   }
 }

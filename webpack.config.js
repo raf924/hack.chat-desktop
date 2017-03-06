@@ -1,5 +1,6 @@
 const webpack = require('webpack');
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 module.exports = {
     entry: {
         main: `${__dirname}/client.js`,
@@ -30,7 +31,8 @@ module.exports = {
     plugins: [
         new webpack.optimize.DedupePlugin(),
         new webpack.optimize.UglifyJsPlugin(),
-        new ExtractTextPlugin(`static/css/app.css`)
+        new ExtractTextPlugin(`static/css/app.css`),
+        new CopyPlugin([{from: `${__dirname}/bower_components`, to: `${__dirname}/cordova/www/bower_components`}])
     ],
     externals: {
         titlebar: "null"

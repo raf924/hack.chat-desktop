@@ -11,8 +11,8 @@ import {Views} from "./views";
 import {NotifyConfig} from "./notifyConfig";
 import Hammer = require("hammerjs");
 import {Tool} from "./tool";
-const mdc = require('material-components-web/dist/material-components-web.min.js');
-const MDCSnackbar: any = mdc.snackbar.MDCSnackbar;
+//const mdc = require('material-components-web/dist/material-components-web.min.js');
+//const MDCSnackbar: any = mdc.snackbar.MDCSnackbar;
 
 //TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
 class UI {
@@ -28,22 +28,28 @@ class UI {
     public static loginMethod: LoginMethod;
     public static toolBar: JQuery;
     private static snackBar: any;
-    public static readonly DEFAULT_ALERT_TIMEOUT = 2750;
+    public static readonly DEFAULT_ALERT_TIMEOUT = 6000;
 
     public static get currentChannelUI(): ChannelUI {
         return UI.channelUIs[App.currentChannel_];
     }
 
     public static isFavourite(channelName: string): boolean {
-        return UI.favouritesUI.find(`[for$='${channelName}']`).length === 1;
+        return UI.favouritesUI.find(`[data-open$='${channelName}']`).length === 1;
     }
 
     private static addFavourite(channelName: string) {
         App.addFavourite(channelName);
-        UI.channelTabs.find(`[for$='${channelName}']`).attr("data-is-fav", "true");
-        let $favourite = $(UI.views.favourite.element).attr("data-open", channelName).text(channelName);
-        UI.favouritesUI.append($favourite);
+        UI.channelTabs.find(`[for$='${channelName}']`).attr("data-is-fav", "true").find(".fav").attr("icon", "star");
+        Polymer.dom(UI.favouritesUI[0]).appendChild(document.createElement("div"));
+        Polymer.dom.flush();
+        let favourite = <HTMLDivElement>Polymer.dom(UI.favouritesUI[0]).lastElementChild;
+        favourite.outerHTML = UI.views.favourite.element;
+        favourite = <HTMLDivElement>UI.favouritesUI.children().last()[0];
+        favourite.dataset["open"] = channelName;
+        favourite.querySelector(".name").textContent = channelName;
         let visibleHeight: Number = UI.favouritesUI.visibleHeight();
+        //TODO: see if code below is still applicable
         if (UI.favouritesUI.css("max-height") != visibleHeight.toString() && UI.favouritesUI.height() > visibleHeight) {
             UI.favouritesUI.css("max-height", visibleHeight.toString());
         }
@@ -51,7 +57,7 @@ class UI {
 
     public static init() {
         UI.channelUIs = new Map<string, ChannelUI>();
-        UI.snackBar = new mdc.snackbar.MDCSnackbar($("#alert")[0]);
+        //UI.snackBar = new mdc.snackbar.MDCSnackbar($("#alert")[0]);
         //TODO: Load UI components from component/selector maps stored in JSON
         UI.channelTabs = $("#menu-channels");
         UI.channelsContainer = $("#channels");
@@ -69,8 +75,8 @@ class UI {
         }; //TODO: get the notify values from the App.userData
 
         UI.favouritesUI = $("#menu-favourites");
-        UI.favouritesUI.on("click", "li", function (e) {
-            let [channel, service] = $(this).attr("data-open").split("@");
+        UI.favouritesUI.on("tap", "paper-item", function (e) {
+            let [channel, service] = (<HTMLElement>e.currentTarget).dataset["open"].split("@");
             UI.login(channel, service);
         });
         App.userData.get("favourites", function (favourites) {
@@ -83,20 +89,25 @@ class UI {
             UI.loadIpcEvents();
             UI.titleBar = titlebar();
             UI.titleBar.appendTo(document.body);
+            document.body.insertBefore(UI.titleBar.element, document.body.firstChild);
             $(UI.titleBar.element).append($("<div>").text("Chatron"));
             UI.titleBar.element.classList.add("mdc-elevation--z4");
             UI.loadTitleBarEvents();
         } else {
             document.body.classList.add("cordova");
         }
+
+        UI.snackBar = Polymer.dom(document.body).querySelector("#alert");
         UI.loadUIEvents();
         UI.loadChatEvents();
         UI.loadLoginEvents();
         UI.loadTabEvents();
         UI.loadChannelEvents();
         UI.loadTools();
-        UI.snackBar = new MDCSnackbar($("#alert")[0]);
-        mdc.autoInit();
+        UI.loadServices();
+        Polymer.dom(document.body).querySelector("#waitIndicator").active = false;
+        //UI.snackBar = new MDCSnackbar(document.getElementById("alert"));
+        //mdc.autoInit();
     }
 
     private static loadTitleBarEvents(): void {
@@ -174,8 +185,8 @@ class UI {
     private static loadLoginEvents(): void {
         //TODO: prefill userData
         App.userData.get("loginMethod", function (loginMethod) {
-            let method = require(`${__dirname}/modules/login/${loginMethod}`);
-            UI.loginMethod = new method[method.className](UI.nickPrompt[0]);
+            let method = require(`${__dirname}/modules/login/${loginMethod}/${loginMethod}`);
+            UI.loginMethod = new method[method.className]();
             UI.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
                 if (!App.isCordova) {
                     App.ipc.send("join", JSON.stringify({
@@ -194,11 +205,6 @@ class UI {
                     App.password = password;
                 }
                 UI.loginMethod.close();
-
-                if (document.body.clientWidth < 992) {
-                    //TODO: hide drawer if smallscreen
-                    //$(".button-collapse").sideNav("hide");
-                }
             };
             UI.loginMethod.oncancel = (channelName) => {
                 UI.loginMethod.close();
@@ -207,8 +213,13 @@ class UI {
     }
 
     private static toggleDrawer(state?: boolean) {
-        $("#sidemenu").toggleClass("open", state);
-        $("#sidemenu-overlay").toggleClass("hidden", state == null ? state : !state);
+        let panel = Polymer.dom(document.body).querySelector("#sidemenu");
+        if (state || state == null) {
+            panel.openDrawer();
+        } else {
+            panel.closeDrawer();
+        }
+
     }
 
     private static loadUIEvents(): void {
@@ -225,14 +236,22 @@ class UI {
         $("#sidemenu-overlay").click(function (e) {
             UI.toggleDrawer(false);
         });
-        if (App.isCordova) {
-            let hammerTime = new Hammer(document.body);
-            hammerTime.on("swiperight", function (ev) {
-                UI.toggleDrawer(true);
-            });
-        }
+        /*if (App.isCordova) {
+         let hammerTime = new Hammer(document.body);
+         hammerTime.on("swiperight", function (ev) {
+         UI.toggleDrawer(true);
+         });
+         }*/
         $("#sidemenu").on("click", "ul li", function () {
             UI.toggleDrawer(false);
+        });
+        Polymer.dom(document.body).querySelectorAll("paper-submenu").forEach(function (el: HTMLElement) {
+            el.addEventListener("paper-submenu-close", function (e) {
+                (<any>el.querySelector(".menu-trigger iron-icon")).icon = "expand-more";
+            });
+            el.addEventListener("paper-submenu-open", function (e) {
+                (<any>el.querySelector(".menu-trigger iron-icon")).icon = "expand-less";
+            });
         });
     }
 
@@ -287,50 +306,74 @@ class UI {
     private static login(channelName: string, service: string, nick ?: string, password ?: string): void {
         if (nick !== undefined && nick !== null && nick !== ""
         ) {
-            UI.openChannel(channelName, nick, password);
+            UI.openChannel(service, channelName, nick, password);
         }
         else if (App.nick === undefined || App.nick === null || App.nick === "") {
             //UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
             UI.loginMethod.open(channelName, service);
             UI.toggleDrawer(false);
-            UI.nickPrompt.find("input").focus();
+            //UI.nickPrompt.find("input").focus();
         } else {
-            UI.openChannel(channelName, App.nick, App.password);
+            UI.openChannel(service, channelName, App.nick, App.password);
         }
     }
 
-    private static openChannel(channelName: string, nick: string, password: string): void {
-        let channel = App.openChannel(channelName, nick, password);
+    private static openChannel(service: string, channelName: string, nick: string, password: string): void {
+        let channel = App.openChannel(service, channelName, nick, password);
         UI.channelUIs[channel.channelId] = new ChannelUI(channel);
     }
 
     private static loadChannelEvents() {
-        let $addChannelForm = $("#addChannel form");
-        $addChannelForm.submit(function (e) {
-            e.preventDefault();
-            let [channel, service] = $(this).find("input").val().split("@");
-            UI.login(channel, service);
-            $(this).find("button").css("display", "");
-            $(this).find("input").val("").parent().css("display", "none");
+        let channelDialog = Polymer.dom(document.body).querySelector("#newChannelDialog");
+        let channelForm = Polymer.dom(channelDialog).querySelector("#newChannelForm");
+        Polymer.dom(document.body).querySelector("#addChannel").addEventListener("tap", function () {
+            Polymer.dom(channelForm).querySelector("#serviceChoice").select(null);
+            channelForm.reset();
+            channelDialog.open();
         });
-        $addChannelForm.find("button").click(function (e) {
-            e.preventDefault();
-            $(this).css("display", "none");
-            $addChannelForm.find("input").parent().css("display", "").find("input").focus();
+        channelDialog.addEventListener("iron-overlay-closed", function (e) {
+            if (e.target !== e.currentTarget) {
+                return;
+            }
+
+            let event = Polymer.dom(e);
+            if (event.event.detail.confirmed) {
+                if (channelForm.validate()) {
+                    channelForm.submit();
+                } else {
+                    channelDialog.open();
+                }
+            }
         });
-        $addChannelForm.find("input").blur(function (e) {
-            $addChannelForm.find("button").css("display", "");
-            $(this).parent().css("display", "none");
+        channelForm.addEventListener("iron-form-submit", function (e) {
+            e.preventDefault();
+            let {channelName, service} = channelForm.serialize();
+            UI.login(channelName, service);
+            channelForm.reset();
         });
     }
 
     public static alert(text: string, timeout?: number, actionText?: string, actionHandler?: () => {}): void {
-        UI.snackBar.show({
-            message: text,
-            actionText: actionText,
-            actionHandler: actionHandler,
-            timeout: timeout || UI.DEFAULT_ALERT_TIMEOUT
+        UI.snackBar.duration = timeout || UI.DEFAULT_ALERT_TIMEOUT;
+        let actionButton = Polymer.dom(UI.snackBar).querySelector("#alertAction");
+        actionButton.innerText = actionText;
+        actionButton.addEventListener("tap", function () {
+            UI.snackBar.close();
+            actionHandler();
         });
+        UI.snackBar.text = text;
+        UI.snackBar.open();
+    }
+
+    private static loadServices() {
+        let select = Polymer.dom(document.body).querySelector("#serviceChoice");
+        for (let service in App.services) {
+            let option = document.createElement("paper-item");
+            option.innerText = service;
+            option.dataset["service"] = service;
+            Polymer.dom(select).appendChild(option);
+            Polymer.dom(select).flush();
+        }
     }
 }
 

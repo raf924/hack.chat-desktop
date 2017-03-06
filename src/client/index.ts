@@ -1,6 +1,5 @@
 interface Window {
     $: any
-    Hammer: any
     jQuery: any
 }
 
@@ -9,7 +8,6 @@ declare const global;
 
 //Necessary for Materialize
 global.$ = global.jQuery = window.$ = window.jQuery = require('jquery');
-require("../../static/js/bootstrap.min");
 
 import {UI} from "./ui";
 import fs = require('fs');

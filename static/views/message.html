@@ -1,14 +1,17 @@
 <li class="message">
-    <div class="title mdc-list-item__text__secondary">
+    <div class="title">
         <span class="nick"></span>&nbsp;<span class="trip"></span>
         <span class="mod hidden material-icons">card_membership</span>
     </div>
-    <div class="text-wrapper mdc-elevation--z2">
-            <div class="title mdc-list-item__text__secondary">
-                <span class="nick"></span>&nbsp;<span class="trip"></span>
-                <span class="mod hidden material-icons">card_membership</span>
-            </div>
+    <paper-card class="text-wrapper">
+        <!-- <div class="card-content text-wrapper"> -->
+        <div class="title">
+            <span class="nick"></span>&nbsp;<span class="trip"></span>
+            <iron-icon icon="card-membership" class="mod hidden"></iron-icon>
+            <!--<span class="mod hidden material-icons">card_membership</span>-->
+        </div>
         <pre class="text"></pre>
-    </div>
+        <!-- </div> -->
+    </paper-card>
     <span class="timestamp hidden"></span>
 </li>

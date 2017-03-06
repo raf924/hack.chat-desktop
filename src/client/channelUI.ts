@@ -1,3 +1,5 @@
+///<reference path="messageData.ts"/>
+///<reference path="../types/cordova.d.ts"/>
 import {Channel} from "./channel";
 import {App} from "./app";
 import {ChannelEventListener} from "./channelEventListener";
@@ -33,7 +35,9 @@ export class ChannelUI extends ChannelEventListener {
     public disconnected(event): void {
         if (event.code !== 1000) {
             let reconnectTimeout = window.setTimeout((function () {
-                this.channel = new Channel(this.channel.name, this.channel.nick, this.channel.password);
+                let currentChannel = App.currentChannel_;
+                this.channel = App.openChannel(this.channel.service, this.channel.name, this.channel.nick, this.channel.password);
+                App.currentChannel = currentChannel;
                 this.bindChannelEvents();
             }).bind(this), UI.DEFAULT_ALERT_TIMEOUT);
             UI.alert(`${this.channel.name}@${this.channel.service} was disconnected\nReason: ${event.reason}\nRetrying`, UI.DEFAULT_ALERT_TIMEOUT, "Cancel", (function () {
@@ -71,21 +75,20 @@ export class ChannelUI extends ChannelEventListener {
         this.messagesUI.on("wheel", function (e) {
             oldHeight = this.scrollHeight;
         });
-        let hammerTime = new Hammer(this.messagesUI[0]);
-        hammerTime.on("tap", (function (e) {
-            if (!$(e.target).is(".messages, .cmd *, .nick, .message .text a")) {
+        this.messagesUI.on("tap", ".message .text", (function (e) {
+            if ((<HTMLElement>e.target).classList.contains(".text")) {
                 $(e.target).parents(".message").find(".timestamp").toggleClass("hidden");
                 if (this.isAtBottom) {
                     this.scrollToBottom();
                 }
             }
         }).bind(this));
-        this.messagesUI.on("click", ".message .nick[data-nick]", function (e) {
+        this.messagesUI.on("tap", ".message .nick[data-nick]", function (e) {
             UI.insertAtCursor(`@${$(this).text()} `);
         });
     }
 
-    public appendMessage(args: MessageData) {
+    public appendMessage(args: any) {
         let $message = $(UI.views.message.element);
         if (args.nick === this.channel.nick) {
             $message.addClass("from-user");
@@ -100,6 +103,19 @@ export class ChannelUI extends ChannelEventListener {
             case "onlineSet":
                 this.messagesUI.find(".message").remove();
                 break;
+            case "warn":
+                if (args.text === "Nickname taken") {
+                    this.channel.close();
+                    this.channel.disconnect(4000, "Nickname taken");
+                }
+            case "info":
+                break;
+            case "onlineAdd":
+                break;
+            case "onlineRemove":
+                break;
+            default:
+                return;
         }
         if (args.cmd !== "chat") {
             args.nick = args.text;
@@ -186,7 +202,7 @@ export class ChannelUI extends ChannelEventListener {
                 notificationText = `\nFrom ${args.nick}:\n ${notificationText}`;
                 break;
         }
-        if(args.cmd !== "chat"){
+        if (args.cmd !== "chat") {
             notificationText = args.text;
         }
         this.appendMessage(args);
@@ -224,7 +240,7 @@ export class ChannelUI extends ChannelEventListener {
     private createAccessLink() {
         this.accessLink = $(UI.views.accessLink.element).attr("for", this.channel.channelId).attr("data-is-fav", `${UI.isFavourite(`${this.channel.name}@${this.channel.service}`)}`);
         this.accessLink.find(".ch-close").attr("data-close", this.channel.channelId);
-        this.accessLink.find(".fav").attr("data-add", `${this.channel.name}@${this.channel.service}`);
+        this.accessLink.find(".fav").attr("data-add", `${this.channel.name}@${this.channel.service}`).attr("icon", UI.isFavourite(this.channel.name) ? "star" : "star-border");
         this.accessLink.find(".ch-link").text(`${this.channel.name}@${this.channel.service}`)
             .attr("data-tab", this.channel.channelId);
         this.messageCounter = this.accessLink.find(".counter");

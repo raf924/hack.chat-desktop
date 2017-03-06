@@ -10,18 +10,87 @@
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
     <link rel="stylesheet" href="node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
-    <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.min.css">
+    <!-- <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.min.css"> -->
     <link rel="stylesheet" href="node_modules/material-design-icons/iconfont/material-icons.css">
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="static/css/bootstrap.min.css"> -->
     <link rel="stylesheet" href="static/css/app.css">
+    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents.js"></script>
+    <script>
+        window.Polymer = {
+            dom: 'shadow',
+            lazyRegister: true
+        };
+    </script>
+    <link href="bower_components/polymer/polymer.html" rel="import">
+    <link href="bower_components/neon-animation/neon-animations.html" rel="import">
+    <link href="bower_components/iron-elements/iron-elements.html" rel="import">
+    <link href="bower_components/paper-elements/paper-elements.html" rel="import">
+    <link href="bower_components/paper-menu/paper-submenu.html" rel="import">
+
+    <style>
+        paper-submenu paper-menu.menu-content > paper-item.iron-selected {
+            font-weight: normal !important;
+        }
+    </style>
 </head>
 <body>
 <!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
     your browser</a> to improve your experience.</p>
 <![endif]-->
+<paper-drawer-panel id="sidemenu">
+    <paper-header-panel drawer>
+        <paper-toolbar>
+            <div class="middle title">Chatron</div>
+        </paper-toolbar>
+        <paper-icon-button icon="add" id="addChannel"></paper-icon-button>
+        <!--<select id="serviceChoice" title="Service"></select>-->
+        <paper-menu>
+            <paper-submenu>
+                <paper-item class="menu-trigger">Open channels
+                    <iron-icon icon="expand-more"></iron-icon>
+                </paper-item>
+                <paper-menu class="menu-content" id="menu-channels">
+                </paper-menu>
+            </paper-submenu>
+            <paper-submenu>
+                <paper-item class="menu-trigger">Favourites
+                    <iron-icon icon="expand-more"></iron-icon>
+                </paper-item>
+                <paper-menu class="menu-content" id="menu-favourites">
+                </paper-menu>
+            </paper-submenu>
+        </paper-menu>
+    </paper-header-panel>
+    <paper-header-panel main>
+        <paper-toolbar id="app-bar">
+            <paper-icon-button id="sidemenu-collapse" paper-drawer-toggle icon="menu"></paper-icon-button>
+            <span id="channelTitle" class="title"></span>
+            <div id="toolbar">
+            </div>
+            <paper-menu-button horizontal-align="right">
+                <paper-icon-button id="menu" icon="menu" class="right"></paper-icon-button>
+                <paper-menu id="menu-items" class="dropdown-content">
+                    <paper-item>Share</paper-item>
+                </paper-menu>
+            </paper-menu-button>
+        </paper-toolbar>
+        <main>
+            <paper-spinner active id="waitIndicator">
 
-<nav id="sidemenu" class="mdc-permanent-drawer mdc-typography mdc-elevation--z16">
+            </paper-spinner>
+            <div id="channels">
+            </div>
+            <div id="chatBox-wrapper" hidden>
+                <form id="chatInputForm">
+                    <paper-textarea no-label-float id="chatBox" label="Type your message here" rows="2"
+                                    max-rows="2"></paper-textarea>
+                </form>
+            </div>
+        </main>
+    </paper-header-panel>
+</paper-drawer-panel>
+<!-- <nav id="sidemenu" class="mdc-permanent-drawer mdc-typography mdc-elevation--z16">
     <h2 id="title">
         Chatron
     </h2>
@@ -33,8 +102,10 @@
                     Join Channel&nbsp;<i class="material-icons">chat</i>
                 </button>
                 <div class="mdc-textfield" style="display:none;">
-                    <input type="text" class="mdc-textfield__input" placeholder="Channel Name">
+                    <input name="channelName" type="text" class="mdc-textfield__input" placeholder="Channel Name">
                 </div>
+                <select class="mdc-select" name="serviceChoice" tabindex="0" id="serviceChoice">
+                </select>
             </form>
         </div>
         <br>
@@ -55,64 +126,26 @@
         </ul>
     </nav>
 </nav>
-<nav id="app-bar" class="mdc-elevation--z4">
-    <span id="sidemenu-collapse" class="material-icons">menu</span>
-    <div id="menu" class="mdc-menu-anchor tool">
-        <span class="material-icons">more_vert</span>
-        <div class="mdc-simple-menu" data-mdc-auto-init="MDCSimpleMenu">
-            <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-            </ul>
-        </div>
-    </div>
-    <div id="toolbar">
+-->
+<paper-dialog id="newChannelDialog" with-backdrop>
+    <h2>New Channel</h2>
+    <form is="iron-form" id="newChannelForm">
+        <paper-input required="true" label="Channel Name" name="channelName" id="channelName"></paper-input>
+        <paper-dropdown-menu required="true" name="service" label="Services">
+            <paper-listbox required="true" id="serviceChoice" class="dropdown-content">
 
-    </div>
-</nav>
-<main>
-    <div id="channels">
-    </div>
-    <div id="chatBox-wrapper" class="mdc-textfield mdc-textfield--multiline mdc-textfield--fullwidth mdc-elevation--z3"
-         data-mdc-auto-init="MDCTextfield" hidden>
-        <form id="chatInputForm">
-            <textarea id="chatBox" class="mdc-textfield__input" placeholder="Type your message here"
-                      aria-label="Type your message here" rows="1"></textarea>
-        </form>
-    </div>
-</main>
-<aside id="nickPrompt" class="dialog">
-    <form>
-        <section class="dialog-header">
-            <h2 class="dialog-header__title">
-                Login
-            </h2>
-        </section>
-        <section class="dialog-body">
-            <div class="mdc-textfield--fullwidth">
-                <input type="text" id="nickInput" class="mdc-textfield__input"
-                       placeholder="nick[#password] (ex: bob#isadick)" pattern="[^#]+(#[^#]*)?">
-            </div>
-            <div class="mdc-form-field">
-                <div class="mdc-checkbox">
-                    <input type="checkbox" id="useAlways" class="mdc-checkbox__native-control">
-                    <div class="mdc-checkbox__background">
-                        <svg version="1.1" class="mdc-checkbox__checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" xml:space="preserve">
-                            <path class="mdc-checkbox__checkmark__path" fill="none" stroke="white" d="M1.73,12.91 8.1,19.28 22.79,4.59"></path>
-                        </svg>
-                        <div class="mdc-checkbox__mixedmark"></div>
-                    </div>
-                </div>
-                <label for="useAlways">Remember</label>
-            </div>
-        </section>
-        <section class="dialog-footer">
-            <button type="reset" class="dialog-footer__btn cancel">Cancel</button>
-            <button type="submit" class="dialog-footer__btn confirm">Login</button>
-        </section>
+            </paper-listbox>
+        </paper-dropdown-menu>
     </form>
-</aside>
-<div id="sidemenu-overlay" class="overlay hidden">
-
-</div>
+    <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm>Connect</paper-button>
+    </div>
+</paper-dialog>
+<paper-toast id="alert">
+    <paper-button id="alertAction">Cancel</paper-button>
+</paper-toast>
+<!--
 <div id="alert" class="mdc-snackbar"
      aria-live="assertive"
      aria-atomic="true"
@@ -122,6 +155,7 @@
         <button type="button" class="mdc-button mdc-snackbar__action-button"></button>
     </div>
 </div>
+-->
 <!--<script src="node_modules/jquery/dist/jquery.min.js"></script>
 <script src="static/js/bootstrap.min.js"></script>-->
 <script src="bundle.js"></script>

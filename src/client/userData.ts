@@ -5,6 +5,6 @@ export abstract class UserData {
 
     static defaultData = {
         "loginMethod": "mixedLogin",
-        "favourites": ["programming@hack.chat"]
+        "favourites": ["programming@hack.chat", "test@hack.chat", "test@dummy"]
     };
 }

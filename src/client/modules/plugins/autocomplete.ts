@@ -1,9 +1,9 @@
 (function ($) {
     $.fn.autocomplete = function (method?: string, value?: any) {
         let that: JQuery = this;
-        if (this[0].nodeName !== "TEXTAREA" && this[0].nodeName !== "INPUT") {
+        /*if (this[0].nodeName !== "TEXTAREA" && this[0].nodeName !== "INPUT") {
             throw "autocomplete has to be applied to a <textarea> or <input> element";
-        }
+        }*/
         if (arguments.length === 0) {
             if (this.data("autocomplete")) {
                 throw "autocomplete has already been applied to the element";

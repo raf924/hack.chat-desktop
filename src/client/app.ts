@@ -2,7 +2,6 @@ import {Parser} from "./parser";
 import  fs = require('fs');
 import {UserData} from "./userData";
 import {Channel} from "./channel";
-import webpack = require("webpack");
 const platformUserDataClass = require('./loadUserData');
 
 export class App {
@@ -15,6 +14,7 @@ export class App {
     public static ipc: Electron.IpcRenderer; //TODO: replace by abstract communication class
     public static isCordova: boolean;
     public static isAndroid: boolean;
+    public static services: Function[];
 
     static proxy: any;
     private static listeners: any;
@@ -35,8 +35,33 @@ export class App {
             });
         }
         App.isAndroid = !!navigator.userAgent.match(/Android/i);
+        App.loadUserData();
+        App.loadServices();
+        App.loadParsers();
+    }
+
+    static loadServices() {
+        App.services = [];
+        if (!App.isCordova) {
+            let services = fs.readdirSync(`${__dirname}/services`);
+            for (let service of services) {
+                let serviceClass = require(`${__dirname}/services/${service}`).service;
+                if (serviceClass) {
+                    App.services[serviceClass.service] = serviceClass;
+                }
+            }
+        } else {
+            let r = require.context(`./services`, false, /\.js$/);
+            let services = r.keys();
+            for (let service of services) {
+                let serviceClass = r(service).service;
+                App.services[serviceClass.service] = serviceClass;
+            }
+        }
+    }
+
+    static loadUserData() {
         App.favourites = [];
-        App.parsers = [];
         App.userData = new platformUserDataClass();
         App.userData.get("favourites", function (value) {
         }, function (error) {
@@ -50,7 +75,6 @@ export class App {
         App.userData.get("password", function (password) {
             App.password = password;
         });
-        App.loadParsers();
     }
 
     static loadProxy() {
@@ -83,6 +107,7 @@ export class App {
     }
 
     private static loadParsers(): void {
+        App.parsers = [];
         let parsers = [];
         if (!App.isCordova) {
             parsers = fs.readdirSync(`${__dirname}/modules/parsers`);
@@ -110,8 +135,9 @@ export class App {
         App.userData.set("favourites", App.favourites);
     }
 
-    static openChannel(channelName: string, nick: string, password?: string) {
-        let channel = new Channel(channelName, nick, password);
+    static openChannel(service: string, channelName: string, nick: string, password?: string) {
+        let channel = new App.services[service](channelName, nick, password);
+        channel.connect();
         App.currentChannel = channel.channelId;
         return channel;
 

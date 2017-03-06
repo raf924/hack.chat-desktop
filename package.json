@@ -54,7 +54,11 @@
     "@types/hammerjs": "^2.0.34",
     "@types/jquery": "^2.0.40",
     "@types/node": "^6.0.62",
+    "@types/polymer": "^1.1.30",
     "@types/webpack": "^2.2.4",
+    "bower": "^1.8.0",
+    "bower-webpack-plugin": "^0.1.9",
+    "copy-webpack-plugin": "^4.0.1",
     "less": "^2.7.2",
     "typescript": "^2.1.5",
     "xml2js": "^0.4.17"
