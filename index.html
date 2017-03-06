@@ -69,9 +69,8 @@
             <div id="toolbar">
             </div>
             <paper-menu-button horizontal-align="right">
-                <paper-icon-button id="menu" icon="menu" class="right"></paper-icon-button>
+                <paper-icon-button id="menu" icon="more-vert" class="right dropdown-trigger"></paper-icon-button>
                 <paper-menu id="menu-items" class="dropdown-content">
-                    <paper-item>Share</paper-item>
                 </paper-menu>
             </paper-menu-button>
         </paper-toolbar>
@@ -90,43 +89,6 @@
         </main>
     </paper-header-panel>
 </paper-drawer-panel>
-<!-- <nav id="sidemenu" class="mdc-permanent-drawer mdc-typography mdc-elevation--z16">
-    <h2 id="title">
-        Chatron
-    </h2>
-    <nav class="mdc-list-group">
-        <div id="addChannel">
-            <form class="inputprompt">
-                <button class="mdc-button mdc-button--primary mdc-button--raised mdc-ripple-surface mdc-ripple-upgraded"
-                        data-mdc-auto-init="MDCRipple" type="button">
-                    Join Channel&nbsp;<i class="material-icons">chat</i>
-                </button>
-                <div class="mdc-textfield" style="display:none;">
-                    <input name="channelName" type="text" class="mdc-textfield__input" placeholder="Channel Name">
-                </div>
-                <select class="mdc-select" name="serviceChoice" tabindex="0" id="serviceChoice">
-                </select>
-            </form>
-        </div>
-        <br>
-        <hr class="mdc-list-divider">
-        <div id="menu-channels-header" class="mdc-list-group__subheader menu-header collapsed" data-toggle="collapse"
-             data-target="#menu-channels">Open
-            Channels
-            <span class="caret"></span>
-        </div>
-        <ul id="menu-channels" class="mdc-list collapse">
-        </ul>
-        <hr class="mdc-list-divider">
-        <div id="menu-favourites-header" class="mdc-list-group__subheader menu-header collapsed" data-toggle="collapse"
-             data-target="#menu-favourites">Favourite Channels
-            <span class="caret"></span>
-        </div>
-        <ul id="menu-favourites" class="mdc-list collapse">
-        </ul>
-    </nav>
-</nav>
--->
 <paper-dialog id="newChannelDialog" with-backdrop>
     <h2>New Channel</h2>
     <form is="iron-form" id="newChannelForm">
@@ -145,19 +107,6 @@
 <paper-toast id="alert">
     <paper-button id="alertAction">Cancel</paper-button>
 </paper-toast>
-<!--
-<div id="alert" class="mdc-snackbar"
-     aria-live="assertive"
-     aria-atomic="true"
-     aria-hidden="true">
-    <div class="mdc-snackbar__text text"></div>
-    <div class="mdc-snackbar__action-wrapper">
-        <button type="button" class="mdc-button mdc-snackbar__action-button"></button>
-    </div>
-</div>
--->
-<!--<script src="node_modules/jquery/dist/jquery.min.js"></script>
-<script src="static/js/bootstrap.min.js"></script>-->
 <script src="bundle.js"></script>
 <script src="client.js"></script>
 <script src="cordova.js"></script>
