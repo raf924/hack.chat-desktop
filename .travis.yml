@@ -18,6 +18,7 @@ install:
   - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" = "true" ]]; then export ANDROID_HOME=/android_sdk && chmod +x cordova/installAndroid.sh && cordova/installAndroid.sh; fi
   - if [[ "$CORDOVA" = "true" ]]; then npm install; fi
   - if [[ "$CORDOVA" != "true" ]]; then npm install --no-optional && npm run install:electron; fi
+  - node_modules/.bin/bower install;
 script:
   - if [[ "$TRAVIS_OS_NAME" = "osx" ]]; then travis_wait 30 npm run package; fi
   - if [[ "$TRAVIS_OS_NAME" = "linux" && "$CORDOVA" != "true" ]]; then npm run package; fi

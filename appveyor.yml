@@ -10,6 +10,7 @@ install:
 - ps: Install-Product node $env:NODE_VERSION
 - npm install --no-optional
 - npm run install:electron
+- node_modules\.bin\bower.cmd install
 cache:
 - node_modules -> package.json
 xamarin:

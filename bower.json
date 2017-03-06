@@ -1,0 +1,26 @@
+{
+  "name": "Chatron",
+  "description": "A cross-platform client",
+  "main": "index.html",
+  "authors": [
+    "raf924"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "hack.chat",
+    "client",
+    "desktop",
+    "electron"
+  ],
+  "homepage": "https://github.com/raf924/hack.chat-desktop",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "polymer": "^1.8.1"
+  }
+}
