@@ -178,7 +178,7 @@ a {
     float: left;
     font-size: 0.6rem;
     &.hidden {
-      visibility: hidden;
+      display: none;
     }
   }
   .text {
@@ -263,6 +263,8 @@ textarea {
   }
 }
 
+@channelPadding: 1%;
+
 .messages {
   overflow-y: scroll;
   position: absolute;
@@ -270,9 +272,8 @@ textarea {
   //margin-bottom: calc(@titlebarButtonSize ~"+" 12px);
   top: 0;
   bottom: calc(66px ~"+" @titlebarButtonSize ~"+" 13px);
-  padding: 0;
-  padding-right: 1%;
-  width: 98.6%;
+  padding: 0 @channelPadding;
+  width: calc(100% ~"-" @channelPadding*2);
   list-style-type: none;
   &::-webkit-scrollbar {
     width: 0.4%;
