@@ -3,42 +3,56 @@
         if (this.length == 0) return this;
         let that = this;
         let tabSelector = ".tab";
+        let tabContentsContainerSelector = "#channels";
         let activateTab = function (index: number | string, newTab?: boolean) {
-            let $tabs = that.find(`${tabSelector} [data-tab]`);
+            let tabs = that[0].querySelectorAll(`${tabSelector} [data-tab]`);
+            let tabContents = document.querySelector(tabContentsContainerSelector).children;
             if (typeof index === "number") {
-                $tabs.each(function (i) {
-                    let $div = $(`[id='${$(this).attr("data-tab")}']`);
-                    $(this)[i == index ? "addClass" : "removeClass"]("active");
-                    $div[i == index ? "addClass" : "removeClass"]("active");
-
+                tabs.forEach(function (tab, i) {
+                    let tabContent = document.querySelector(`[id='${tab.dataset["tab"]}']`);
+                    tab.classList.toggle("active", i === index);
+                    tabContent.classList.toggle("active", i === index);
                 });
             } else if (typeof index === "string") {
-                $tabs.removeClass("active");
-                $(`[id='${index}']`).addClass("active");
+                tabs.forEach((tab) => tab.classList.remove("active"));
+                Array.from(tabContents).forEach((tabContent) => tabContent.classList.remove("active"));
+                document.querySelector(tabContentsContainerSelector).querySelector(`[id='${index}']`).classList.toggle("active", true);
+                document.querySelector(`[data-tab='${index}']`).classList.toggle("active", true);
             }
+            let tab = that[0].querySelector(`${tabSelector} [data-tab].active`);
+            if(tab == null){
+                return this;
+            }
+            let tabId = tab.dataset["tab"];
             if (newTab) {
-                $(that).trigger("tabs.opened", $(`${tabSelector} [data-tab].active`, that).attr("data-tab"));
+                let event = new CustomEvent("tabs.opened", {detail: tabId});
+                that[0].dispatchEvent(event);
             }
-            $(that).trigger("tabs.changed", $(`${tabSelector} [data-tab].active`, that).attr("data-tab"));
-
+            let event = new CustomEvent("tabs.changed", {detail: tabId});
+            that[0].dispatchEvent(event);
         };
-        this.on("click", "[data-close]", function () {
-            $(that).trigger("tabs.closed", $(this).attr("data-close"));
-            $(`[id='${$(this).attr("data-close")}']`).remove();
-            $(this).parent().remove();
-        }).on("click", "[data-tab]", function () {
-            activateTab($(this).index(`${tabSelector} [data-tab]`));
+        this.on("click", "[data-close]", function (e) {
+            let tabId = e.currentTarget.dataset["close"];
+            let event = new CustomEvent("tabs.closed", {detail: tabId});
+            that[0].dispatchEvent(event);
+            document.querySelector(`[id='${tabId}']`).remove();
+            e.currentTarget.parentElement.remove();
+        }).on("click", "[data-tab]", function (e) {
+            activateTab(e.currentTarget.dataset["tab"]);
         });
         let observer = new MutationObserver(function (mutationRecord) {
             mutationRecord.forEach(function (mutation) {
                 switch (mutation.type) {
                     case "attributes":
-                        activateTab($(mutation.target).index(`${tabSelector} [data-tab]`));
+                        activateTab((<HTMLElement>mutation.target).dataset["tab"]);
                         break;
                     case "childList":
                         if (mutation.addedNodes.length > 0) {
-                            let $tabs = $(mutation.addedNodes).find("[data-tab]");
-                            activateTab($tabs.index(`${tabSelector} [data-tab]`), true);
+                            for (let node of mutation.addedNodes) {
+                                if ((<HTMLElement>node).dataset["tab"]) {
+                                    activateTab((<HTMLElement>node).dataset["tab"], true);
+                                }
+                            }
                         }
                         break;
                 }

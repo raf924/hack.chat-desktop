@@ -90,8 +90,7 @@ class UI {
             UI.titleBar = titlebar();
             UI.titleBar.appendTo(document.body);
             document.body.insertBefore(UI.titleBar.element, document.body.firstChild);
-            $(UI.titleBar.element).append($("<div>").text("Chatron"));
-            UI.titleBar.element.classList.add("mdc-elevation--z4");
+            $(UI.titleBar.element).append($("<div>").attr("id","app-title").text("Chatron"));
             UI.loadTitleBarEvents();
         } else {
             document.body.classList.add("cordova");
@@ -112,7 +111,7 @@ class UI {
 
     private static loadTitleBarEvents(): void {
         for (let event of ["close", "minimize", "fullscreen"]) {
-            UI.titleBar.on(event, function (e) {
+            UI.titleBar.on(event, function () {
                 App.ipc.send(event, function () {
 
                 });
@@ -206,7 +205,7 @@ class UI {
                 }
                 UI.loginMethod.close();
             };
-            UI.loginMethod.oncancel = (channelName) => {
+            UI.loginMethod.oncancel = () => {
                 UI.loginMethod.close();
             }
         });
@@ -230,10 +229,10 @@ class UI {
                 UI.addFavourite(channelName);
             }
         });
-        $("#sidemenu-collapse").click(function (eventObject) {
+        $("#sidemenu-collapse").click(function () {
             UI.toggleDrawer();
         });
-        $("#sidemenu-overlay").click(function (e) {
+        $("#sidemenu-overlay").click(function () {
             UI.toggleDrawer(false);
         });
         /*if (App.isCordova) {
@@ -246,10 +245,10 @@ class UI {
             UI.toggleDrawer(false);
         });
         Polymer.dom(document.body).querySelectorAll("paper-submenu").forEach(function (el: HTMLElement) {
-            el.addEventListener("paper-submenu-close", function (e) {
+            el.addEventListener("paper-submenu-close", function () {
                 (<any>el.querySelector(".menu-trigger iron-icon")).icon = "expand-more";
             });
-            el.addEventListener("paper-submenu-open", function (e) {
+            el.addEventListener("paper-submenu-open", function () {
                 (<any>el.querySelector(".menu-trigger iron-icon")).icon = "expand-less";
             });
         });
@@ -263,33 +262,37 @@ class UI {
     }
 
     private static loadTabEvents(): void {
-        $("#menu-channels")
-            .tabs("init")
-            .on("tabs.opened", function (e, channelId) {
-                if (!UI.channelUIs[channelId].channel.isOnline) {
-                    //UI.chatInputForm.find("#chatBox").attr("disabled", "");
-                }
-            })
-            .on("tabs.changed", function (e, channelId) {
-                let currentChannelUI: ChannelUI = UI.channelUIs[channelId];
-                if (currentChannelUI != null) {
-                    currentChannelUI.unreadMessageCount = 0;
-                    currentChannelUI.messageCounter.text(0);
-                    App.currentChannel = channelId;
-                    if (currentChannelUI.channel.isOnline) {
-                        UI.chatInputForm.parent().removeAttr("hidden");
-                        let users: string[] = [];
-                        for (let user in UI.channelUIs[channelId].channel.users) {
-                            users.push(user);
-                        }
-                        UI.chatInputForm.find("#chatBox").autocomplete("setItems", users);
+        let tabContainer = document.querySelector("#menu-channels");
+        $(tabContainer).tabs("init");
+
+        tabContainer.addEventListener("tabs.opened", function (e: CustomEvent) {
+            if (!UI.channelUIs[e.detail.tabId].channel.isOnline) {
+                //UI.chatInputForm.find("#chatBox").attr("disabled", "");
+            }
+        });
+
+        tabContainer.addEventListener("tabs.changed", function (e: CustomEvent) {
+            let channelId = e.detail.tabId;
+            let currentChannelUI: ChannelUI = UI.channelUIs[channelId];
+            if (currentChannelUI != null) {
+                currentChannelUI.unreadMessageCount = 0;
+                currentChannelUI.messageCounter.text(0);
+                App.currentChannel = channelId;
+                if (currentChannelUI.channel.isOnline) {
+                    UI.chatInputForm.parent().removeAttr("hidden");
+                    let users: string[] = [];
+                    for (let user in UI.channelUIs[channelId].channel.users) {
+                        users.push(user);
                     }
+                    UI.chatInputForm.find("#chatBox").autocomplete("setItems", users);
                 }
-                document.title = `Chatron - ${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
-            })
-            .on("tabs.closed", function (e, channelId) {
-                UI.closeChannelUI(channelId);
-            });
+            }
+            document.title = `Chatron - ${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
+            UI.titleBar.element.querySelector("#app-title").textContent = `${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
+        });
+        tabContainer.addEventListener("tabs.closed", function (e: CustomEvent) {
+            UI.closeChannelUI(e.detail.tabId);
+        });
     }
 
     public static closeChannelUI(channelId) {
