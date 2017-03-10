@@ -13,7 +13,7 @@ import {UI} from "./ui";
 import fs = require('fs');
 import {App} from "./app";
 
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
     App.init();
     if (!App.isCordova) {
         fs.readdir(`${__dirname}/modules/plugins`, function (err, files) {

@@ -6,12 +6,12 @@ import {ChannelEventListener} from "./channelEventListener";
 import {UI} from "./ui";
 
 export class ChannelUI extends ChannelEventListener {
-    public messagesUI: JQuery;
-    public usersUI: JQuery;
+    public messagesUI: HTMLElement;
+    public usersUI: HTMLElement;
     public readonly channel: Channel;
-    public accessLink: JQuery;
-    public ui: JQuery;
-    public messageCounter: JQuery;
+    public accessLink: HTMLElement;
+    public ui: HTMLElement;
+    public messageCounter: HTMLElement;
     public unreadMessageCount: number;
     public isAtBottom: boolean = true;
 
@@ -24,8 +24,15 @@ export class ChannelUI extends ChannelEventListener {
         this.channel = channel;
         this.createAccessLink();
         this.unreadMessageCount = 0;
-        this.usersUI = $(UI.views.users.element).attr("for", this.channel.channelId).appendTo('#users');
-        this.ui = $(UI.views.channel.element).attr("id", this.channel.channelId).appendTo("#channels");
+        let tmpElement = document.createElement("div");
+        document.querySelector("#users").appendChild(tmpElement);
+        tmpElement.outerHTML = UI.views.users.element;
+        this.usersUI = <HTMLElement>document.querySelector("#users").lastChild;
+        this.usersUI.setAttribute("for", this.channel.channelId);
+        tmpElement = document.createElement("div");
+        document.querySelector("#channels").appendChild(tmpElement);
+        tmpElement.outerHTML = UI.views.channel.element;
+        this.ui = <HTMLElement>document.querySelector("#channels").lastChild;
         this.messagesUI = this.ui;
         this.bindChannelEvents();
         this.bindUIEvents();
@@ -67,41 +74,48 @@ export class ChannelUI extends ChannelEventListener {
     }
 
     private bindUIEvents() {
-        let that = this;
         let oldHeight = 0;
-        this.messagesUI.scroll(function (e) {
-            that.isAtBottom = Math.floor(this.scrollHeight - this.scrollTop) <= this.clientHeight + 1;
+        this.messagesUI.addEventListener("scroll", (function () {
+            this.isAtBottom = Math.floor(this.messagesUI.scrollHeight - this.messagesUI.scrollTop) <= this.messagesUI.clientHeight + 1;
+        }).bind(this));
+        this.messagesUI.addEventListener("wheel", function (e) {
+            oldHeight = (<HTMLElement>e.currentTarget).scrollHeight;
         });
-        this.messagesUI.on("wheel", function (e) {
-            oldHeight = this.scrollHeight;
-        });
-        this.messagesUI.on("tap", ".message .text", (function (e) {
-            if ((<HTMLElement>e.target).classList.contains(".text")) {
-                $(e.target).parents(".message").find(".timestamp").toggleClass("hidden");
+        this.messagesUI.addEventListener("tap", (function (e) {
+            let target = <HTMLElement>e.currentTarget;
+            if (target.classList.contains("text")) {
+                let parentElement = target.parentElement;
+                while (!parentElement.classList.contains("message")) {
+                    parentElement = parentElement.parentElement;
+                }
+                parentElement.querySelector(".timestamp").classList.toggle("hidden");
                 if (this.isAtBottom) {
                     this.scrollToBottom();
                 }
+            } else if (target.classList.contains("nick")) {
+                UI.insertAtCursor(`@${target.innerText} `);
             }
         }).bind(this));
-        this.messagesUI.on("tap", ".message .nick[data-nick]", function (e) {
-            UI.insertAtCursor(`@${$(this).text()} `);
-        });
     }
 
     public appendMessage(args: any) {
-        let $message = $(UI.views.message.element);
+        let tmpElement = document.createElement("div");
+        let wasAtBottom = Math.floor(this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop) <= this.messagesUI[0].clientHeight + 1;
+        this.messagesUI.appendChild(tmpElement);
+        tmpElement.outerHTML = UI.views.message.element;
+        let messageElement = <HTMLElement>this.messagesUI.lastChild;
         if (args.nick === this.channel.nick) {
-            $message.addClass("from-user");
+            messageElement.classList.add("from-user");
         }
         switch (args.cmd) {
             case "chat":
                 if (args.nick === this.channel.lastSender) {
-                    $message.addClass("from-last-sender");
+                    messageElement.classList.add("from-last-sender");
                 }
-                $message.find(".nick").attr("data-nick", args.nick);
+                messageElement.querySelector(".nick").setAttribute("data-nick", args.nick);
                 break;
             case "onlineSet":
-                this.messagesUI.find(".message").remove();
+                this.messagesUI.lastElementChild.remove();
                 break;
             case "warn":
                 if (args.text === "Nickname taken") {
@@ -119,22 +133,19 @@ export class ChannelUI extends ChannelEventListener {
         }
         if (args.cmd !== "chat") {
             args.nick = args.text;
-            args.text = "";
-            $message.addClass("cmd");
-            $message.find(".text").parent().css("display", "none");
-            $message.find(".timestamp").removeClass("hidden");
+            messageElement.classList.add("cmd");
+            messageElement.parentElement.classList.add("hidden");
+            messageElement.querySelector(".timestamp").classList.remove("hidden");
         }
-        $message.find(".nick").html(args.nick);
-        $message.find(".text").html(args.text);
-        $message.find(".trip").text(args.trip);
+        messageElement.querySelector(".nick").innerHTML = args.nick;
+        messageElement.querySelector(".text").innerHTML = args.text;
+        messageElement.querySelector(".trip").innerHTML = args.trip;
         if (args.time) {
-            $message.find(".timestamp").text(new Date(args.time).toLocaleString());
+            messageElement.querySelector(".timestamp").textContent = new Date(args.time).toLocaleString();
         }
         if (args.mod) {
-            $message.find(".mod").removeClass("hidden");
+            messageElement.querySelector(".mod").classList.remove("hidden");
         }
-        let wasAtBottom = Math.floor(this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop) <= this.messagesUI[0].clientHeight + 1;
-        this.messagesUI.append($message);
         if (wasAtBottom) {
             this.scrollToBottom();
         } else {
@@ -144,26 +155,27 @@ export class ChannelUI extends ChannelEventListener {
 
     public scrollToBottom() {
         this.isAtBottom = true;
-        this.messagesUI.scrollTop(this.messagesUI[0].scrollHeight);
+        this.messagesUI.scrollTo({top: this.messagesUI[0].scrollHeight});
     }
 
     addUser(user) {
-        let $user = $(UI.views.user.element);
-        $user.attr("user", user)
-            .find(".nick")
-            .text(user);
-        this.usersUI.append($user);
+        let tmpElement = document.createElement("div");
+        this.usersUI.appendChild(tmpElement);
+        tmpElement.outerHTML = UI.views.users.element;
+        let userElement = <HTMLElement>this.usersUI.lastChild;
+        userElement.setAttribute("user", user);
+        (<HTMLElement>userElement.querySelector(".nick")).innerText = user;
         if (App.currentChannel_ === this.channel.channelId) {
             UI.chatInputForm.find("#chatBox").autocomplete("addItem", user);
         }
     }
 
     tripCodeSet(user, tripCode) {
-        this.usersUI.find(`.user[user='${user}'] .trip`).text(tripCode);
+        (<HTMLElement>this.usersUI.querySelector(`.user[user='${user}'] .trip`)).innerText = tripCode;
     }
 
     removeUser(user) {
-        this.usersUI.find(`.user[user='${user}']`).remove();
+        this.usersUI.querySelector(`.user[user='${user}']`).remove();
         if (App.currentChannel_ === this.channel.channelId) {
             UI.chatInputForm.find("#chatBox").autocomplete("removeItem", user);
         }
@@ -212,11 +224,11 @@ export class ChannelUI extends ChannelEventListener {
         let isUserMentionned = args.mention;
         if (!isCurrentChannel || !isAppActive) {
             this.unreadMessageCount++;
-            this.messageCounter.text(this.unreadMessageCount);
+            this.messageCounter.innerText = `${this.unreadMessageCount}`;
             if (shouldNotify || isUserMentionned) {
                 let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
                 let notificationClicked = (function () {
-                    UI.channelTabs.tabs("activate", this.channel.channelId);
+                    UI.channelTabs.activateTab(this.channel.channelId);
                 }).bind(this);
                 if (App.isCordova) {
                     window.cordova.plugins.notification.local.schedule({
@@ -233,17 +245,24 @@ export class ChannelUI extends ChannelEventListener {
             }
         } else {
             this.unreadMessageCount = 0;
-            this.messageCounter.text(this.unreadMessageCount);
+            this.messageCounter.innerText = `${this.unreadMessageCount}`;
         }
     }
 
     private createAccessLink() {
-        this.accessLink = $(UI.views.accessLink.element).attr("for", this.channel.channelId).attr("data-is-fav", `${UI.isFavourite(`${this.channel.name}@${this.channel.service}`)}`);
-        this.accessLink.find(".ch-close").attr("data-close", this.channel.channelId);
-        this.accessLink.find(".fav").attr("data-add", `${this.channel.name}@${this.channel.service}`).attr("icon", UI.isFavourite(this.channel.name) ? "star" : "star-border");
-        this.accessLink.find(".ch-link").text(`${this.channel.name}@${this.channel.service}`)
-            .attr("data-tab", this.channel.channelId);
-        this.messageCounter = this.accessLink.find(".counter");
-        UI.channelTabs.append(this.accessLink);
+        let tmpElement = document.createElement("div");
+        UI.channelTabs.tabContainer.appendChild(tmpElement);
+        tmpElement.outerHTML = UI.views.accessLink.element;
+        this.accessLink = <HTMLElement>UI.channelTabs.tabContainer.lastChild;
+        this.accessLink.setAttribute("for", this.channel.channelId);
+        this.accessLink.dataset["isFav"] = `${UI.isFavourite(`${this.channel.name}@${this.channel.service}`)}`;
+        (<HTMLElement>this.accessLink.querySelector(".ch-close")).dataset["close"] = this.channel.channelId;
+        let fav = <HTMLElement>this.accessLink.querySelector(".fav");
+        fav.dataset["add"] = `${this.channel.name}@${this.channel.service}`;
+        fav.setAttribute("icon", UI.isFavourite(`${this.channel.name}@${this.channel.service}`) ? "star" : "star-border");
+        let link = <HTMLElement>this.accessLink.querySelector(".ch-link");
+        link.innerText = `${this.channel.name}@${this.channel.service}`;
+        link.dataset["tab"] = this.channel.channelId;
+        this.messageCounter = <HTMLElement>this.accessLink.querySelector(".counter");
     }
 }

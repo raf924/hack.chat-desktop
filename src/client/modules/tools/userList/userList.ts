@@ -20,17 +20,16 @@ export class UserList extends Tool {
         }
         link.rel = "stylesheet";
         document.head.appendChild(link);
-        UI.toolBar.find("#toolbar").append(html);
-        this.root = UI.toolBar.find(`#toolbar #userList`)[0];
+        let tmpElement = document.createElement("div");
+        UI.toolBar.querySelector("#toolbar").appendChild(tmpElement);
+        tmpElement.outerHTML = html;
+        this.root = UI.toolBar.querySelector(`#toolbar #userList`);
         this.root.style.display = "none";
         this.menu = this.root.querySelector("paper-menu");
         this.userList = this.root.querySelector("#list");
         (<HTMLElement>this.root.querySelector("paper-icon-button")).addEventListener("click", (function () {
             //TODO: erase all children
             if (App.currentChannel_) {
-                if (!this.menu.classList.contains("mdc-simple-menu--open")) {
-                    this.menu.classList.add("mdc-simple-menu--open");
-                }
                 let users = UI.currentChannelUI.channel.users;
                 this.userList.innerHTML = "";
                 for (let user in users) {
@@ -43,7 +42,6 @@ export class UserList extends Tool {
                     userElement.dataset["nick"] = user;
                     userElement.dataset["trip"] = users[user];
                 }
-                //document.addEventListener("click", closeMenu);
             }
         }).bind(this));
         this.userList.addEventListener("tap", (function (e) {

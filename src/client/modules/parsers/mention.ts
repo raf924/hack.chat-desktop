@@ -28,7 +28,10 @@ class MentionParser implements Parser {
 
             if (users[nick] !== undefined && users.hasOwnProperty(nick)) { //TODO: add condition from config : highlightedMention
                 let userReg = new RegExp(`(\\s+|^|<span>)(@)${nick}(</span>|\\s+|$)`, 'g');
-                let html = $("<span>").css("color", users[nick] || "#b7ef72").text(`@${nick}`)[0].outerHTML; //TODO: set default highlight color
+                let element = document.createElement("span");
+                element.style.color = "#b7ef72"; //TODO: set default highlight color + generate color from trip
+                element.innerText = `@${nick}`;
+                let html = element.outerHTML;
                 message = newMessage.replace(userReg, `$1${html}$3`);
             }
         }
