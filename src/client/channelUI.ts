@@ -7,7 +7,6 @@ import {UI} from "./ui";
 
 export class ChannelUI extends ChannelEventListener {
     public messagesUI: HTMLElement;
-    public usersUI: HTMLElement;
     public readonly channel: Channel;
     public accessLink: HTMLElement;
     public ui: HTMLElement;
@@ -25,11 +24,6 @@ export class ChannelUI extends ChannelEventListener {
         this.createAccessLink();
         this.unreadMessageCount = 0;
         let tmpElement = document.createElement("div");
-        document.querySelector("#users").appendChild(tmpElement);
-        tmpElement.outerHTML = UI.views.users.element;
-        this.usersUI = <HTMLElement>document.querySelector("#users").lastChild;
-        this.usersUI.setAttribute("for", this.channel.channelId);
-        tmpElement = document.createElement("div");
         document.querySelector("#channels").appendChild(tmpElement);
         tmpElement.outerHTML = UI.views.channel.element;
         this.ui = <HTMLElement>document.querySelector("#channels").lastChild;
@@ -60,7 +54,6 @@ export class ChannelUI extends ChannelEventListener {
         //TODO: ask for confirmation (if config allows it)
         this.channel.close();
         this.accessLink.remove();
-        this.usersUI.remove();
         this.messagesUI.remove();
         this.ui.remove();
     }
@@ -100,7 +93,7 @@ export class ChannelUI extends ChannelEventListener {
 
     public appendMessage(args: any) {
         let tmpElement = document.createElement("div");
-        let wasAtBottom = Math.floor(this.messagesUI[0].scrollHeight - this.messagesUI[0].scrollTop) <= this.messagesUI[0].clientHeight + 1;
+        let wasAtBottom = Math.floor(this.messagesUI.scrollHeight - this.messagesUI.scrollTop) <= this.messagesUI.clientHeight + 1;
         this.messagesUI.appendChild(tmpElement);
         tmpElement.outerHTML = UI.views.message.element;
         let messageElement = <HTMLElement>this.messagesUI.lastChild;
@@ -155,28 +148,21 @@ export class ChannelUI extends ChannelEventListener {
 
     public scrollToBottom() {
         this.isAtBottom = true;
-        this.messagesUI.scrollTo({top: this.messagesUI[0].scrollHeight});
+        this.messagesUI.scrollTop = this.messagesUI.scrollHeight;
     }
 
     addUser(user) {
-        let tmpElement = document.createElement("div");
-        this.usersUI.appendChild(tmpElement);
-        tmpElement.outerHTML = UI.views.users.element;
-        let userElement = <HTMLElement>this.usersUI.lastChild;
-        userElement.setAttribute("user", user);
-        (<HTMLElement>userElement.querySelector(".nick")).innerText = user;
-        if (App.currentChannel_ === this.channel.channelId) {
+        if (!App.isCordova && App.currentChannel_ === this.channel.channelId) {
             UI.chatInputForm.find("#chatBox").autocomplete("addItem", user);
         }
     }
 
     tripCodeSet(user, tripCode) {
-        (<HTMLElement>this.usersUI.querySelector(`.user[user='${user}'] .trip`)).innerText = tripCode;
+
     }
 
     removeUser(user) {
-        this.usersUI.querySelector(`.user[user='${user}']`).remove();
-        if (App.currentChannel_ === this.channel.channelId) {
+        if (!App.isCordova && App.currentChannel_ === this.channel.channelId) {
             UI.chatInputForm.find("#chatBox").autocomplete("removeItem", user);
         }
 
