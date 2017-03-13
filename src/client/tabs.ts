@@ -37,7 +37,7 @@ export class Tabs {
             console.warn(`tabClass must be a string. Using default tab selector: ${this.tabSelector}`);
         }
         this.tabContainer.addEventListener("click", (function (e) {
-            let target = <HTMLElement>e.currentTarget;
+            let target = <HTMLElement>e.target;
             if(target.dataset["close"]){
                 let tabId = target.dataset["close"];
                 let event = new CustomEvent("tabs.closed", {detail: tabId});

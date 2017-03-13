@@ -4,6 +4,7 @@ import {Channel} from "./channel";
 import {App} from "./app";
 import {ChannelEventListener} from "./channelEventListener";
 import {UI} from "./ui";
+import {Autocomplete} from "./autocomplete";
 
 export class ChannelUI extends ChannelEventListener {
     public messagesUI: HTMLElement;
@@ -27,6 +28,7 @@ export class ChannelUI extends ChannelEventListener {
         document.querySelector("#channels").appendChild(tmpElement);
         tmpElement.outerHTML = UI.views.channel.element;
         this.ui = <HTMLElement>document.querySelector("#channels").lastChild;
+        this.ui.id = this.channel.channelId;
         this.messagesUI = this.ui;
         this.bindChannelEvents();
         this.bindUIEvents();
@@ -75,10 +77,10 @@ export class ChannelUI extends ChannelEventListener {
             oldHeight = (<HTMLElement>e.currentTarget).scrollHeight;
         });
         this.messagesUI.addEventListener("tap", (function (e) {
-            let target = <HTMLElement>e.currentTarget;
+            let target = <HTMLElement>e.target;
             if (target.classList.contains("text")) {
                 let parentElement = target.parentElement;
-                while (!parentElement.classList.contains("message")) {
+                while (!parentElement.matches(".message")) {
                     parentElement = parentElement.parentElement;
                 }
                 parentElement.querySelector(".timestamp").classList.toggle("hidden");
@@ -153,7 +155,7 @@ export class ChannelUI extends ChannelEventListener {
 
     addUser(user) {
         if (!App.isCordova && App.currentChannel_ === this.channel.channelId) {
-            UI.chatInputForm.find("#chatBox").autocomplete("addItem", user);
+            (<Autocomplete>UI.chatBox).addItem(user);
         }
     }
 
@@ -163,7 +165,7 @@ export class ChannelUI extends ChannelEventListener {
 
     removeUser(user) {
         if (!App.isCordova && App.currentChannel_ === this.channel.channelId) {
-            UI.chatInputForm.find("#chatBox").autocomplete("removeItem", user);
+            (<Autocomplete>UI.chatBox).removeItem(user);
         }
 
     }
@@ -173,7 +175,7 @@ export class ChannelUI extends ChannelEventListener {
         switch (args.cmd) {
             case "onlineSet":
                 args.text = `Users online : ${args.nicks.join(", ")}`;
-                UI.chatInputForm.parent().removeAttr("hidden");
+                UI.chatInputForm.parentElement.removeAttribute("hidden");
                 break;
             case "onlineRemove":
                 args.text = `${args.nick} has left`;

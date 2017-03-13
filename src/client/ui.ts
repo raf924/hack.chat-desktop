@@ -12,6 +12,7 @@ import {NotifyConfig} from "./notifyConfig";
 import Hammer = require("hammerjs");
 import {Tool} from "./tool";
 import {Tabs} from "./tabs";
+import {Autocomplete} from "./autocomplete";
 //const mdc = require('material-components-web/dist/material-components-web.min.js');
 //const MDCSnackbar: any = mdc.snackbar.MDCSnackbar;
 
@@ -24,6 +25,7 @@ class UI {
     public static views: Views;
     private static nickPrompt: HTMLElement;
     public static chatInputForm: HTMLFormElement;
+    public static chatBox: HTMLTextAreaElement | Autocomplete;
     public static channelTabs: Tabs;
     public static channelsContainer: HTMLElement;
     public static loginMethod: LoginMethod;
@@ -42,7 +44,7 @@ class UI {
     private static addFavourite(channelName: string) {
         App.addFavourite(channelName);
         let channelTab = <HTMLElement>UI.channelTabs.tabContainer.querySelector(`[for$='${channelName}']`);
-        if(channelTab){
+        if (channelTab) {
             channelTab.dataset["isFav"] = "true";
             channelTab.querySelector(".fav").setAttribute("icon", "star");
         }
@@ -102,6 +104,8 @@ class UI {
         UI.loadViews();
         UI.nickPrompt = <HTMLElement>document.querySelector("#nickPrompt");
         UI.chatInputForm = <HTMLFormElement>document.querySelector("#chatInputForm");
+        UI.chatBox = App.isCordova ? <HTMLTextAreaElement>document.querySelector("#chatBox") :
+            new Autocomplete(<HTMLTextAreaElement>document.querySelector("#chatBox"));
         this.channelTabs = new Tabs("menu-channels", "channels");
         UI.favouritesUI = <HTMLElement>document.querySelector("#menu-favourites");
         if (!App.isCordova) {
@@ -272,7 +276,9 @@ class UI {
                     for (let user in UI.channelUIs[channelId].channel.users) {
                         users.push(user);
                     }
-                    UI.chatInputForm.find("#chatBox").autocomplete("setItems", users);
+                    if (!App.isCordova) {
+                        (<Autocomplete>UI.chatBox).items = users;
+                    }
                 }
             }
             document.title = `Chatron - ${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
@@ -285,7 +291,7 @@ class UI {
             let target = <HTMLElement>e.target;
             if (target.matches(".favourite, .favourite *")) {
                 let parent = target;
-                while (!parent.matches(".favourite")){
+                while (!parent.matches(".favourite")) {
                     parent = parent.parentElement;
                 }
                 target = parent;
