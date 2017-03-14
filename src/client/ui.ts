@@ -1,5 +1,3 @@
-///<reference path="../../node_modules/@types/jquery/index.d.ts" />
-///<reference path="modules/plugins/index.d.ts"/>
 //TODO: add keyboard shortcuts
 
 import {ChannelUI} from "./channelUI"
@@ -13,8 +11,6 @@ import Hammer = require("hammerjs");
 import {Tool} from "./tool";
 import {Tabs} from "./tabs";
 import {Autocomplete} from "./autocomplete";
-//const mdc = require('material-components-web/dist/material-components-web.min.js');
-//const MDCSnackbar: any = mdc.snackbar.MDCSnackbar;
 
 //TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
 class UI {
@@ -176,9 +172,6 @@ class UI {
             //TODO: add commands handling
             //TODO: add history
         });
-        if (!App.isCordova) {
-            $(UI.chatInputForm.querySelector("#chatBox")).autocomplete();
-        }
         window.onresize = function (ev) {
             if (App.currentChannel_ != null && UI.currentChannelUI.isAtBottom) {
                 UI.currentChannelUI.scrollToBottom();
