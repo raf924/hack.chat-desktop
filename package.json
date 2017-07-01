@@ -13,6 +13,7 @@
     "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
     "package": "node build.js && node package.js",
     "build": "node build.js",
+    "bower": "node_modules\\.bin\\bower install",
     "install:electron": "npm install electron && npm install electron-builder && npm install electron-packager",
     "build:cordova": "node build.js && cd cordova && ../node_modules/.bin/cordova prepare && node copyIcon.js && ../node_modules/.bin/cordova build",
     "run:android": "node build.js && cd cordova && node copyIcon.js && ..\\node_modules\\.bin\\cordova.cmd run android"
@@ -35,20 +36,19 @@
     "titlebar": "^1.4.0"
   },
   "optionalDependencies": {
-    "cordova": "^6.5.0",
+    "cordova": "^7.0.1",
     "extract-text-webpack-plugin": "^2.0.0-rc.3",
-    "file-loader": "^0.10.0",
+    "file-loader": "^0.11.1",
     "html-loader": "^0.4.4",
     "webpack": "^2.2.1",
-    "css-loader": "^0.26.1"
+    "css-loader": "^0.28.2"
   },
   "devDependencies": {
     "@types/cordova": "0.0.34",
     "@types/electron": "^1.4.31",
-    "@types/electron-builder": "^2.0.29",
     "@types/hammerjs": "^2.0.34",
     "@types/jquery": "^2.0.40",
-    "@types/node": "^6.0.62",
+    "@types/node": "^6.0.73",
     "@types/webpack": "^2.2.4",
     "bower": "^1.8.0",
     "copy-webpack-plugin": "^4.0.1",

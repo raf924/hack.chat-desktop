@@ -110,7 +110,7 @@ export class ChannelUI extends ChannelEventListener {
                 messageElement.querySelector(".nick").setAttribute("data-nick", args.nick);
                 break;
             case "onlineSet":
-                this.messagesUI.lastElementChild.remove();
+                //this.messagesUI.lastElementChild.remove();
                 break;
             case "warn":
                 if (args.text === "Nickname taken") {
