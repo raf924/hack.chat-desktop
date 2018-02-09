@@ -1,14 +1,14 @@
+import {ConfigJSON} from "./src/modules/config-json"
+
 const electron = require('electron');
 const app = electron.app; // Module to control application life.
+app.commandLine.appendSwitch("--ignore-certificate-errors");
 const BrowserWindow = electron.BrowserWindow; // Module to create native browser window.
 const Menu = electron.Menu;
 const shell = electron.shell;
 const ipc = electron.ipcMain;
 
-const ConfigJSON = require("./lib/modules/config-json");
-
 const localConfig = new ConfigJSON(`${process.cwd()}/data.json`);
-const fs = require('fs');
 
 //TODO: Add remote config
 //TODO: Add tray icon
@@ -84,10 +84,11 @@ app.on('ready', function () {
     Menu.setApplicationMenu(null);
 
     // and load the index.html of the app.
-    mainWindow.loadURL(`file://${__dirname}/index.html`);
+    let htmlFile = `file://${__dirname}/../platforms/browser/www/index.html`;
+    mainWindow.loadURL(htmlFile);
     webContents = mainWindow.webContents;
     webContents.on("did-finish-load", function () {
-       webContents.executeJavaScript("document.dispatchEvent(new Event('deviceready'));");
+        webContents.executeJavaScript("document.dispatchEvent(new Event('deviceready'));");
     });
     mainWindow.flashFrame(true);
     // Open the devtools.

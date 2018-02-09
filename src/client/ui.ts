@@ -1,71 +1,61 @@
+///<reference path="../types/Polymer.d.ts"/>
 //TODO: add keyboard shortcuts
 
-import {ChannelUI} from "./channelUI"
-const titlebar = require('titlebar');
-import fs = require('fs');
 import {App} from "./app";
 import {LoginMethod} from "./loginMethod";
 import {Views} from "./views";
 import {NotifyConfig} from "./notifyConfig";
-import Hammer = require("hammerjs");
-import {Tool} from "./tool";
+// import {Tool} from "./tool";
 import {Tabs} from "./tabs";
 import {Autocomplete} from "./autocomplete";
+import {UIChannels} from "./elements/ui-channels";
+import {ChannelTabs} from "./elements/ui-channel-tabs";
+import {Favourite, Favourites} from "./elements/ui-favourites";
+import {ServiceManager} from "./serviceManager";
 
 //TODO: subclass UI to allow custom interfaces (remove titlebar from parent class ?)
-class UI {
-    public static favouritesUI: HTMLElement;
-    private static titleBar: Titlebar;
-    private static channelUIs: Map<string, ChannelUI>;
-    public static notifyConfig: NotifyConfig;
-    public static views: Views;
-    private static nickPrompt: HTMLElement;
-    public static chatInputForm: HTMLFormElement;
-    public static chatBox: HTMLTextAreaElement | Autocomplete;
-    public static channelTabs: Tabs;
-    public static channelsContainer: HTMLElement;
-    public static loginMethod: LoginMethod;
-    public static toolBar: HTMLElement;
-    private static snackBar: any;
+class UI extends Polymer.PropertyEffects(Object) {
+    public favouritesUI: Favourites;
+    private titleBar: TitleBar;
+    public notifyConfig: NotifyConfig;
+    public views: Views;
+    private nickPrompt: HTMLElement;
+    public chatInputForm: HTMLFormElement;
+    public chatBox: HTMLTextAreaElement | Autocomplete;
+    public channelTabs: Tabs;
+    public channelsContainer: HTMLElement;
+    public loginMethod: LoginMethod;
+    public toolBar: HTMLElement;
+    private snackBar: any;
     public static readonly DEFAULT_ALERT_TIMEOUT = 6000;
+    private channelsUI: UIChannels;
+    public static instance: UI;
 
-    public static get currentChannelUI(): ChannelUI {
-        return UI.channelUIs[App.currentChannel_];
-    }
-
-    public static isFavourite(channelName: string): boolean {
-        return !!UI.favouritesUI.querySelector(`[data-open$='${channelName}']`);
-    }
-
-    private static addFavourite(channelName: string) {
-        App.addFavourite(channelName);
-        let channelTab = <HTMLElement>UI.channelTabs.tabContainer.querySelector(`[for$='${channelName}']`);
-        if (channelTab) {
-            channelTab.dataset["isFav"] = "true";
-            channelTab.querySelector(".fav").setAttribute("icon", "star");
+    public static load(): UI {
+        if (!UI.instance) {
+            UI.instance = new UI();
         }
-        Polymer.dom(UI.favouritesUI).appendChild(document.createElement("div"));
-        Polymer.dom.flush();
-        let favourite = <HTMLElement>Polymer.dom(UI.favouritesUI).lastElementChild;
-        favourite.outerHTML = UI.views.favourite.element;
-        favourite = <HTMLElement>UI.favouritesUI.lastChild;
-        favourite.dataset["open"] = channelName;
-        favourite.querySelector(".name").textContent = channelName;
-        /*
-         let visibleHeight: Number = $(UI.favouritesUI).visibleHeight();
-         //TODO: see if code below is still applicable
-         if (UI.favouritesUI.css("max-height") != visibleHeight.toString() && UI.favouritesUI.height() > visibleHeight) {
-         UI.favouritesUI.css("max-height", visibleHeight.toString());
-         }*/
+        return UI.instance;
     }
 
-    public static init() {
-        UI.channelUIs = new Map<string, ChannelUI>();
+    public static get properties() {
+        return {
+            favouriteUI: {
+                type: Favourites
+            }, channelsUI: {
+                type: UIChannels
+            }
+        };
+    }
+
+    constructor() {
+        super();
+        require(`style-loader!${__dirname}/../less/app.less`)();
         //UI.snackBar = new mdc.snackbar.MDCSnackbar($("#alert")[0]);
         //TODO: Load UI components from component/selector maps stored in JSON
-        UI.loadUIComponents();
+        this.loadUIComponents();
 
-        UI.notifyConfig = {
+        this.notifyConfig = {
             "onlineSet": false,
             "onlineAdd": true,
             "onlineRemove": true,
@@ -74,84 +64,84 @@ class UI {
             "info": true
         }; //TODO: get the notify values from the App.userData
 
-        UI.loadUIEvents();
-        UI.loadChatEvents();
-        UI.loadLoginEvents();
-        UI.loadTabEvents();
-        UI.loadChannelEvents();
-        UI.loadTools();
-        UI.loadServices();
-        Polymer.dom(document.body).querySelector("#waitIndicator").active = false;
+        this.loadUIEvents();
+        this.loadChatEvents();
+        this.loadLoginEvents();
+        this.loadTabEvents();
+        this.loadChannelEvents();
+        this.loadTools();
+        this.loadServices();
+        (<any>document.querySelector("#waitIndicator")).active = false;
     }
 
-    private static loadTitleBarEvents(): void {
+    public isFavourite(channelName: string): boolean {
+        return !!this.favouritesUI.querySelector(`[data-open$='${channelName}']`);
+    }
+
+    private addFavourite(channelName: string) {
+        let favourite: Favourite = {name: null, service: null};
+        [favourite.name, favourite.service] = channelName.split("@");
+        App.load().addFavourite(favourite);
+        (<ChannelTabs>this.channelTabs.tabContainer).addFavourite(favourite);
+        this.favouritesUI.addFavourite(favourite);
+        /*
+         //TODO: see if code below is still applicable
+         if (UI.favouritesUI.css("max-height") != visibleHeight.toString() && UI.favouritesUI.height() > visibleHeight) {
+         UI.favouritesUI.css("max-height", visibleHeight.toString());
+         }*/
+    }
+
+    private loadTitleBarEvents(): void {
         for (let event of ["close", "minimize", "fullscreen"]) {
-            UI.titleBar.on(event, function () {
-                App.ipc.send(event, function () {
+            this.titleBar.on(event, function () {
+                App.load().ipc.send(event, function () {
 
                 });
             });
         }
     }
 
-    private static loadUIComponents(): void {
-        UI.channelsContainer = <HTMLElement>document.querySelector("#channels");
-        UI.toolBar = <HTMLElement>document.querySelector("#app-bar");
-        UI.loadViews();
-        UI.nickPrompt = <HTMLElement>document.querySelector("#nickPrompt");
-        UI.chatInputForm = <HTMLFormElement>document.querySelector("#chatInputForm");
-        UI.chatBox = App.isCordova ? <HTMLTextAreaElement>document.querySelector("#chatBox") :
+    private loadUIComponents(): void {
+        this.channelsContainer = <HTMLElement>document.querySelector("#channels");
+        this.toolBar = <HTMLElement>document.querySelector("#app-bar");
+        this.loadViews();
+        this.nickPrompt = <HTMLElement>document.querySelector("#nickPrompt");
+        this.chatInputForm = <HTMLFormElement>document.querySelector("#chatInputForm");
+        this.chatBox = !App.isElectron ? <HTMLTextAreaElement>document.querySelector("#chatBox") :
             new Autocomplete(<HTMLTextAreaElement>document.querySelector("#chatBox"));
         this.channelTabs = new Tabs("menu-channels", "channels");
-        UI.favouritesUI = <HTMLElement>document.querySelector("#menu-favourites");
-        if (!App.isCordova) {
-            UI.loadIpcEvents();
-            UI.titleBar = titlebar();
-            UI.titleBar.appendTo(document.body);
-            document.body.insertBefore(UI.titleBar.element, document.body.firstChild);
+        this.favouritesUI = <Favourites>document.querySelector("#menu-favourites");
+        if (App.isElectron) {
+            this.loadIpcEvents();
+            this.titleBar = window.TitleBar;
+            this.titleBar.appendTo(document.body);
+            document.body.insertBefore(this.titleBar.element, document.body.firstChild);
             let titleElement = document.createElement("div");
             titleElement.id = "app-title";
             titleElement.innerText = "Chatron";
-            UI.titleBar.element.appendChild(titleElement);
-            UI.loadTitleBarEvents();
+            this.titleBar.element.appendChild(titleElement);
+            this.loadTitleBarEvents();
         } else {
             document.body.classList.add("cordova");
         }
-        UI.snackBar = Polymer.dom(document.body).querySelector("#alert");
+        this.snackBar = document.querySelector("#alert");
     }
 
-    private static loadTools(): void {
-        let tools: Tool[];
-        let files = [];
-        let toolPath = `${__dirname}/modules/tools`;
-        if (!App.isCordova) {
-            files = fs.readdirSync(toolPath);
-            files.forEach(function (file) {
-                try {
-                    let toolModule = require(`${__dirname}/modules/tools/${file}/${file}`);
-                    let tool: Tool = new toolModule[toolModule.toolName]();
-                } catch (e) {
-                    console.error(`Couldn't load tool '${file}'`);
-                }
-            });
-
-        } else {
-            let r = require.context("./modules/tools", true, /\.js$/);
-            files = r.keys();
-            for (let tool of files) {
-                let toolModule = r(tool);
-                new toolModule[toolModule.toolName]();
-            }
+    private loadTools(): void {
+        let r = require.context("./modules/tools", true, /\.ts/);
+        let files = r.keys();
+        for (let tool of files) {
+            let toolClass = r(tool).default;
+            (<any>document.querySelector("#toolbar")).push("tools", {is: toolClass.is});
         }
-
     }
 
-    private static loadViews(): void {
-        UI.views = new Views();
+    private loadViews(): void {
+        this.views = new Views();
     }
 
-    static insertAtCursor(text): void {
-        let chatBox: HTMLTextAreaElement = <HTMLTextAreaElement>UI.chatInputForm.find("#chatBox")[0];
+    insertAtCursor(text): void {
+        let chatBox: HTMLTextAreaElement = <HTMLTextAreaElement>this.chatInputForm.find("#chatBox")[0];
         let pos = chatBox.selectionStart || 0;
         let value = chatBox.value;
         chatBox.value = [value.slice(0, pos), text, value.slice(pos)].join('');
@@ -159,227 +149,205 @@ class UI {
         chatBox.focus();
     }
 
-    private static loadChatEvents(): void {
-        UI.chatInputForm.addEventListener("submit", function (e) {
+    private loadChatEvents(): void {
+        this.chatInputForm.addEventListener("submit", function (e) {
             e.preventDefault();
         });
-        UI.chatInputForm.querySelector("#chatBox").addEventListener("keydown", function (e: KeyboardEvent) {
+        this.chatInputForm.querySelector("#chatBox").addEventListener("keydown", function (e: KeyboardEvent) {
             if (e.keyCode === 13 && !e.shiftKey) {
                 e.preventDefault();
-                UI.currentChannelUI.channel.sendMessage((<HTMLInputElement>e.currentTarget).value);
+                this.currentChannelUI.channel.sendMessage((<HTMLInputElement>e.currentTarget).value);
                 (<HTMLInputElement>e.currentTarget).value = "";
             }
             //TODO: add commands handling
             //TODO: add history
         });
         window.onresize = function (ev) {
-            if (App.currentChannel_ != null && UI.currentChannelUI.isAtBottom) {
-                UI.currentChannelUI.scrollToBottom();
+            if (App.load().currentChannel_ != null && this.currentChannelUI.isAtBottom) {
+                this.currentChannelUI.scrollToBottom();
             }
-        };
+        }.bind(this);
     }
 
-    private static loadLoginEvents(): void {
-        App.userData.get("loginMethod", function (loginMethod) {
-            let method = require(`${__dirname}/modules/login/${loginMethod}/${loginMethod}`);
-            UI.loginMethod = new method[method.className]();
-            UI.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
-                if (!App.isCordova) {
-                    App.ipc.send("join", JSON.stringify({
-                        "channel": channelName,
-                        "service": service,
-                        "nick": nick,
-                        "password": password
-                    }));
-                } else {
-                    UI.login(channelName, service, nick, password);
-                }
-                if (useAlways) {
-                    App.userData.set("nickName", nick);
-                    App.userData.set("password", password);
-                    App.nick = nick;
-                    App.password = password;
-                }
-                UI.loginMethod.close();
-            };
-            UI.loginMethod.oncancel = () => {
-                UI.loginMethod.close();
-            }
-        });
-    }
-
-    private static toggleDrawer(state?: boolean) {
-        let panel = Polymer.dom(document.body).querySelector("#sidemenu");
-        if (state || state == null) {
-            panel.openDrawer();
-        } else {
-            panel.closeDrawer();
+    private toggleDrawer(state?: boolean) {
+        let panel = <AppDrawer>document.querySelector("#sidemenu");
+        if (panel.persistent) {
+            return;
         }
-
+        if (state || state == null) {
+            panel.close();
+        } else {
+            panel.close();
+        }
     }
 
-    private static loadUIEvents(): void {
+    private loadUIEvents(): void {
+        //TODO: move this to the ui-channel component
         this.channelTabs.tabContainer.addEventListener("click", function (e) {
             e.preventDefault();
             let target = <HTMLElement>e.currentTarget;
             if (target.classList.contains("fav")) {
                 let channelName = target.dataset["add"];
-                if (!UI.isFavourite(channelName)) {
-                    UI.addFavourite(channelName);
+                if (!this.isFavourite(channelName)) {
+                    this.addFavourite(channelName);
                 }
             }
-        });
+        }.bind(this));
         document.querySelector("#sidemenu-collapse").addEventListener("tap", function () {
-            UI.toggleDrawer();
+            this.toggleDrawer();
         });
-        Polymer.dom(document.body).querySelectorAll("paper-submenu").forEach(function (el: HTMLElement) {
-            el.addEventListener("paper-submenu-close", function () {
-                (<any>el.querySelector(".menu-trigger iron-icon")).icon = "expand-more";
+        document.querySelectorAll("ui-collapse").forEach(function (el: HTMLElement) {
+            el.addEventListener("closed", function () {
+                (<any>el.querySelector("iron-icon")).icon = "expand-more";
             });
-            el.addEventListener("paper-submenu-open", function () {
-                (<any>el.querySelector(".menu-trigger iron-icon")).icon = "expand-less";
+            el.addEventListener("opened", function () {
+                (<any>el.querySelector("iron-icon")).icon = "expand-less";
             });
         });
     }
 
-    private static loadIpcEvents(): void {
-        App.ipc.on("openChannel", function (e, data) {
+    private loadIpcEvents(): void {
+        App.load().ipc.on("openChannel", function (e, data) {
             let {channel, service, nick, password} = JSON.parse(data);
-            UI.login(channel, service, nick, password);
+            if (channel && service && nick) {
+                this.login(channel, service, nick, password);
+            } else {
+                this.alert("There was an error during login");
+            }
         });
     }
 
-    private static loadTabEvents(): void {
-        UI.channelTabs.tabContainer.addEventListener("tabs.opened", function (e: CustomEvent) {
-            if (!UI.channelUIs[e.detail.tabId].channel.isOnline) {
+    private loadTabEvents(): void {
+        this.channelTabs.tabContainer.addEventListener("tabs.opened", function (e: CustomEvent) {
+            if (!this.channelUIs[e.detail.tabId].channel.isOnline) {
                 //UI.chatInputForm.find("#chatBox").attr("disabled", "");
             }
         });
 
-        UI.channelTabs.tabContainer.addEventListener("tabs.changed", function (e: CustomEvent) {
+        this.channelTabs.tabContainer.addEventListener("tabs.changed", function (e: CustomEvent) {
+            document.dispatchEvent(new CustomEvent("channel.changed", {
+                detail: {
+                    channelId: e.detail.tabId
+                }
+            }));
+            /*
             let channelId = e.detail.tabId;
-            let currentChannelUI: ChannelUI = UI.channelUIs[channelId];
             if (currentChannelUI != null) {
                 currentChannelUI.unreadMessageCount = 0;
                 currentChannelUI.messageCounter.innerText = "0";
-                App.currentChannel = channelId;
+                App.load().currentChannel = channelId;
                 if (currentChannelUI.channel.isOnline) {
-                    UI.chatInputForm.parent().removeAttr("hidden");
+                    this.chatInputForm.parent().removeAttr("hidden");
                     let users: string[] = [];
-                    for (let user in UI.channelUIs[channelId].channel.users) {
+                    for (let user in this.channelUIs[channelId].channel.users) {
                         users.push(user);
                     }
-                    if (!App.isCordova) {
-                        (<Autocomplete>UI.chatBox).items = users;
+                    if (App.isElectron) {
+                        (<Autocomplete>this.chatBox).items = users;
                     }
                 }
-            }
-            document.title = `Chatron - ${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
-            UI.titleBar.element.querySelector("#app-title").textContent = `${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
+                document.title = `Chatron - ${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
+                this.titleBar.element.querySelector("#app-title").textContent = `${currentChannelUI.channel.nick}${currentChannelUI.channel.name}@${currentChannelUI.channel.service}`;
+            }*/
         });
-        UI.channelTabs.tabContainer.addEventListener("tabs.closed", function (e: CustomEvent) {
-            UI.closeChannelUI(e.detail.tabId);
+        this.channelTabs.tabContainer.addEventListener("tabs.closed", function (e: CustomEvent) {
+            this.closeChannelUI(e.detail.tabId);
         });
-        UI.favouritesUI.addEventListener("tap", function (e) {
-            let target = <HTMLElement>e.target;
-            if (target.matches(".favourite, .favourite *")) {
-                let parent = target;
-                while (!parent.matches(".favourite")) {
-                    parent = parent.parentElement;
-                }
-                target = parent;
-                let [channel, service] = target.dataset["open"].split("@");
-                UI.login(channel, service);
-            }
+        this.favouritesUI.addEventListener("favourite.tapped", function (e: CustomEvent) {
+            let {name, service} = e.detail;
+            this.login(name, service);
         });
-        App.userData.get("favourites", function (favourites) {
+        this.favouritesUI.addEventListener("favourite.remove", function (e: CustomEvent) {
+            //TODO: remove favourite
+            (<ChannelTabs>this.channelTabs.tabContainer).removeFavourite(e.detail);
+        });
+        App.load().userData.get("favourites", function (favourites) {
             favourites.forEach(function (favourite) {
-                UI.addFavourite(favourite);
+                this.addFavourite(favourite);
             });
         });
     }
 
-    public static closeChannelUI(channelId) {
-        UI.channelUIs[channelId].close();
-        delete UI.channelUIs[channelId];
-        if (UI.channelTabs.count === 0) {
-            UI.chatInputForm.parent().attr("hidden", "true");
+    public closeChannelUI(channelId) {
+        this.channelsUI.closeChannel(channelId);
+        //UI.channelUIs[channelId].close();
+        //delete UI.channelUIs[channelId];
+        if (this.channelTabs.count === 0) {
+            this.chatInputForm.parent().attr("hidden", "true");
         }
-        if (channelId === App.currentChannel_) {
-            App.currentChannel = null;
+        if (channelId === App.load().currentChannel_) {
+            App.load().currentChannel = null;
         }
     }
 
-    private static login(channelName: string, service: string, nick ?: string, password ?: string): void {
+    private login(channelName: string, service: string, nick ?: string, password ?: string): void {
         if (nick !== undefined && nick !== null && nick !== ""
         ) {
-            UI.openChannel(service, channelName, nick, password);
+            this.openChannel(service, channelName, nick, password);
         }
-        else if (App.nick === undefined || App.nick === null || App.nick === "") {
-            //UI.nickPrompt.modal('open');//TODO: give the user a choice in the type of login popup
-            UI.loginMethod.open(channelName, service);
-            UI.toggleDrawer(false);
-            //UI.nickPrompt.find("input").focus();
+        else if (App.load().nick === undefined || App.load().nick === null || App.load().nick === "") {
+            //TODO: give the user a choice in the type of login popup
+            this.loginMethod.open(channelName, service);
+            this.toggleDrawer(false);
         } else {
-            UI.openChannel(service, channelName, App.nick, App.password);
+            this.openChannel(service, channelName, App.load().nick, App.load().password);
         }
     }
 
-    private static openChannel(service: string, channelName: string, nick: string, password: string): void {
-        let channel = App.openChannel(service, channelName, nick, password);
-        UI.channelUIs[channel.channelId] = new ChannelUI(channel);
+    private openChannel(service: string, channelName: string, nick: string, password: string): void {
+        let channel = App.load().openChannel(service, channelName, nick, password);
+        this.channelsUI.addChannel(channel);
     }
 
-    private static loadChannelEvents() {
-        let channelDialog = Polymer.dom(document.body).querySelector("#newChannelDialog");
-        let channelForm = Polymer.dom(channelDialog).querySelector("#newChannelForm");
-        Polymer.dom(document.body).querySelector("#addChannel").addEventListener("tap", function () {
-            Polymer.dom(channelForm).querySelector("#serviceChoice").select(null);
-            channelForm.reset();
-            channelDialog.open();
+    private loadChannelEvents() {
+        let channelDialog = document.querySelector("#newChannelDialog");
+        let channelForm = channelDialog.querySelector("#newChannelForm");
+        document.querySelector("#addChannel").addEventListener("tap", function () {
+            channelForm.querySelector("#serviceChoice")["select"](null);
+            channelForm["reset"]();
+            channelDialog["open"]();
         });
         channelDialog.addEventListener("iron-overlay-closed", function (e) {
             if (e.target !== e.currentTarget) {
                 return;
             }
 
-            let event = Polymer.dom(e);
-            if (event.event.detail.confirmed) {
-                if (channelForm.validate()) {
-                    channelForm.submit();
+            let event = e;
+            if (event["event"].detail.confirmed) {
+                if (channelForm["validate"]()) {
+                    channelForm["submit"]();
                 } else {
-                    channelDialog.open();
+                    channelDialog["open"]();
                 }
             }
         });
         channelForm.addEventListener("iron-form-submit", function (e) {
             e.preventDefault();
-            let {channelName, service} = channelForm.serialize();
-            UI.login(channelName, service);
-            channelForm.reset();
+            let {channelName, service} = channelForm["serialize"]();
+            this.login(channelName, service);
+            channelForm["reset"]();
         });
     }
 
-    public static alert(text: string, timeout?: number, actionText?: string, actionHandler?: () => {}): void {
-        UI.snackBar.duration = timeout || UI.DEFAULT_ALERT_TIMEOUT;
-        let actionButton = Polymer.dom(UI.snackBar).querySelector("#alertAction");
-        actionButton.innerText = actionText;
+    public alert(text: string, timeout?: number, actionText?: string, actionHandler?: Function): void {
+        this.snackBar.duration = timeout || UI.DEFAULT_ALERT_TIMEOUT;
+        let actionButton = this.snackBar.querySelector("#alertAction");
+        (<HTMLElement>actionButton).innerText = actionText;
         actionButton.addEventListener("tap", function () {
-            UI.snackBar.close();
+            this.snackBar.close();
             actionHandler();
         });
-        UI.snackBar.text = text;
-        UI.snackBar.open();
+        this.snackBar.text = text;
+        this.snackBar.open();
     }
 
-    private static loadServices() {
-        let select = Polymer.dom(document.body).querySelector("#serviceChoice");
-        for (let service in App.services) {
+    private loadServices() {
+        let select = document.querySelector("#serviceChoice");
+        for (let service in ServiceManager.load().services) {
             let option = document.createElement("paper-item");
             option.innerText = service;
             option.dataset["service"] = service;
-            Polymer.dom(select).appendChild(option);
-            Polymer.dom(select).flush();
+            select.appendChild(option);
         }
     }
 }

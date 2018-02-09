@@ -1,0 +1,73 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner.html">
+
+<dom-module id="ui-loader">
+    <template>
+        <style>
+            :host {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                background: white;
+                display: none;
+                z-index: 1;
+            }
+
+            :host([active]) {
+                display: block;
+            }
+
+            #backdrop {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                height: 100%;
+                background: white;
+                display: none;
+                z-index: 1;
+            }
+
+            #spinner {
+                position: fixed;
+                top: 50%;
+                left: calc(50% - 14px);
+                z-index: 2;
+            }
+
+            #backdrop[active] {
+                display: block;
+            }
+        </style>
+        <paper-spinner active="{{active}}" id="spinner"></paper-spinner>
+        <div id="backdrop" active$="{{active}}"></div>
+    </template>
+</dom-module>
+<script>
+    class Loader extends Polymer.Element {
+        static get is() {
+            return "ui-loader";
+        }
+
+        static get properties() {
+            return {
+                active: {
+                    type: Boolean,
+                    value: false,
+                    reflectToAttribute: true
+                }
+            };
+        }
+
+        constructor() {
+            super();
+        }
+    }
+    customElements.define(Loader.is, Loader);
+</script>

@@ -1,44 +1,67 @@
 const webpack = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
-module.exports = {
+
+let clientConfig = {
+    //devtool: 'inline-source-map',
+    target: "electron-renderer",
     entry: {
-        main: `${__dirname}/client.js`,
-        static: `${__dirname}/cordova/static.js`
+        main: `${__dirname}/client.ts`,
     },
     output: {
-        path: `${__dirname}/cordova/www`,
+        path: `${__dirname}/www`,
         filename: 'bundle.js'
+    },
+    resolve: {
+        extensions: [".ts", ".js"],
+        //modules: [`${__dirname}/src`, `${__dirname}/node_modules`]
+    },
+    resolveLoader: {
+        modules: [`${__dirname}/loaders`, `${__dirname}/node_modules`]
     },
     module: {
         rules: [{
-            test: /\.css$/,
-            exclude: /(tools|cordova)/,
-            use: ExtractTextPlugin.extract({
-                loader: 'css-loader',
-                options: {
-                    sourceMap: true
-                }
-            })
+            test: /\.ts$/, loader: "ts-loader"
         }, {
-            test: /\.(png|woff(2)?|eot|ttf|svg)(\?[a-z0-9=\.]+)?$/,
-            loader: 'file-loader?name=[name].[ext]&publicPath=../fonts/&outputPath=static/fonts/',
-        },{
-            test: /index\.html$/,
-            loader: 'file-loader?name=[name].[ext]'
+            test: /\.less$/,
+            use: "./loaders/less-loader"
         }]
     },
     plugins: [
-        new webpack.optimize.DedupePlugin(),
-        new webpack.optimize.UglifyJsPlugin(),
-        new ExtractTextPlugin(`static/css/app.css`),
-        new CopyPlugin([{from: `${__dirname}/bower_components`, to: `${__dirname}/cordova/www/bower_components`}])
+        new webpack.optimize.ModuleConcatenationPlugin(),
+        new CopyPlugin([
+            //{from: `${__dirname}/bower_components/**/*.+(html|js)`, to: `${__dirname}/www`},
+            {from: `${__dirname}/static`, to: `${__dirname}/www/static`},
+            {from: `${__dirname}/vendor`, to: `${__dirname}/www/vendor`},
+            {from: `${__dirname}/index.html`, to: `${__dirname}/www/index.html`}])
     ],
-    externals: {
-        titlebar: "null"
-    },
     node: {
-        fs: "empty",
-        titlebar: "empty"
+        __dirname: false,
+        fs: false
     }
 };
+
+let electronConfig = {
+    target: "electron-main",
+    entry: "./main.js",
+    output: {
+        path: `${__dirname}/electron`,
+        filename: "main.js"
+    },
+    module: {
+        rules: [
+            {test: /\.ts$/, loader: "ts-loader"}
+        ]
+    },
+    resolve: {
+        extensions: [".tsx", ".ts", ".js"],
+        modules: [`${__dirname}/src`, `${__dirname}/node_modules`]
+    },
+    plugins: [
+        new webpack.optimize.ModuleConcatenationPlugin()
+    ],
+    node: {
+        __dirname: false
+    }
+};
+
+module.exports = [clientConfig, electronConfig];

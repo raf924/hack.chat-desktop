@@ -1,62 +1,71 @@
-import {Tool, ToolType} from "../../../tool";
+import {Listener, Tool, ToolType} from "../../../tool";
 import {UI} from "../../../ui";
 import {App} from "../../../app";
-export class UserList extends Tool {
-    root: any | HTMLElement;
-    menu: any | HTMLElement;
-    userList: any | HTMLElement;
+import {MentionEvent} from "../../../events";
+
+export default class ToolUserList extends Tool {
+    //TODO: use App::addListener
+    get listeners(): Array<Listener> {
+        return [
+            {
+                property: "currentChannel_",
+                callback: (function (currentChannel) {
+                    if (currentChannel === null) {
+                        this.root.style.display = "none";
+                    } else {
+                        this.root.style.display = "";
+                    }
+                    this.loadList();
+                }).bind(this)
+            }
+        ];
+    }
+
+    static get is() {
+        return "tool-userlist";
+    }
 
     constructor() {
         super();
-        let html = "";
-        let link = document.createElement("link");
-        if (!App.isCordova) {
-            html = require("fs").readFileSync(`${__filename.replace(/\.js$/i, ".html")}`).toString();
-            link.href = `${__filename.replace(/\.js$/i, ".css")}`;
+    }
 
-        } else {
-            html = require(`html-loader!${__filename.replace(/\.js$/i, ".html")}`);
-            link.href = require(`file-loader?name=[name].[ext]&publicPath=tools/&outputPath=tools/!${__filename.replace(/\.js$/i, ".css")}`);
-        }
-        link.rel = "stylesheet";
-        document.head.appendChild(link);
-        let tmpElement = document.createElement("div");
-        UI.toolBar.querySelector("#toolbar").appendChild(tmpElement);
-        tmpElement.outerHTML = html;
-        this.root = UI.toolBar.querySelector(`#toolbar #userList`);
-        this.root.style.display = "none";
-        this.menu = this.root.querySelector("paper-menu");
-        this.userList = this.root.querySelector("#list");
-        (<HTMLElement>this.root.querySelector("paper-icon-button")).addEventListener("click", (function () {
-            //TODO: erase all children
-            if (App.currentChannel_) {
-                let users = UI.currentChannelUI.channel.users;
-                this.userList.innerHTML = "";
-                for (let user in users) {
-                    let userElement = document.createElement("paper-item");
-                    this.userList.appendChild(userElement);
-                    userElement.outerHTML = this.root.querySelector("#userTemplate").innerHTML.trim();
-                    userElement = this.userList.lastElementChild;
-                    userElement.querySelector(".nick").textContent = user;
-                    userElement.querySelector(".trip").textContent = users[user];
-                    userElement.dataset["nick"] = user;
-                    userElement.dataset["trip"] = users[user];
+    static get properties() {
+        return {
+            users: {
+                type: Array,
+                value() {
+                    return [];
                 }
             }
-        }).bind(this));
-        this.userList.addEventListener("tap", (function (e) {
-            if ((e.target.classList.contains("user") || e.target.parentElement.classList.contains("user"))) {
-                UI.insertAtCursor(`@${e.target.dataset["nick"] || e.target.parentElement.dataset["nick"]} `);
-            }
-        }).bind(this));
-        App.addListener("currentChannel_", (function (currentChannel) {
-            if (currentChannel === null) {
-                this.root.style.display = "none";
-            } else {
-                this.root.style.display = "";
-            }
-        }).bind(this));
+        };
+    }
+
+    ready() {
+        super.ready();
+        require(`style-loader!${__filename.replace(/\.ts$/i, ".less")}`)(this.root);
+    }
+
+    loadList() {
+        //TODO: erase all children
+        if (App.load().currentChannel) {
+            this.set("users", App.load().currentChannel.users);
+        }
+    }
+
+    mention(e) {
+        UI.load().insertAtCursor(`@${e.model.item.nick} `);
+        document.dispatchEvent(new MentionEvent(App.load().currentChannel, e.model.item.nick));
+    }
+
+    get hasListeners() {
+        return true;
     }
 }
 
-export let toolName = UserList.name;
+let link = document.createElement("link");
+link.rel = "import";
+link.href = require("file-loader?name=[name].[ext]&publicPath=./&outputPath=./lib/client/modules/tools/userList/!./userList.html");
+document.head.appendChild(link);
+link.onload = function () {
+    customElements.define(ToolUserList.is, ToolUserList);
+};

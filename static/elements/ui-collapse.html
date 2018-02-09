@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/polymer/lib/utils/flattened-nodes-observer.html">
+
+<dom-module id="ui-collapse">
+    <template>
+        <iron-collapse></iron-collapse>
+    </template>
+</dom-module>
+<script>
+    class Collapse extends Polymer.Element {
+
+        static get is() {
+            return "ui-collapse";
+        }
+
+        constructor() {
+            super();
+            let that = this;
+            let interval = setInterval(function () {
+                if (that.root) {
+                    clearInterval(interval);
+                    that.ironCollapse = that.root.querySelector("iron-collapse");
+                    that.ironCollapse.addEventListener("transitionend", function (e) {
+                        that.dispatchEvent(new CustomEvent(that.opened ? "opened" : "closed", {
+                            composed: true,
+                            bubbles: true
+                        }));
+                    });
+                    that.loadContent();
+                    let observer = new MutationObserver(function (mutations) {
+                        that.loadContent();
+                    });
+                    observer.observe(that, {childList: true, subtree: true, attribute: true, characterData: true});
+                }
+            }, 100);
+        }
+
+        get opened() {
+            return this.ironCollapse.opened;
+        }
+
+        loadContent() {
+            this.ironCollapse.root.querySelector("content").innerHTML = this.innerHTML;
+        }
+
+        toggle() {
+            this.ironCollapse.toggle();
+        }
+    }
+    customElements.define(Collapse.is, Collapse);
+</script>

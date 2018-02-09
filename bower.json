@@ -20,9 +20,35 @@
     "test",
     "tests"
   ],
-  "devDependencies": {
-    "polymer": "^1.8.1",
-    "paper-elements": "PolymerElements/paper-elements#^1.0.7",
-    "iron-elements": "PolymerElements/iron-elements#^1.0.10"
+  "dependencies": {
+    "polymer": "^2.0.1",
+    "webcomponentsjs": "1.0.1",
+    "paper-listbox": "^2.0.0",
+    "paper-badge": "^2.0.0",
+    "neon-animation": "^2.0.1",
+    "paper-menu": "^1.3.0",
+    "paper-drawer-panel": "^2.0.0",
+    "paper-toolbar": "^2.0.0",
+    "paper-button": "^2.0.0",
+    "paper-item": "^2.0.0",
+    "paper-spinner": "^2.0.0",
+    "paper-input": "^2.0.1",
+    "paper-checkbox": "^2.0.0",
+    "iron-form": "^2.0.0",
+    "paper-dialog": "^2.0.0",
+    "paper-toast": "^2.0.0",
+    "paper-dropdown-menu": "^2.0.0",
+    "iron-icon": "^2.0.0",
+    "iron-icons": "^2.0.1",
+    "app-layout": "PolymerElements/app-layout#^2.0.1",
+    "paper-ui-elements": "PolymerElements/paper-ui-elements",
+    "iron-a11y-keys": "PolymerElements/iron-a11y-keys#^2.0.0",
+    "paper-card": "PolymerElements/paper-card#^2.0.0"
+  },
+  "resolutions": {
+    "polymer": "^2.0.1",
+    "webcomponentsjs": "1.0.1",
+    "font-roboto": "master",
+    "paper-ripple": "1 - 2"
   }
 }

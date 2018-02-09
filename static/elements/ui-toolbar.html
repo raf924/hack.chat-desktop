@@ -1,0 +1,39 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+
+<dom-module id="ui-toolbar">
+    <template>
+        <template is="dom-repeat" items="{{tools}}">
+            <ui-tool name="{{item.is}}"></ui-tool>
+        </template>
+    </template>
+</dom-module>
+
+<script>
+    class UIToolBar extends Polymer.Element {
+        static get is() {
+            return "ui-toolbar";
+        }
+
+        constructor() {
+            super();
+        }
+
+        static get properties() {
+            return {
+                tools: {
+                    type: Array,
+                    value(){
+                        return [];
+                    }
+                }
+            }
+        }
+
+        ready() {
+            super.ready();
+        }
+    }
+
+    customElements.define(UIToolBar.is, UIToolBar);
+</script>

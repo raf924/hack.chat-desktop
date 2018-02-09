@@ -1,6 +1,10 @@
-declare interface Titlebar {
-    appendTo(el: HTMLElement): Titlebar;
+declare interface TitleBar {
+
+    appendTo(el: HTMLElement): TitleBar;
+
     element: HTMLElement;
+
     destroy(): void;
-    on(event: string, callback: Function): Titlebar;
+
+    on(event: string, callback: Function): TitleBar;
 }

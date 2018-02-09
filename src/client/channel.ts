@@ -1,13 +1,14 @@
-import {EventEmitter} from 'events';
+import {EventEmitter} from './eventEmitter';
 
-abstract class Channel extends EventEmitter {
+export abstract class Channel extends EventEmitter {
     name: string;
     nick: string;
     users: Map<string, string>;
     password: string;
-    service;
+    service: string;
     lastSender: string = null;
     currentSender: string;
+    active: boolean;
 
     constructor(name, nickName, password) {
         super();
@@ -60,5 +61,3 @@ abstract class Channel extends EventEmitter {
         super.emit("disconnected", {code, reason});
     }
 }
-
-export {Channel};

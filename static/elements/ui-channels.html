@@ -1,0 +1,68 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="ui-channel.html">
+
+<dom-module id="ui-channels">
+    <template>
+        <template is="dom-repeat" items="{{channels}}">
+            <ui-channel id="[[item.channelId]]" channel="[[item]]"></ui-channel>
+        </template>
+    </template>
+</dom-module>
+
+<script>
+    class UIChannels extends Polymer.GestureEventListeners(Polymer.Element) {
+        static get is() {
+            return "ui-channels";
+        }
+
+        static get properties() {
+            return {
+                channels: {
+                    type: Array,
+                    value() {
+                        return [];
+                    }
+                }
+            }
+        }
+
+        constructor() {
+            super();
+        }
+
+        ready() {
+            super.ready();
+        }
+
+        public setActive(channelId) {
+            this.channels.forEach(function (channel) {
+                channel.active = channel.channelId === channelId;
+            });
+        }
+
+        public get currentChannel() {
+            return this.channels.find(function (channel) {
+                return channel.active;
+            });
+        }
+
+        public get currentChannelUI(){
+            return this.querySelectorAll("ui-channel").find(function (channelUI) {
+                return channelUI.channel.active;
+            });
+        }
+
+        public addChannel(channel) {
+            this.push("channels", channel);
+        }
+
+        public closeChannel(channelId) {
+            let channelIndex = this.channels.findIndex(function (channel) {
+                return channel.channelId === channelId;
+            });
+            this.channels[channelIndex].close();
+            this.splice("channels", channelIndex, 1);
+        }
+    }
+</script>

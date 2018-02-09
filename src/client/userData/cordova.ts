@@ -1,5 +1,6 @@
 import {UserData} from "../userData";
-class UserDataCordova extends UserData {
+
+export default class UserDataCordova extends UserData {
     get(prop: string, successCallBack: Function, errorCallBack: Function): void {
         window.NativeStorage.getItem(prop, function (obj) {
             successCallBack(obj);
@@ -22,5 +23,3 @@ class UserDataCordova extends UserData {
         });
     }
 }
-
-module.exports = UserDataCordova;

@@ -1,0 +1,1 @@
+window.TitleBar = require("titlebar")();

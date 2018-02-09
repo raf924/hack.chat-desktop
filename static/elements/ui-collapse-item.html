@@ -1,0 +1,105 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="ui-collapse.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="ui-collapse-item">
+    <template>
+        <style>
+            :host {
+                outline: none;
+            }
+
+            paper-item {
+                padding-right: 0;
+            }
+
+            #header {
+                cursor: pointer;
+            }
+
+            #header:active {
+                background: rgba(0, 0, 0, 0.2);
+            }
+
+            #body {
+                min-height: 0;
+            }
+        </style>
+        <paper-item id="header">
+            <slot name="title"><span>Default</span></slot>
+            <div style="width: 2rem; height: 2rem; float: right;">
+                <iron-icon icon="[[icon]]" style="--iron-icon-width: 100%; --iron-icon-height: 100%;"></iron-icon>
+            </div>
+        </paper-item>
+        <paper-item id="body">
+            <iron-collapse>
+                <slot slot="collapsible" name="collapsible"></slot>
+            </iron-collapse>
+        </paper-item>
+    </template>
+</dom-module>
+
+<script>
+    class CollapseItem extends Polymer.Element {
+
+        static get is() {
+            return "ui-collapse-item";
+        }
+
+        constructor() {
+            super();
+            let that = this;
+            let interval = setInterval(function () {
+                if (that.root) {
+                    clearInterval(interval);
+                    that.uiCollapse = that.root.querySelector("iron-collapse");
+                    let slot = document.createElement("slot");
+                    slot.name = "collapsible";
+                    that.uiCollapse.root.appendChild(slot);
+                    that.root.querySelector("#header").addEventListener("click", function (e) {
+                        that.toggle();
+                    });
+                    function passThrough(e) {
+                        that.dispatchEvent(new CustomEvent(event.type));
+                    }
+
+                    that.uiCollapse.addEventListener("opened", passThrough);
+                    that.uiCollapse.addEventListener("closed", passThrough);
+                }
+            }, 100);
+        }
+
+        static get properties() {
+            return {
+                openIcon: {
+                    type: String,
+                    value: "expand-less"
+                },
+                closeIcon: {
+                    type: String,
+                    value: "expand-more"
+                },
+                icon: {
+                    type: String,
+                    value: "expand-more",
+                    computed: "_icon(openIcon, closeIcon, opened)"
+                },
+                opened: {
+                    type: Boolean,
+                    value: false
+                }
+            };
+        }
+
+        _icon() {
+            return this.uiCollapse ? (this.opened ? this.openIcon : this.closeIcon) : "expand-more";
+        }
+
+        toggle() {
+            this.uiCollapse.toggle();
+            this.opened = this.uiCollapse.opened;
+        }
+    }
+    customElements.define(CollapseItem.is, CollapseItem);
+</script>

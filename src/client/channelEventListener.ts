@@ -1,4 +1,4 @@
-export abstract class ChannelEventListener {
+export abstract class ChannelEventListener extends Polymer.GestureEventListeners(Polymer.Element) {
     protected static events = ["addUser", "removeUser", "tripCodeSet", "messageReceived", "disconnected"];
 
     abstract addUser(user: string): void

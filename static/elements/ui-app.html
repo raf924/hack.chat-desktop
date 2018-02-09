@@ -1,0 +1,74 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<dom-module id="ui-app">
+    <app-header reveals>
+        <app-toolbar id="app-bar">
+            <paper-icon-button id="sidemenu-collapse" icon="menu" onclick="sidemenu.toggle()"></paper-icon-button>
+            <span id="channelTitle" class="title"></span>
+            <div id="toolbar">
+            </div>
+            <paper-menu-button horizontal-align="right">
+                <paper-icon-button id="menu" icon="more-vert" class="right dropdown-trigger"></paper-icon-button>
+                <paper-listbox id="menu-items" slot="dropdown-content">
+                </paper-listbox>
+            </paper-menu-button>
+        </app-toolbar>
+    </app-header>
+    <app-drawer id="sidemenu" swipe-open>
+        <paper-icon-button icon="add" id="addChannel"></paper-icon-button>
+        <!--<select id="serviceChoice" title="Service"></select>-->
+        <paper-listbox>
+            <ui-collapse-item>
+                <span slot="title">Open Channels</iron-icon></span>
+                <ui-channels slot="collapsible" id="menu-channels"></ui-channels>
+            </ui-collapse-item>
+            <ui-collapse-item>
+                <span slot="title">Favourites</iron-icon></span>
+                <ui-favourites slot="collapsible" id="menu-favourites"></ui-favourites>
+            </ui-collapse-item>
+        </paper-listbox>
+    </app-drawer>
+    <main>
+        <ui-loader active id="waitIndicator"></ui-loader>
+        <div id="channels">
+        </div>
+        <div id="chatBox-wrapper" hidden>
+            <form id="chatInputForm">
+                <paper-textarea no-label-float id="chatBox" label="Type your message here" rows="2"
+                                max-rows="2"></paper-textarea>
+            </form>
+        </div>
+    </main>
+
+    <paper-dialog id="newChannelDialog" with-backdrop>
+        <h2>New Channel</h2>
+        <form is="iron-form" id="newChannelForm">
+            <paper-input required="true" label="Channel Name" name="channelName" id="channelName"></paper-input>
+            <paper-dropdown-menu required="true" name="service" label="Services">
+                <paper-listbox required="true" id="serviceChoice" class="dropdown-content">
+
+                </paper-listbox>
+            </paper-dropdown-menu>
+        </form>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Cancel</paper-button>
+            <paper-button dialog-confirm>Connect</paper-button>
+        </div>
+    </paper-dialog>
+    <paper-toast id="alert">
+        <paper-button id="alertAction">Cancel</paper-button>
+    </paper-toast>
+</dom-module>
+
+<script>
+    class App extends Polymer.Element {
+        static get is(){
+            return "ui-app";
+        }
+
+        constructor(){
+            super();
+        }
+    }
+
+    customElements.define(App.is, App);
+</script>

@@ -1,5 +1,11 @@
-if(window.cordova){
-    module.exports = require('./userData/cordova');
+let userData;
+import * as cordovaUserData from './userData/cordova';
+import * as electronUserData from './userData/electron';
+
+if (window.NativeStorage) {
+    userData = cordovaUserData.default;
 } else {
-    module.exports = require('./userData/electron');
+    userData = electronUserData.default;
 }
+
+export default userData;

@@ -1,0 +1,67 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">
+
+<dom-module id="ui-message">
+    <template>
+        <li class="message">
+            <template is="dom-if" if="[[message.cmd !== 'chat']]">
+                <div class="title">
+                    [[message.text]]
+                </div>
+                <span class="timestamp">[[new Date(message.time).toLocaleString()]]</span>
+            </template>
+            <template is="dom-if" if="[[message.cmd === 'chat']]">
+                <div class="title">
+                    <span class="nick">[[message.nick]]</span>&nbsp;<span class="trip">[[message.trip]]</span>
+                    <template is="dom-if" if="[[message.mod]]">
+                        <iron-icon icon="card-membership" class="mod hidden"></iron-icon>
+                    </template>
+                </div>
+                <paper-card class="text-wrapper">
+                    <!-- <div class="card-content text-wrapper"> -->
+                    <div class="title">
+                        <span class="nick"></span>&nbsp;<span class="trip"></span>
+                        <template is="dom-if" if="[[message.mod]]">
+                            <iron-icon icon="card-membership" class="mod"></iron-icon>
+                        </template>
+                        <!--<span class="mod hidden material-icons">card_membership</span>-->
+                    </div>
+                    <pre class="text">[[message.text]]</pre>
+                    <!-- </div> -->
+                </paper-card>
+                <span class="timestamp hidden">[[new Date(message.time).toLocaleString()]]</span>
+            </template>
+        </li>
+    </template>
+</dom-module>
+
+<script>
+    class UIMessage extends Polymer.GestureEventListeners(Polymer.Element) {
+
+        static get is() {
+            return "ui-message";
+        }
+
+        static get properties() {
+            return {
+                message: {
+                    type: Object,
+                    value: {
+                        text: "",
+                        cmd: "",
+                        nick: "",
+                        trip: "",
+                        mod: false,
+                        time: Date.now()
+                    },
+                    readOnly: true,
+                    notify: true
+                }
+            };
+        }
+    }
+
+    customElements.define(UIMessage.is, UIMessage);
+</script>

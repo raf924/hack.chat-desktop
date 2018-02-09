@@ -8,7 +8,7 @@ class ConfigJSONObject extends ConfigObject {
     configDatabase?: string;
 }
 
-class ConfigJSON extends Config {
+export class ConfigJSON extends Config {
     readonly config: ConfigJSONObject;
     readonly filePath: string;
 
@@ -30,7 +30,7 @@ class ConfigJSON extends Config {
         super();
         this.config = new ConfigJSONObject();
         filePath = path.resolve(filePath);
-        if (filePath !== undefined && filePath !== null)
+        if (filePath !== undefined && filePath !== null) {
             this.filePath = filePath;
             if (fs.existsSync(filePath)) {
                 this.config = JSON.parse(fs.readFileSync(filePath, "utf-8").toString());
@@ -38,7 +38,6 @@ class ConfigJSON extends Config {
             } else {
                 this.save();
             }
+        }
     }
 }
-
-module.exports = ConfigJSON;

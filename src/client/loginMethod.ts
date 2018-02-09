@@ -1,10 +1,24 @@
-export abstract class LoginMethod {
+export class LoginMethod extends Polymer.Element {
+    static get is(): string {
+        return "login-method";
+    };
+
     open(channel, service) {
         this.channel = channel;
         this.service = service;
     };
 
-    abstract close(): void;
+    constructor() {
+        super();
+    }
+
+    ready() {
+        super.ready();
+    }
+
+    close(): void {
+        throw "Must be implemented";
+    };
 
     service: string;
     channel: string;
@@ -13,3 +27,5 @@ export abstract class LoginMethod {
     oncancel: (channelName: string, service: string) => void;
     onsuccess: (channelName: string, service: string, nick: string, password: string, useAlways: boolean) => void;
 }
+
+customElements.define(LoginMethod.is, LoginMethod);

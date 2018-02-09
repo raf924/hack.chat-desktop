@@ -1,12 +1,13 @@
 import {Parser} from "../../parser"
 import {UI} from "../../ui";
+import {App} from "../../app";
 
 interface MentionMessage extends ParsedMessage {
     mention: boolean,
     originalText: string
 }
 
-class MentionParser implements Parser {
+export default class MentionParser implements Parser {
     private mention: boolean;
 
     getRegex(): RegExp {
@@ -15,7 +16,7 @@ class MentionParser implements Parser {
 
     parse(message: string): MentionMessage {
         this.mention = false;
-        let channel = UI.currentChannelUI.getChannel();
+        let channel = App.load().currentChannel;
         let users = channel.users;
         let ownNick = channel.nick.split("#")[0];
         let m;
@@ -38,5 +39,3 @@ class MentionParser implements Parser {
         return {text: message, mention: mention, originalText: newMessage};
     }
 }
-
-module.exports = MentionParser;

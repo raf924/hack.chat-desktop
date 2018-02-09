@@ -1,15 +1,15 @@
 const execFile = require('child_process').execFile;
 const path = require('path');
-var electronPath = 'node_modules/.bin/electron';
-if (process.platform == "win32") {
+let electronPath = 'node_modules/.bin/electron';
+if (process.platform === "win32") {
     electronPath += ".cmd";
 }
-let args = ['.'];
+let args = ['./electron/main.js'];
 if (process.argv[2] === "dev") {
     args.push("dev");
 }
 
-const child = execFile(electronPath.replace(/\//g, path.sep), args, (error, stdout, stderr) => {
+execFile(path.resolve(electronPath), args, (error, stdout, stderr) => {
     if (error) {
         throw error;
     }

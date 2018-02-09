@@ -5,10 +5,11 @@ import {App} from "./app";
 import {ChannelEventListener} from "./channelEventListener";
 import {UI} from "./ui";
 import {Autocomplete} from "./autocomplete";
+import {ChannelTabs} from "./elements/ui-channel-tabs";
 
 export class ChannelUI extends ChannelEventListener {
     public messagesUI: HTMLElement;
-    public readonly channel: Channel;
+    public channel: Channel;
     public accessLink: HTMLElement;
     public ui: HTMLElement;
     public messageCounter: HTMLElement;
@@ -19,14 +20,35 @@ export class ChannelUI extends ChannelEventListener {
         return this.channel;
     }
 
-    constructor(channel: Channel) {
-        super();
-        this.channel = channel;
+    static get is() {
+        return "ui-channel";
+    }
+
+    static get properties() {
+        return {
+            channel: {
+                type: Channel,
+                readOnly: true,
+                notify: true
+            },
+            messages: {
+                type: Array,
+                notify: true,
+                value() {
+                    return [];
+                }
+            }, active: {
+                type: Boolean,
+                notify: true,
+                computed: "_isActive(channel)"
+            }
+        };
+    }
+
+    ready() {
+        super.ready();
         this.createAccessLink();
         this.unreadMessageCount = 0;
-        let tmpElement = document.createElement("div");
-        document.querySelector("#channels").appendChild(tmpElement);
-        tmpElement.outerHTML = UI.views.channel.element;
         this.ui = <HTMLElement>document.querySelector("#channels").lastChild;
         this.ui.id = this.channel.channelId;
         this.messagesUI = this.ui;
@@ -35,23 +57,50 @@ export class ChannelUI extends ChannelEventListener {
         this.appendMessage({cmd: "info", text: "Waiting for connection..."});
     }
 
+    constructor() {
+        super();
+    }
+
+    public _isActive(channel: Channel) {
+        return channel.active;
+    }
+
     public disconnected(event): void {
         if (event.code !== 1000) {
             let reconnectTimeout = window.setTimeout((function () {
-                let currentChannel = App.currentChannel_;
-                this.channel = App.openChannel(this.channel.service, this.channel.name, this.channel.nick, this.channel.password);
-                App.currentChannel = currentChannel;
+                document.dispatchEvent(new CustomEvent("newChannel", {
+                    detail: {
+                        service: this.channel.service,
+                        name: this.channel.name,
+                        nick: this.channel.nick,
+                        password: this.channel.password,
+                        reconnect: true
+                    }
+                }));
                 this.bindChannelEvents();
             }).bind(this), UI.DEFAULT_ALERT_TIMEOUT);
-            UI.alert(`${this.channel.name}@${this.channel.service} was disconnected\nReason: ${event.reason}\nRetrying`, UI.DEFAULT_ALERT_TIMEOUT, "Cancel", (function () {
-                window.clearTimeout(reconnectTimeout);
-                UI.closeChannelUI(this.channel.channelId);
-            }).bind(this));
+            document.dispatchEvent(new CustomEvent("disconnect", {
+                detail: {
+                    channel: this.channel,
+                    reason: event.reason,
+                    reconnectTimeout
+                }
+            }));
+            /*            UI.alert(`${this.channel.name}@${this.channel.service} was disconnected\nReason: ${event.reason}\nRetrying`, UI.DEFAULT_ALERT_TIMEOUT, "Cancel", (function () {
+                            window.clearTimeout(reconnectTimeout);
+                            UI.closeChannelUI(this.channel.channelId);
+                        }).bind(this));*/
         } else {
-            UI.closeChannelUI(this.channel.channelId);
+            this.ui.dispatchEvent(new CustomEvent("close", {
+                detail: {
+                    channelId: this.channel.channelId
+                }
+            }));
+            //UI.closeChannelUI(this.channel.channelId);
         }
     }
 
+    //Is replaced by UIChannels.closeChannel
     public close() {
         //TODO: ask for confirmation (if config allows it)
         this.channel.close();
@@ -88,17 +137,17 @@ export class ChannelUI extends ChannelEventListener {
                     this.scrollToBottom();
                 }
             } else if (target.classList.contains("nick")) {
-                UI.insertAtCursor(`@${target.innerText} `);
+                this.insertAtCursor(`@${target.innerText} `);
             }
         }).bind(this));
     }
 
     public appendMessage(args: any) {
-        let tmpElement = document.createElement("div");
+        let messageElement = <UIMessage>document.createElement("ui-message");
         let wasAtBottom = Math.floor(this.messagesUI.scrollHeight - this.messagesUI.scrollTop) <= this.messagesUI.clientHeight + 1;
-        this.messagesUI.appendChild(tmpElement);
-        tmpElement.outerHTML = UI.views.message.element;
-        let messageElement = <HTMLElement>this.messagesUI.lastChild;
+        this.messagesUI.appendChild(messageElement);
+        //tmpElement.outerHTML = UI.views.message.element;
+        //let messageElement = <HTMLElement>this.messagesUI.lastChild;
         if (args.nick === this.channel.nick) {
             messageElement.classList.add("from-user");
         }
@@ -107,7 +156,7 @@ export class ChannelUI extends ChannelEventListener {
                 if (args.nick === this.channel.lastSender) {
                     messageElement.classList.add("from-last-sender");
                 }
-                messageElement.querySelector(".nick").setAttribute("data-nick", args.nick);
+                //messageElement.querySelector(".nick").setAttribute("data-nick", args.nick);
                 break;
             case "onlineSet":
                 //this.messagesUI.lastElementChild.remove();
@@ -127,20 +176,21 @@ export class ChannelUI extends ChannelEventListener {
                 return;
         }
         if (args.cmd !== "chat") {
-            args.nick = args.text;
             messageElement.classList.add("cmd");
-            messageElement.parentElement.classList.add("hidden");
-            messageElement.querySelector(".timestamp").classList.remove("hidden");
+            //args.nick = args.text;
+            //messageElement.parentElement.classList.add("hidden");
+            //messageElement.querySelector(".timestamp").classList.remove("hidden");
         }
-        messageElement.querySelector(".nick").innerHTML = args.nick;
-        messageElement.querySelector(".text").innerHTML = args.text;
-        messageElement.querySelector(".trip").innerHTML = args.trip;
-        if (args.time) {
+        messageElement.message = args;
+        /*        messageElement.querySelector(".nick").innerHTML = args.nick;
+                messageElement.querySelector(".text").innerHTML = args.text;
+                messageElement.querySelector(".trip").innerHTML = args.trip;*/
+        /*if (args.time) {
             messageElement.querySelector(".timestamp").textContent = new Date(args.time).toLocaleString();
         }
         if (args.mod) {
-            messageElement.querySelector(".mod").classList.remove("hidden");
-        }
+            //messageElement.querySelector(".mod").classList.remove("hidden");
+        }*/
         if (wasAtBottom) {
             this.scrollToBottom();
         } else {
@@ -154,8 +204,8 @@ export class ChannelUI extends ChannelEventListener {
     }
 
     addUser(user) {
-        if (!App.isCordova && App.currentChannel_ === this.channel.channelId) {
-            (<Autocomplete>UI.chatBox).addItem(user);
+        if (App.isElectron && App.load().currentChannel_ === this.channel.channelId) {
+            (<Autocomplete>UI.load().chatBox).addItem(user);
         }
     }
 
@@ -164,8 +214,8 @@ export class ChannelUI extends ChannelEventListener {
     }
 
     removeUser(user) {
-        if (!App.isCordova && App.currentChannel_ === this.channel.channelId) {
-            (<Autocomplete>UI.chatBox).removeItem(user);
+        if (App.isElectron && App.load().currentChannel_ === this.channel.channelId) {
+            (<Autocomplete>UI.load().chatBox).removeItem(user);
         }
 
     }
@@ -175,7 +225,7 @@ export class ChannelUI extends ChannelEventListener {
         switch (args.cmd) {
             case "onlineSet":
                 args.text = `Users online : ${args.nicks.join(", ")}`;
-                UI.chatInputForm.parentElement.removeAttribute("hidden");
+                UI.load().chatInputForm.parentElement.removeAttribute("hidden");
                 break;
             case "onlineRemove":
                 args.text = `${args.nick} has left`;
@@ -189,7 +239,7 @@ export class ChannelUI extends ChannelEventListener {
                 }
             case "chat":
                 args.text = new Option(args.text).innerHTML;
-                let message = App.parseText(args.text);
+                let message = App.load().parseText(args.text);
                 args.text = message.text;
                 if (message.hasOwnProperty("mention")) {
                     args.mention = message["mention"];
@@ -206,19 +256,19 @@ export class ChannelUI extends ChannelEventListener {
             notificationText = args.text;
         }
         this.appendMessage(args);
-        let isCurrentChannel = this.channel.channelId === App.currentChannel_;
-        let shouldNotify = UI.notifyConfig[args.cmd];
-        let isAppActive = !(!document.hasFocus() || App.isCordova && window.cordova.plugins.backgroundMode.isActive());
+        let isCurrentChannel = this.channel.channelId === App.load().currentChannel_;
+        let shouldNotify = UI.load().notifyConfig[args.cmd];
+        let isAppActive = !(!document.hasFocus() || !App.isElectron && window.cordova.plugins.backgroundMode.isActive());
         let isUserMentionned = args.mention;
         if (!isCurrentChannel || !isAppActive) {
             this.unreadMessageCount++;
-            this.messageCounter.innerText = `${this.unreadMessageCount}`;
+            //this.messageCounter.innerText = `${this.unreadMessageCount}`;
             if (shouldNotify || isUserMentionned) {
                 let notificationTitle = `Chatron - ${this.channel.name}@${this.channel.service}`;
                 let notificationClicked = (function () {
-                    UI.channelTabs.activateTab(this.channel.channelId);
+                    UI.load().channelTabs.activateTab(this.channel.channelId);
                 }).bind(this);
-                if (App.isCordova) {
+                if (!App.isElectron) {
                     window.cordova.plugins.notification.local.schedule({
                         title: notificationTitle,
                         text: notificationText,
@@ -232,25 +282,28 @@ export class ChannelUI extends ChannelEventListener {
                 }
             }
         } else {
-            this.unreadMessageCount = 0;
-            this.messageCounter.innerText = `${this.unreadMessageCount}`;
+            //this.unreadMessageCount = 0;
+            //this.messageCounter.innerText = `${this.unreadMessageCount}`;
         }
     }
 
     private createAccessLink() {
-        let tmpElement = document.createElement("div");
-        UI.channelTabs.tabContainer.appendChild(tmpElement);
-        tmpElement.outerHTML = UI.views.accessLink.element;
-        this.accessLink = <HTMLElement>UI.channelTabs.tabContainer.lastChild;
-        this.accessLink.setAttribute("for", this.channel.channelId);
-        this.accessLink.dataset["isFav"] = `${UI.isFavourite(`${this.channel.name}@${this.channel.service}`)}`;
-        (<HTMLElement>this.accessLink.querySelector(".ch-close")).dataset["close"] = this.channel.channelId;
-        let fav = <HTMLElement>this.accessLink.querySelector(".fav");
-        fav.dataset["add"] = `${this.channel.name}@${this.channel.service}`;
-        fav.setAttribute("icon", UI.isFavourite(`${this.channel.name}@${this.channel.service}`) ? "star" : "star-border");
-        let link = <HTMLElement>this.accessLink.querySelector(".ch-link");
-        link.innerText = `${this.channel.name}@${this.channel.service}`;
-        link.dataset["tab"] = this.channel.channelId;
-        this.messageCounter = <HTMLElement>this.accessLink.querySelector(".counter");
+        //TODO: replace this with an event to the App component
+        (<ChannelTabs>UI.load().channelTabs.tabContainer).addChannel(this.channel);
+        /*        let tmpElement = document.createElement("div");
+                UI.channelTabs.tabContainer.appendChild(tmpElement);
+                tmpElement.outerHTML = UI.views.accessLink.element;
+                this.accessLink = <HTMLElement>UI.channelTabs.tabContainer.lastChild;
+                this.accessLink.setAttribute("for", this.channel.channelId);
+                this.accessLink.dataset["isFav"] = `${UI.isFavourite(`${this.channel.name}@${this.channel.service}`)}`;
+                (<HTMLElement>this.accessLink.querySelector(".ch-close")).dataset["close"] = this.channel.channelId;
+                let fav = <HTMLElement>this.accessLink.querySelector(".fav");
+                fav.dataset["add"] = `${this.channel.name}@${this.channel.service}`;
+                fav.setAttribute("icon", UI.isFavourite(`${this.channel.name}@${this.channel.service}`) ? "star" : "star-border");
+                let link = <HTMLElement>this.accessLink.querySelector(".ch-link");
+                link.innerText = `${this.channel.name}@${this.channel.service}`;
+                link.dataset["tab"] = this.channel.channelId;
+                this.messageCounter = <HTMLElement>this.accessLink.querySelector(".counter");
+                */
     }
 }

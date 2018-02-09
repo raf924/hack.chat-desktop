@@ -1,5 +1,5 @@
 import {UserData} from "../userData";
-class UserDataElectron extends UserData {
+export default class UserDataElectron extends UserData {
     get(prop: string, successCallBack: (value) => any, errorCallBack?: (error: Error) => any): void {
         if (localStorage.hasOwnProperty(prop)) {
             successCallBack(JSON.parse(localStorage.getItem(prop)));
@@ -20,5 +20,3 @@ class UserDataElectron extends UserData {
         }
     }
 }
-
-module.exports = UserDataElectron;

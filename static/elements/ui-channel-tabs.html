@@ -1,0 +1,29 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+
+<dom-module id="ui-channel-tabs">
+    <template>
+        <style>
+            paper-listbox {
+                padding-right: 0;
+                outline: none;
+            }
+
+            paper-item {
+                padding-right: 0;
+            }
+        </style>
+        <paper-listbox>
+            <template is="dom-repeat" items="{{channels}}">
+                <paper-item class="tab" data-is-fav="false">
+                    <paper-icon-button data-is-fav="{{_isFav(item)}}" class="fav" icon="star"></paper-icon-button>
+                    <span class="ch-link" data-tab="{{item.channelId}}">{{item.channelId}}</span>
+                    <span class="counter">{{item.unread}}</span>
+                    <paper-icon-button class="ch-close" data-close="{{item.channelId}}"
+                                       icon="close"></paper-icon-button>
+                </paper-item>
+            </template>
+        </paper-listbox>
+    </template>
+</dom-module>

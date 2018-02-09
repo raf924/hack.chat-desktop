@@ -1,13 +1,35 @@
-<paper-dialog entry-animation="scale-up-animation" exit-animation="fade-out-animation" with-backdrop>
-    <h2>Login</h2>
-    <form is="iron-form" method="get" action="/">
-        <paper-input label="Username" placeholder="nick[#password] (ex: bob#isadick)" preventInvalidInput="true"
-                     allowedPattern="[^#]+(#[^#]*)?" id="nickInput" required>
-        </paper-input>
-        <paper-checkbox id="useAlways">Remember</paper-checkbox>
-        <div class="buttons">
-            <paper-button class="cancel" dialog-dismiss>Cancel</paper-button>
-            <paper-button class="confirm" dialog-confirm autofocus>Login</paper-button>
-        </div>
-    </form>
-</paper-dialog>
+<link href="../../../../../bower_components/polymer/polymer-element.html" rel="import">
+<link href="../../../../../bower_components/paper-checkbox/paper-checkbox.html" rel="import">
+<link href="../../../../../bower_components/paper-input/paper-input.html" rel="import">
+<link href="../../../../../bower_components/paper-dialog/paper-dialog.html" rel="import">
+<link href="../../../../../bower_components/paper-button/paper-button.html" rel="import">
+<link href="../../../../../bower_components/iron-form/iron-form.html" rel="import">
+<link href="../../../../../bower_components/iron-a11y-keys/iron-a11y-keys.html" rel="import">
+
+<dom-module id="login-mixed">
+    <template>
+        <paper-dialog id="dialog" entry-animation="scale-up-animation" exit-animation="fade-out-animation"
+                      with-backdrop>
+            <h2>Login</h2>
+            <iron-form>
+                <form method="get" action="/">
+                    <iron-a11y-keys target="[[target]]" keys="enter" on-keys-pressed="confirm"></iron-a11y-keys>
+                    <iron-a11y-keys target="[[target]]" keys="delete" on-keys-pressed="delete"></iron-a11y-keys>
+                    <iron-a11y-keys target="[[target]]" keys="backspace" on-keys-pressed="remove"></iron-a11y-keys>
+                    <paper-input id="input" label="Username" placeholder="nick[#password] (ex: bob#isadick)"
+                                 preventInvalidInput="true"
+                                 allowedPattern="[^#]+(#[^#]*)?" id="nickInput" required on-keydown="keyInput"
+                                 on-textInput="keyInput"
+                                 on-keyup="keyProcess"
+                                 value="{{displayNick::input}}">
+                    </paper-input>
+                    <paper-checkbox id="useAlways">Remember</paper-checkbox>
+                    <div class="buttons">
+                        <paper-button on-tap="cancel" class="cancel" dialog-dismiss>Cancel</paper-button>
+                        <paper-button on-tap="confirm" class="confirm" dialog-confirm autofocus>Login</paper-button>
+                    </div>
+                </form>
+            </iron-form>
+        </paper-dialog>
+    </template>
+</dom-module>

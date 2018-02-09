@@ -198,7 +198,7 @@ a {
     .trip {
       font-size: 0.8em;
     }
-    .nick[data-nick] {
+    .nick {
       cursor: pointer;
     }
   }
@@ -213,9 +213,8 @@ a {
 body {
   font-family: Roboto, sans-serif !important;
   margin-top: calc(@titlebarButtonSize ~"+" 13px);
-  paper-drawer-panel {
+  app-drawer {
     margin-top: calc(@titlebarButtonSize ~"+" 13px);
-    position: fixed;
     [main] {
       #waitIndicator {
         top: 50%;
@@ -273,7 +272,7 @@ textarea {
   top: 0;
   bottom: calc(66px ~"+" @titlebarButtonSize ~"+" 13px);
   padding: 0 @channelPadding;
-  width: calc(100% ~"-" @channelPadding*2);
+  width: calc(100%~"-"@channelPadding * 2);
   list-style-type: none;
   &::-webkit-scrollbar {
     width: 0.4%;
@@ -288,4 +287,12 @@ paper-textarea /deep/ iron-autogrow-textarea {
   max-height: 3rem;
 }
 
-@import "imports/small-screens";
+app-drawer-layout:not([narrow]) [drawer-toggle] {
+  display: none;
+}
+
+app-header {
+  left: 0 !important;
+}
+
+//@import "imports/small-screens";

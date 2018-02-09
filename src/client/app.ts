@@ -1,88 +1,106 @@
+///<reference path="../../node_modules/electron/electron.d.ts"/>
+///<reference path="../types/Polymer.d.ts"/>
 import {Parser} from "./parser";
-import  fs = require('fs');
 import {UserData} from "./userData";
+import * as platformUserDataClass from './loadUserData';
+import {UI} from "./ui";
 import {Channel} from "./channel";
-const platformUserDataClass = require('./loadUserData');
+import {Favourite} from "./elements/ui-favourites";
+import {ServiceManager} from "./serviceManager";
 
-export class App {
-    public static favourites: string[];
-    public static currentChannel_: string;
-    public static nick: string;
-    public static password: string;
-    public static parsers: Parser[];
-    public static userData: UserData;
-    public static ipc: Electron.IpcRenderer; //TODO: replace by abstract communication class
-    public static isCordova: boolean;
-    public static isAndroid: boolean;
-    public static services: Function[];
+export class App extends Polymer.PropertyEffects(Object) {
+    public favourites: Favourite[];
+    public channels: Channel[];
+    public currentChannel_: string;
+    public currentChannel: Channel;
+    public nick: string;
+    public password: string;
+    public parsers: Parser[];
+    public userData: UserData;
+    public ipc: Electron.IpcRenderer; //TODO: replace by abstract communication class
+    public static instance: App;
+    public proxy: any;
+    private listeners: Map<string, Array<Function>>;
+    private ui: UI = UI.load();
 
-    static proxy: any;
-    private static listeners: any;
-
-    public static set currentChannel(channelId) {
-        App.proxy.currentChannel_ = App.currentChannel_ = channelId;
-    }
-
-    public static init(): void {
-        App.loadProxy();
-        App.isCordova = !!window.cordova;
-        if (!window.cordova) {
-            App.ipc = require('electron').ipcRenderer;
-        } else {
-            document.addEventListener("deviceready", function () {
-                window.cordova.plugins.backgroundMode.setDefaults({text: 'Chatron is running'});
-                window.cordova.plugins.backgroundMode.enable();
-            });
-        }
-        App.isAndroid = !!navigator.userAgent.match(/Android/i);
-        App.loadUserData();
-        App.loadServices();
-        App.loadParsers();
-    }
-
-    static loadServices() {
-        App.services = [];
-        if (!App.isCordova) {
-            let services = fs.readdirSync(`${__dirname}/services`);
-            for (let service of services) {
-                let serviceClass = require(`${__dirname}/services/${service}`).service;
-                if (serviceClass) {
-                    App.services[serviceClass.service] = serviceClass;
+    static get properties() {
+        return {
+            favourites: {
+                type: Array,
+                value() {
+                    return [];
                 }
-            }
-        } else {
-            let r = require.context(`./services`, false, /\.js$/);
-            let services = r.keys();
-            for (let service of services) {
-                let serviceClass = r(service).service;
-                App.services[serviceClass.service] = serviceClass;
+            },
+            channels: {
+                type: Array,
+                value() {
+                    return [];
+                }
+            }, currentChannel: {
+                type: Channel,
+                observer: "currentChannelChanged"
             }
         }
+    };
+
+    public static get isElectron() {
+        return !!navigator.userAgent.match(/Electron/i);
     }
 
-    static loadUserData() {
-        App.favourites = [];
-        App.userData = new platformUserDataClass();
-        App.userData.get("favourites", function (value) {
+    public static get isAndroid() {
+        return !!navigator.userAgent.match(/Android/i);
+    }
+
+    /*public set currentChannel(channelId) {
+        this.proxy.currentChannel_ = this.currentChannel_ = channelId;
+    }*/
+
+    constructor() {
+        super();
+        this.linkPaths("favourites", "");
+        this.loadProxy();
+        if (App.isElectron) {
+            this.ipc = require('electron').ipcRenderer;
+        } else {
+            window.cordova.plugins.backgroundMode.setDefaults({text: 'Chatron is running'});
+            window.cordova.plugins.backgroundMode.enable();
+        }
+        this.loadUserData();
+        this.loadParsers();
+        this.loadEventHandlers();
+        this.ui = UI.load();
+    }
+
+    public static load(): App {
+        if (!App.instance) {
+            App.instance = new App();
+        }
+        return App.instance;
+    }
+
+    loadUserData() {
+        this.favourites = [];
+        this.userData = new platformUserDataClass.default();
+        this.userData.get("favourites", function (value) {
         }, function (error) {
             for (let prop in UserData.defaultData) {
-                App.userData.set(prop, UserData.defaultData[prop]);
+                this.userData.set(prop, UserData.defaultData[prop]);
             }
+        }.bind(this));
+        this.userData.get("nickName", function (nick) {
+            this.nick = nick;
         });
-        App.userData.get("nickName", function (nick) {
-            App.nick = nick;
-        });
-        App.userData.get("password", function (password) {
-            App.password = password;
-        });
+        this.userData.get("password", function (password) {
+            this.password = password;
+        }.bind(this));
     }
 
-    static loadProxy() {
-        App.listeners = {};
-        App.proxy = new Proxy(App, {
+    loadProxy() {
+        this.listeners = new Map();
+        this.proxy = new Proxy(App, {
             set: function (obj, prop, value) {
-                if (App.listeners[prop]) {
-                    App.listeners[prop].forEach(function (listener) {
+                if (this.listeners[prop]) {
+                    this.listeners[prop].forEach(function (listener) {
                         listener(value);
                     });
                 }
@@ -91,55 +109,122 @@ export class App {
         });
     }
 
-    static addListener(prop: string, handler: (value) => {}) {
-        if (!App.listeners[prop]) {
-            App.listeners[prop] = [];
-        }
-        App.listeners[prop].push(handler);
+    private loadLoginEvents(): void {
+        this.userData.get("loginMethod", async function (loginMethod) {
+            let method = require(`${__dirname}/modules/login/${loginMethod}/${loginMethod}`);
+            this.loginMethod = await method.default();
+            this.loginMethod.onsuccess = (channelName, service, nick, password, useAlways) => {
+                if (App.isElectron) {
+                    this.ipc.send("join", JSON.stringify({
+                        "channel": channelName,
+                        "service": service,
+                        "nick": nick,
+                        "password": password
+                    }));
+                } else {
+                    this.login(channelName, service, nick, password);
+                }
+                if (useAlways) {
+                    this.userData.set("nickName", nick);
+                    this.userData.set("password", password);
+                    this.nick = nick;
+                    this.password = password;
+                }
+                this.loginMethod.close();
+            };
+            this.loginMethod.oncancel = () => {
+                this.loginMethod.close();
+            }
+        }.bind(this));
     }
 
-    static parseText(text: string): ParsedMessage {
+    addListener(prop: string, handler: (value) => {}) {
+        if (!this.listeners[prop]) {
+            this.listeners[prop] = [];
+        }
+        this.listeners[prop].push(handler);
+    }
+
+    parseText(text: string): ParsedMessage {
         let message: ParsedMessage = {text: text};
-        App.parsers.forEach(function (parser: Parser) {
+        this.parsers.forEach(function (parser: Parser) {
             message = parser.parse(message.text);
         });
         return message;
     }
 
-    private static loadParsers(): void {
-        App.parsers = [];
-        let parsers = [];
-        if (!App.isCordova) {
-            parsers = fs.readdirSync(`${__dirname}/modules/parsers`);
-            parsers.forEach(function (file) {
-                try {
-                    let parser = require(`${__dirname}/modules/parsers/${file}`);
-                    App.parsers.push(new parser());
-                } catch (e) {
-                    console.warn(`./modules/parsers/${file} doesn't contain a Parser`);
-                }
-            });
-        } else {
-            let r = require.context(`./modules/parsers`, false, /\.js$/);
-            parsers = r.keys();
-            for (let parser of parsers) {
-                let parserClass = r(parser);
-                App.parsers.push(new parserClass());
-            }
-
+    loadParsers(): void {
+        this.parsers = [];
+        let r = require.context(`./modules/parsers`, false, /\.ts$/);
+        let parsers = r.keys();
+        for (let parser of parsers) {
+            let parserClass = r(parser).default;
+            this.parsers.push(new parserClass());
         }
     }
 
-    static addFavourite(favourite: string) {
-        App.favourites.push(favourite);
-        App.userData.set("favourites", App.favourites);
+    addFavourite(favourite: Favourite) {
+        this.push("favourites", favourite);
+        this.userData.set("favourites", this.favourites);
     }
 
-    static openChannel(service: string, channelName: string, nick: string, password?: string) {
-        let channel = new App.services[service](channelName, nick, password);
+    openChannel(service: string, channelName: string, nick: string, password ?: string) {
+        let serviceConstructor = ServiceManager.load().services[service];
+        let channel: Channel = new serviceConstructor(channelName, nick, password);
         channel.connect();
-        App.currentChannel = channel.channelId;
+        this.push("channels", channel);
+        this.currentChannel = channel;
         return channel;
+    }
 
+    private loadEventHandlers() {
+        document.addEventListener("disconnect", this.disconnect);
+        document.addEventListener("close", this.close);
+        document.addEventListener("changeChannel", this.changeChannel);
+        document.addEventListener("newChannel", this.newChannel);
+    }
+
+    private disconnect(e: CustomEvent) {
+        let {channel, reason, reconnectTimeout} = e.detail;
+        this.ui.alert(`${channel.name}@${channel.service} was disconnected\nReason: ${reason}\nRetrying`,
+            UI.DEFAULT_ALERT_TIMEOUT,
+            "Cancel",
+            () => {
+                window.clearTimeout(reconnectTimeout);
+                this.splice("channels", this.channels.indexOf(channel), 1);
+                this.notifyPath("channels");
+            });
+    }
+
+    private close(e: CustomEvent) {
+        let {channel} = e.detail;
+        this.splice("channels", this.channels.indexOf(channel), 1);
+        this.notifyPath("channels");
+    }
+
+    private changeChannel(e: CustomEvent) {
+        let channel: Channel = this.channels.find(function (channel: Channel) {
+            return channel.channelId == e.detail.channelId;
+        });
+        channel.active = true;
+    }
+
+    private newChannel(e: CustomEvent) {
+        let {service, name, nick, password, reconnect} = e.detail;
+        let currentChannel: Channel = this.currentChannel;
+        this.openChannel(service, name, nick, password);
+        if (reconnect) {
+            this.currentChannel = currentChannel;
+        }
+    }
+
+    private currentChannelChanged(currentChannel: Channel, previousChannel: Channel) {
+        previousChannel.active = false;
+        currentChannel.active = true;
+    }
+
+    attributeChangedCallback(name: string, old: any, value: any) {
+        super.attributeChangedCallback(name, old, value);
+        console.log(name, old, value);
     }
 }

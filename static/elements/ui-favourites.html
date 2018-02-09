@@ -1,0 +1,77 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../../bower_components/paper-listbox/paper-listbox.html">
+
+<dom-module id="ui-favourites">
+    <template>
+        <style>
+            paper-listbox {
+                padding-right: 0;
+                outline: none;
+            }
+
+            paper-item {
+                padding-right: 0;
+            }
+
+            .name div {
+                display: inline-block;
+                float: left;
+                clear: both;
+                font-weight: normal;
+            }
+
+            .name {
+                float: left;
+            }
+
+            .remove {
+                float: right;
+            }
+
+        </style>
+        <paper-listbox>
+            <template is="dom-repeat" items="{{channels}}">
+                <paper-item class="favourite" data-open$="[[item.name]]@[[item.service]]">
+                    <paper-icon-item>
+                        <!--<div class="avatar service" item-icon></div>-->
+                        <paper-item-body two-lines class="name" on-tap="favouriteTapped">
+                            <div>{{item.name}}</div>
+                            <div secondary>{{item.service}}</div>
+                        </paper-item-body>
+                        <paper-icon-button slot="item-icon" class="remove" icon="delete"
+                                           on-tap="deleteFavourite"></paper-icon-button>
+                    </paper-icon-item>
+                </paper-item>
+            </template>
+        </paper-listbox>
+    </template>
+</dom-module>
+
+<script>
+    class Favourites extends Polymer.GestureEventListeners(Polymer.Element) {
+        constructor() {
+            super();
+            this.channels = [];
+        }
+
+        static get is() {
+            return "ui-favourites";
+        }
+
+        addFavourite(favourite) {
+            this.push("channels", favourite);
+        }
+
+        favouriteTapped(e) {
+            this.dispatchEvent(new CustomEvent("favourite.tapped", {detail: e.model.item}));
+        }
+
+        deleteFavourite(e) {
+            this.remove("channels", e.model.item);
+            this.dispatchEvent(new CustomEvent("favourite.remove", {detail: e.model.item}));
+        }
+    }
+
+    customElements.define(Favourites.is, Favourites);
+</script>

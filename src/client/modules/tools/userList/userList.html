@@ -1,28 +1,22 @@
-<!--<div class="mdc-menu-anchor tool" id="userList">
-    <span class="material-icons" id="userListOpen">account_circle</span>
-    <div class="mdc-simple-menu" data-mdc-auto-init="MDCSimpleMenu">
-        <ul class="mdc-simple-menu__items mdc-list" role="menu" aria-hidden="true">
-        </ul>
-    </div>
-    <script type="template" id="userTemplate">
-        <li class="user mdc-list-item">
-            <span class="nick"></span>
-            <span class="trip"></span>
-        </li>
-    </script>
-</div> -->
-<paper-menu-button class="tool" id="userList" horizontal-align="right">
-    <paper-icon-button id="userListOpen" icon="account-circle" class="dropdown-trigger"></paper-icon-button>
-    <paper-menu id="list" class="dropdown-content">
-        <paper-item>
-            <span>No user</span>
-            <span>no trip</span>
-        </paper-item>
-    </paper-menu>
-    <script type="template" id="userTemplate">
-        <paper-item>
-            <span class="nick"></span>
-            <span class="trip"></span>
-        </paper-item>
-    </script>
-</paper-menu-button>
+<link href="../../../../../bower_components/polymer/polymer-element.html" rel="import">
+<link href="../../../../../bower_components/paper-menu-button/paper-menu-button.html" rel="import">
+<link href="../../../../../bower_components/paper-menu/paper-menu.html" rel="import">
+<link href="../../../../../bower_components/paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../../../../../bower_components/paper-item/paper-item.html" rel="import">
+<link href="../../../../../bower_components/polymer/lib/elements/dom-repeat.html" rel="import">
+<dom-module id="tool-userlist">
+    <template>
+        <paper-menu-button class="tool" id="userList" horizontal-align="right">
+            <paper-icon-button on-tap="loadList" id="userListOpen" icon="account-circle"
+                               class="dropdown-trigger"></paper-icon-button>
+            <paper-menu id="list" class="dropdown-content">
+                <template is="dom-repeat" items="users">
+                    <paper-item on-tap="mention">
+                        <span>[[item.nick]]</span>
+                        <span>[[item.trip]]</span>
+                    </paper-item>
+                </template>
+            </paper-menu>
+        </paper-menu-button>
+    </template>
+</dom-module>

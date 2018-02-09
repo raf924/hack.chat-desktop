@@ -1,5 +1,5 @@
 <!doctype html>
-<html class="mdc-typography" lang="">
+<html lang="">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
@@ -9,75 +9,66 @@
 
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <!-- Place favicon.ico in the root directory -->
-    <link rel="stylesheet" href="node_modules/roboto-fontface/css/roboto/roboto-fontface.css">
-    <!-- <link rel="stylesheet" href="node_modules/material-components-web/dist/material-components-web.min.css"> -->
-    <link rel="stylesheet" href="node_modules/material-design-icons/iconfont/material-icons.css">
-    <!-- <link rel="stylesheet" href="static/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="static/css/app.css">
-    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents.js"></script>
-    <script>
-        window.Polymer = {
-            dom: 'shadow',
-            lazyRegister: true
-        };
-    </script>
-    <link href="bower_components/polymer/polymer.html" rel="import">
+    <script type="text/javascript" src="bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="bower_components/app-layout/app-layout.html">
+    <link href="bower_components/paper-spinner/paper-spinner.html" rel="import">
     <link href="bower_components/neon-animation/neon-animations.html" rel="import">
-    <link href="bower_components/iron-elements/iron-elements.html" rel="import">
-    <link href="bower_components/paper-elements/paper-elements.html" rel="import">
-    <link href="bower_components/paper-menu/paper-submenu.html" rel="import">
-
-    <style>
-        paper-submenu paper-menu.menu-content > paper-item.iron-selected {
-            font-weight: normal !important;
-        }
-    </style>
+    <link href="bower_components/neon-animation/web-animations.html" rel="import">
+    <link href="bower_components/neon-animation/animations/scale-up-animation.html" rel="import">
+    <link href="bower_components/neon-animation/animations/fade-out-animation.html" rel="import">
+    <link href="bower_components/iron-icons/iron-icons.html" rel="import">
+    <link rel="import" href="bower_components/paper-icon-button/paper-icon-button.html">
+    <link rel="import" href="bower_components/paper-menu-button/paper-menu-button.html">
+    <link rel="import" href="bower_components/paper-dialog/paper-dialog.html">
+    <link rel="import" href="bower_components/paper-input/paper-input.html">
+    <link rel="import" href="bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+    <link rel="import" href="bower_components/paper-button/paper-button.html">
+    <link rel="import" href="bower_components/paper-toast/paper-toast.html">
+    <link rel="import" href="bower_components/paper-toast/paper-toast.html">
+    <link rel="import" href="bower_components/polymer/lib/mixins/property-effects.html">
+    <script src="vendor/titlebar.js"></script>
+    <link href="static/elements/ui-collapse-item.html" rel="import">
+    <link href="static/elements/ui-channel-tabs.html" rel="import">
+    <link href="static/elements/ui-favourites.html" rel="import">
+    <link href="static/elements/ui-loader.html" rel="import">
+    <link href="static/elements/ui-toolbar.html" rel="import">
 </head>
+
 <body>
 <!--[if lt IE 8]>
 <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade
     your browser</a> to improve your experience.</p>
 <![endif]-->
-<paper-drawer-panel id="sidemenu">
-    <paper-header-panel drawer>
-        <paper-toolbar>
-            <div class="middle title">Chatron</div>
-        </paper-toolbar>
+<app-drawer-layout>
+    <app-drawer id="sidemenu" slot="drawer" swipe-open opened>
         <paper-icon-button icon="add" id="addChannel"></paper-icon-button>
         <!--<select id="serviceChoice" title="Service"></select>-->
-        <paper-menu>
-            <paper-submenu>
-                <paper-item class="menu-trigger">Open channels
-                    <iron-icon icon="expand-more"></iron-icon>
-                </paper-item>
-                <paper-menu class="menu-content" id="menu-channels">
-                </paper-menu>
-            </paper-submenu>
-            <paper-submenu>
-                <paper-item class="menu-trigger">Favourites
-                    <iron-icon icon="expand-more"></iron-icon>
-                </paper-item>
-                <paper-menu class="menu-content" id="menu-favourites">
-                </paper-menu>
-            </paper-submenu>
-        </paper-menu>
-    </paper-header-panel>
-    <paper-header-panel main>
-        <paper-toolbar id="app-bar">
-            <paper-icon-button id="sidemenu-collapse" paper-drawer-toggle icon="menu"></paper-icon-button>
-            <span id="channelTitle" class="title"></span>
-            <div id="toolbar">
-            </div>
-            <paper-menu-button horizontal-align="right">
-                <paper-icon-button id="menu" icon="more-vert" class="right dropdown-trigger"></paper-icon-button>
-                <paper-menu id="menu-items" class="dropdown-content">
-                </paper-menu>
-            </paper-menu-button>
-        </paper-toolbar>
+        <paper-listbox>
+            <ui-collapse-item>
+                <span slot="title">Open Channels</iron-icon></span>
+                <ui-channels slot="collapsible" id="menu-channels"></ui-channels>
+            </ui-collapse-item>
+            <ui-collapse-item>
+                <span slot="title">Favourites</iron-icon></span>
+                <ui-favourites slot="collapsible" id="menu-favourites"></ui-favourites>
+            </ui-collapse-item>
+        </paper-listbox>
+    </app-drawer>
+    <app-header-layout>
+        <app-header slot="header">
+            <app-toolbar id="app-bar">
+                <paper-icon-button id="sidemenu-collapse" icon="menu" drawer-toggle></paper-icon-button>
+                <span id="channelTitle" main-title class="title"></span>
+                <ui-toolbar id="toolbar"></ui-toolbar>
+                <paper-menu-button horizontal-align="right">
+                    <paper-icon-button id="menu" icon="more-vert" class="right dropdown-trigger"></paper-icon-button>
+                    <paper-listbox id="menu-items" slot="dropdown-content">
+                    </paper-listbox>
+                </paper-menu-button>
+            </app-toolbar>
+        </app-header>
         <main>
-            <paper-spinner active id="waitIndicator">
-
-            </paper-spinner>
+            <ui-loader active id="waitIndicator"></ui-loader>
             <div id="channels">
             </div>
             <div id="chatBox-wrapper" hidden>
@@ -87,8 +78,9 @@
                 </form>
             </div>
         </main>
-    </paper-header-panel>
-</paper-drawer-panel>
+    </app-header-layout>
+</app-drawer-layout>
+
 <paper-dialog id="newChannelDialog" with-backdrop>
     <h2>New Channel</h2>
     <form is="iron-form" id="newChannelForm">
@@ -104,11 +96,11 @@
         <paper-button dialog-confirm>Connect</paper-button>
     </div>
 </paper-dialog>
+
 <paper-toast id="alert">
     <paper-button id="alertAction">Cancel</paper-button>
 </paper-toast>
 <script src="bundle.js"></script>
-<script src="client.js"></script>
 <script src="cordova.js"></script>
 </body>
 </html>

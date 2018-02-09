@@ -1,59 +1,74 @@
 {
-  "name": "Chatron",
-  "version": "0.1.0",
-  "main": "main.js",
-  "engines": {
-    "node": ">=6.5.0"
-  },
-  "author": "raf924",
-  "description": "A cross-platform client",
-  "scripts": {
-    "start": "node start.js",
-    "dev": "node_modules\\.bin\\electron.cmd . dev",
-    "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
-    "package": "node build.js && node package.js",
-    "build": "node build.js",
-    "bower": "node_modules\\.bin\\bower install",
-    "install:electron": "npm install electron && npm install electron-builder && npm install electron-packager",
-    "build:cordova": "node build.js && cd cordova && ../node_modules/.bin/cordova prepare && node copyIcon.js && ../node_modules/.bin/cordova build",
-    "run:android": "node build.js && cd cordova && node copyIcon.js && ..\\node_modules\\.bin\\cordova.cmd run android"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/raf924/hack.chat-desktop"
-  },
-  "keywords": [
-    "hack.chat",
-    "client",
-    "desktop",
-    "electron"
-  ],
-  "build": {
-    "appId": "tk.rafaelnaciri.chatron"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "titlebar": "^1.4.0"
-  },
-  "optionalDependencies": {
-    "cordova": "^7.0.1",
-    "extract-text-webpack-plugin": "^2.0.0-rc.3",
-    "file-loader": "^0.11.1",
-    "html-loader": "^0.4.4",
-    "webpack": "^2.2.1",
-    "css-loader": "^0.28.2"
-  },
-  "devDependencies": {
-    "@types/cordova": "0.0.34",
-    "@types/electron": "^1.4.31",
-    "@types/hammerjs": "^2.0.34",
-    "@types/jquery": "^2.0.40",
-    "@types/node": "^6.0.73",
-    "@types/webpack": "^2.2.4",
-    "bower": "^1.8.0",
-    "copy-webpack-plugin": "^4.0.1",
-    "less": "^2.7.2",
-    "typescript": "^2.2.1",
-    "xml2js": "^0.4.17"
-  }
+    "name": "Chatron",
+    "version": "0.1.0",
+    "main": "main.js",
+    "engines": {
+        "node": ">=6.5.0"
+    },
+    "author": "raf924",
+    "description": "A cross-platform client",
+    "scripts": {
+        "postinstall": "node_modules\\.bin\\bower.cmd install",
+        "start": "node start.js",
+        "dev": "node_modules\\.bin\\electron.cmd ./electron/main.js dev",
+        "debug": "node_modules\\.bin\\electron.cmd %NODE_DEBUG_OPTION% . dev",
+        "package": "node build.js && node package.js",
+        "build": "node build.js",
+        "bower": "node_modules\\.bin\\bower.cmd install",
+        "install:electron": "npm install electron && npm install electron-builder && npm install electron-packager",
+        "run:android": ".\\node_modules\\.bin\\cordova.cmd run android"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/raf924/hack.chat-desktop"
+    },
+    "keywords": [
+        "hack.chat",
+        "client",
+        "desktop",
+        "electron"
+    ],
+    "build": {
+        "appId": "tk.rafaelnaciri.chatron"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "cordova-android": "^6.2.3",
+        "cordova-browser": "^4.1.0",
+        "cordova-plugin-background-mode": "0.7.2",
+        "cordova-plugin-nativestorage": "2.2.2",
+        "cordova-plugin-whitelist": "1",
+        "de.appplant.cordova.plugin.local-notification": "0.8.5",
+        "titlebar": "^1.4.0"
+    },
+    "devDependencies": {
+        "@types/cordova": "*",
+        "@types/node": "^6.0.87",
+        "@types/webcomponents.js": "*",
+        "@types/webpack": "^3.0.9",
+        "bower": "*",
+        "copy-webpack-plugin": "*",
+        "cordova": "*",
+        "extract-text-webpack-plugin": "*",
+        "file-loader": "^0.11.2",
+        "html-loader": "*",
+        "less": "*",
+        "loader-utils": "^1.1.0",
+        "ts-loader": "^2.3.3",
+        "typescript": "^2.4.2",
+        "webpack": "^3.5.5",
+        "xml2js": "^0.4.17"
+    },
+    "cordova": {
+        "platforms": [
+            "android",
+            "browser"
+        ],
+        "plugins": {
+            "cordova-plugin-background-mode": {},
+            "cordova-plugin-nativestorage": {},
+            "cordova-plugin-whitelist": {},
+            "de.appplant.cordova.plugin.local-notification": {}
+        }
+    }
 }

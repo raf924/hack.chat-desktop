@@ -1,14 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="tk.rafaelnaciri.chatron" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="tech.raf924.chatron" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Chatron</name>
     <description>
         A cross platform client for communication services
     </description>
-    <author email="rafael@rafaelnaciri.tk" href="http://cordova.io">
+    <author email="rafael@raf924.tech" href="https://github.com/raf924/">
         Rafael Naciri
     </author>
     <content src="index.html" />
-    <plugin name="cordova-plugin-whitelist" spec="1" />
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
@@ -23,11 +22,13 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
-    <engine name="android" spec="~5.1.1" />
     <preference name="android-minSdkVersion" value="22" />
     <preference name="android-targetSdkVersion" value="22" />
-    <plugin name="cordova-plugin-nativestorage" spec="~2.0.2" />
-    <plugin name="cordova-plugin-background-mode" spec="~0.6.5" />
-    <plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.4" />
-    <app-icon src="../icon128.png" width="128" height="128"/>
+    <app-icon height="128" src="icon128.png" width="128" />
+    <engine name="android" spec="^6.2.3" />
+    <engine name="browser" spec="^4.1.0" />
+    <plugin name="cordova-plugin-background-mode" spec="0.7.2" />
+    <plugin name="cordova-plugin-nativestorage" spec="2.2.2" />
+    <plugin name="cordova-plugin-whitelist" spec="1" />
+    <plugin name="de.appplant.cordova.plugin.local-notification" spec="0.8.5" />
 </widget>
